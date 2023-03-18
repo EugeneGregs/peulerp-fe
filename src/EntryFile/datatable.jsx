@@ -20,7 +20,7 @@ const Datatable = ({ props, columns, dataSource }) => {
       className="table datanew dataTable no-footer"
       rowSelection={rowSelection}
       columns={columns}
-      dataSource={dataSource}
+      dataSource= {dataSource}
       pagination={{
         total: dataSource.length,
         showTotal: (total, range) =>

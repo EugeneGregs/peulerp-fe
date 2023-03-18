@@ -21,9 +21,11 @@ import {
 } from "../../EntryFile/imagePath";
 import Select2 from "react-select2-wrapper";
 import "react-select2-wrapper/css/select2.css";
+import Loader from "react-js-loader";
+import axios from "axios";
 
 const ProductList = () => {
-  const [inputfilter, setInputfilter] = useState(false);  
+  const [inputfilter, setInputfilter] = useState(false);
 
   //select2
   const options = [
@@ -49,178 +51,49 @@ const ProductList = () => {
     { id: 2, text: "150.00", text: "150.00" },
   ];
 
-  const products = [
-    {
-      id: 1,
-      image: MacbookIcon,
-      productName: "Macbook pro",
-      sku: "PT001",
-      category: "Computer",
-      brand: "N/D",
-      price: "1500.00",
-      unit: "pc",
-      qty: "100.00",
-      createdBy: "Admin",
-    },
-    {
-      id: 2,
-      image: OrangeImage,
-      productName: "Orange",
-      sku: "PT002",
-      category: "Fruits",
-      brand: "N/D",
-      price: "20.00",
-      unit: "pc",
-      qty: "100.00",
-      createdBy: "Admin",
-    },
-    {
-      id: 3,
-      image: PineappleImage,
-      productName: "Pinapple",
-      sku: "PT003",
-      category: "Fruits",
-      brand: "N/D",
-      price: "10.00",
-      unit: "pc",
-      qty: "100.00",
-      createdBy: "Admin",
-    },
-    {
-      id: 4,
-      image: StawberryImage,
-      productName: "Strawberry",
-      sku: "PT004",
-      category: "Fruits",
-      brand: "N/D",
-      price: "150.00",
-      unit: "pc",
-      qty: "100.00",
-      createdBy: "Admin",
-    },
-    {
-      id: 5,
-      image: AvocatImage,
-      productName: "Avocat",
-      sku: "PT005",
-      category: "Fruits",
-      brand: "N/D",
-      price: "1 500.00",
-      unit: "pc",
-      qty: "100.00",
-      createdBy: "Admin",
-    },
-    {
-      id: 6,
-      image: MacbookIcon,
-      productName: "Macbook pro",
-      sku: "PT006",
-      category: "Computer",
-      brand: "N/D",
-      price: "1500.00",
-      unit: "pc",
-      qty: "100.00",
-      createdBy: "Admin",
-    },
-    {
-      id: 7,
-      image: EarpodIcon,
-      productName: "Apple Earpods",
-      sku: "PT007",
-      category: "Computer",
-      brand: "N/D",
-      price: "1500.00",
-      unit: "pc",
-      qty: "100.00",
-      createdBy: "Admin",
-    },
-    {
-      id: 8,
-      image: IphoneIcon,
-      productName: "iPhone 11",
-      sku: "PT008",
-      category: "Computer",
-      brand: "N/D",
-      price: "1500.00",
-      unit: "pc",
-      qty: "100.00",
-      createdBy: "Admin",
-    },
-    {
-      id: 9,
-      image: SamsungIcon,
-      productName: "Samsung",
-      sku: "PT009",
-      category: "Computer",
-      brand: "N/D",
-      price: "120.00",
-      unit: "pc",
-      qty: "100.00",
-      createdBy: "Admin",
-    },
-    {
-      id: 10,
-      image: EarpodIcon,
-      productName: "Banana",
-      sku: "PT0010",
-      category: "Computer",
-      brand: "N/D",
-      price: "4500.00",
-      unit: "pc",
-      qty: "100.00",
-      createdBy: "Admin",
-    },
-    {
-      id: 11,
-      image: MacbookIcon,
-      productName: "Macbook pro",
-      sku: "PT0011",
-      category: "Computer",
-      brand: "N/D",
-      price: "1550.00",
-      unit: "pc",
-      qty: "100.00",
-      createdBy: "Admin",
-    },
-    {
-      id: 12,
-      image: AvocatImage,
-      productName: "Avocat",
-      sku: "PT0012",
-      category: "Computer",
-      brand: "N/D",
-      price: "1505.00",
-      unit: "pc",
-      qty: "100.00",
-      createdBy: "Admin",
-    },
-    {
-      id: 13,
-      image: AvocatImage,
-      productName: "Sabuni",
-      sku: "PT00123",
-      category: "Soaps",
-      brand: "N/D",
-      price: "200.00",
-      unit: "pc",
-      qty: "100.00",
-      createdBy: "Greg",
-    }
-  ];
-
-  const [data, updateData] = useState([]);
-  let people = [];
+  let products = []
+  const [data, updateData] = useState({ products: [], filtered: [] });
+  const [isBusy, setBusy] = useState(true);
+  const [filterValue, setFilterValue] = useState('');
+  const baseUrl = "http://localhost:5071";
 
   useEffect(() => {
-    console.log(products);
-    updateData(products);
-    getUsers();
-    getProducts();
+    setBusy(true);
+    const fetchData = async () => {
+      axios.get(`${baseUrl}/products`)
+        .then(res => {
+          const resData = res.data;
+          let products = resData ? [...resData.map(p => { return {name: p.name, sellingPrice: p.sellingPrice, barCode: p.barCode, productCategory: p.productCategory.name} })] : [];
+          updateData({products : [...products], filtered: [...products]});
+          setBusy(false);
+        })
+    }
+
+    fetchData().catch(console.log(console.error));
   }, []);
-  
-  const togglefilter = (value) => {    
-    setInputfilter(value);  
+
+  const togglefilter = (value) => {
+    setInputfilter(value);
+    // updateData(data.splice(0,10));
   };
+
+  useEffect(() => {
+    console.log("SearchKey::" + filterValue);
+    if(!filterValue){
+      console.log(data.products);
+      updateData({products: [...data.products], filtered: [...data.products]});
+    } else {
+      const filteredData = data.products.filter( p => p.name.replaceAll(' ','').toLowerCase().includes(filterValue) || p.productCategory.replaceAll(' ','').toLowerCase().includes(filterValue));
+      (filteredData && filteredData.length) ? updateData({products: [...data.products], filtered: [...filteredData]}) : updateData({products: [...data.products], filtered: [...data.filtered]});
+    }
+  }, [filterValue])
+
+  const filterData = (e) => {
+    console.log(data);
+    let inputValue = e.target.value.trim().toLowerCase();
+    setFilterValue(inputValue);
+  };
+
   const confirmText = () => {
     Swal.fire({
       title: "Are you sure?",
@@ -244,56 +117,38 @@ const ProductList = () => {
     });
   };
 
+  const imageAddress = "https://cdn-icons-png.flaticon.com/512/3703/3703259.png";
+
   const columns = [
     {
       title: "Product Name",
-      dataIndex: "productName",
+      dataIndex: "name",
       render: (text, record) => (
         <div className="productimgname">
           <Link className="product-img">
-            <img alt="" src={record.image} />
+            <img alt="" src={imageAddress} />
           </Link>
           <Link style={{ fontSize: "15px", marginLeft: "10px" }}>
-            {record.productName}
+            {record.name}
           </Link>
         </div>
       ),
-      sorter: (a, b) => a.productName.length - b.productName.length,
+      sorter: (a, b) => a.name.length - b.name.length,
     },
     {
-      title: "SKU",
-      dataIndex: "sku",
-      sorter: (a, b) => a.sku.length - b.sku.length,
+      title: "Code",
+      dataIndex: "barCode",
+      sorter: (a, b) => a.barCode.length - b.barCode.length,
     },
     {
       title: "Category",
-      dataIndex: "category",
-      sorter: (a, b) => a.category.length - b.category.length,
-    },
-    {
-      title: "Brand",
-      dataIndex: "brand",
-      sorter: (a, b) => a.brand.length - b.brand.length,
+      dataIndex: "productCategory",
+      sorter: (a, b) => a.productCategory.length - b.productCategory.length,
     },
     {
       title: "Price",
-      dataIndex: "price",
-      sorter: (a, b) => a.price.length - b.price.length,
-    },
-    {
-      title: "Unit",
-      dataIndex: "unit",
-      sorter: (a, b) => a.unit.length - b.unit.length,
-    },
-    {
-      title: "Qty",
-      dataIndex: "qty",
-      sorter: (a, b) => a.qty.length - b.qty.length,
-    },
-    {
-      title: "Created By",
-      dataIndex: "createdBy",
-      sorter: (a, b) => a.createdBy.length - b.createdBy.length,
+      dataIndex: "sellingPrice",
+      sorter: (a, b) => a.sellingPrice.length - b.sellingPrice.length,
     },
     {
       title: "Action",
@@ -337,15 +192,17 @@ const ProductList = () => {
           {/* /product list */}
           <div className="card">
             <div className="card-body">
-            <Tabletop 
-              inputfilter={inputfilter}
-              togglefilter={togglefilter}
-            />
+              <Tabletop
+                inputfilter={inputfilter}
+                togglefilter={togglefilter}
+                filterFunction={filterData}
+                filterValue = {filterValue}
+              />
               {/* /Filter */}
               <div
-                className={`card mb-0 ${ inputfilter ? "toggleCls" : ""}`}
+                className={`card mb-0 ${inputfilter ? "toggleCls" : ""}`}
                 id="filter_inputs"
-                style={{ display: inputfilter ? "block" :"none"}}
+                style={{ display: inputfilter ? "block" : "none" }}
               >
                 <div className="card-body pb-0">
                   <div className="row">
@@ -420,10 +277,9 @@ const ProductList = () => {
               </div>
               {/* /Filter */}
               <div className="table-responsive">
-                <Table                                    
-                  columns={columns}
-                  dataSource={data}                 
-                />
+                {
+                  isBusy ? (<div className={"item"}> <Loader type="spinner-default" bgColor={"#FFFFFF"} title={"spinner-default"} color={'#FFFFFF'} size={100} /> </div>)
+                    : <Table columns={columns} dataSource={data.filtered} /> }
               </div>
             </div>
           </div>
