@@ -1,40 +1,107 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Upload } from '../../EntryFile/imagePath';
 import Select2 from 'react-select2-wrapper';
 import 'react-select2-wrapper/css/select2.css';
-
+import axios from "axios";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const options = [
-    {id: 1, text: 'Choose Category', text: 'Choose Category' },
-    {id: 2, text: 'Computers', text: 'Computers' },
+    { id: "", text: 'Choose Category', text: 'Choose Category' },
+    { id: '9e4828e9-e070-4a55-b824-0b6b397f37ad1', text: 'Beverages' },
+    { id: '9e4828e9-e070-4a55-b824-0b6b397f37ad2', text: 'Water' },
+    { id: '9e4828e9-e070-4a55-b824-0b6b397f37ad3', text: 'Spices' }
 ]
-const options1 = [
-    {id: 1, text: 'Choose Sub Category', text: 'Choose Sub Category' },
-    {id: 2, text: 'Fruits', text: 'Fruits' },
-]
-const options2 = [
-    {id: 1, text: 'Choose Brand', text: 'Choose Brand' },
-    {id: 2, text: 'Brand', text: 'Brand' },
-]
-const options3 = [
-    {id: 1, text: 'Choose Unit', text: 'Choose Unit' },
-    {id: 2, text: 'Unit', text: 'Unit' },
-]
-const options4 = [
-    {id: 1, text: 'Choose Tax', text: 'Choose Tax' },
-    {id: 2, text: '2%', text: '2%' },
-]
-const options5 = [
-    {id: 1, text: 'Percentage', text: 'Percentage' },
-    {id: 2, text: '10%', text: '10%' },
-    {id: 3, text: '20%', text: '20%' },
-]
-const options6 = [
-    {id: 1, text: 'Closed', text: 'Closed' },
-    {id: 2, text: 'Open', text: 'Open' },
-]
+const baseUrl = "http://localhost:5071";
 
 const AddProduct = () => {
+    const [productName, setProductName] = useState('');
+    const [productCategory, setProductCategory] = useState('');
+    const [productCode, setProductCode] = useState('');
+    const [sellingPrice, setSellingPrice] = useState('');
+    const [buyingPrice, setBuyingPrice] = useState('');
+    const [categories, setCategories] = useState([{ id: '9e4828e9-e070-4a55-b824-0b6b397f37ad1', text: 'Beverages' }]);
+
+    const toastProps = {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+    }
+
+    //Load product categories
+    useEffect(() => {
+        const fetchData = async () => {
+            axios.get(`${baseUrl}/productcategory`)
+                .then(res => {
+                    const resData = res.data.map(
+                        category => {
+                            return { id: category.id, text: category.name }
+                        }
+                    );
+                    setCategories([...resData]);
+                })
+        }
+
+        fetchData().catch(console.log(console.error));
+    }, []);
+
+    const notify = (message, type) => { 
+        if(type == "success"){
+            toast.success(message, toastProps);
+        } else if(type == "info"){
+            toast.info(message, toastProps);
+        } else if(type == "warning"){
+            toast.warning(message, toastProps);
+        } else if(type == "error"){
+            toast.success(message, toastProps);
+        } else{
+            toast(message, toastProps);
+        }
+    }
+
+    const PostProduct = (product) => {
+        axios.post(`${baseUrl}/products`, product)
+            .then(res => {
+                console.log("POST RES::")
+                console.log(res.data);
+                notify(`${productName} Added Successfully!`, "success")
+                clearInputs();
+            })
+            .catch(error => {
+                console.log(error)
+                notify("Error Creating new Product", "error")
+            })
+    }
+
+    const handlePost = () => {
+        //TODO: validate fields
+
+        //Create Product
+        let product = {
+            Name: productName,
+            BarCode: productCode,
+            SellingPrice: sellingPrice,
+            CategoryId: productCategory,
+            BuyingPrice: buyingPrice
+        }
+
+        //Post Products
+        console.log(product);
+        PostProduct(product);
+    }
+
+    const clearInputs = () => {
+        setProductCategory('');
+        setProductCode('');
+        setProductName('');
+        setSellingPrice('');
+        setBuyingPrice('');
+    }
 
     return (
         <>
@@ -53,116 +120,64 @@ const AddProduct = () => {
                                 <div className="col-lg-3 col-sm-6 col-12">
                                     <div className="form-group">
                                         <label>Product Name</label>
-                                        <input type="text" />
+                                        <input
+                                            type="text"
+                                            value={productName}
+                                            onChange={(e) => setProductName(e.target.value)}
+                                            required />
                                     </div>
                                 </div>
                                 <div className="col-lg-3 col-sm-6 col-12">
                                     <div className="form-group">
                                         <label>Category</label>
                                         <Select2
-                              className="select"
-                              data={options}
-                              options={{
-                                placeholder: 'Choose Category',
-                              }} />
+                                            className="select"
+                                            value={productCategory}
+                                            onChange={(e) => setProductCategory(e.target.value)}
+                                            data={categories}
+                                            options={{
+                                                placeholder: 'Choose Category',
+                                            }}
+                                        />
 
                                     </div>
                                 </div>
-                                <div className="col-lg-3 col-sm-6 col-12">
+                                <div className="col-lg-2 col-sm-6 col-12">
                                     <div className="form-group">
-                                        <label>Sub Category</label>
-                                        <Select2
-                              className="select"
-                              data={options1}
-                              options={{
-                                placeholder: 'Choose Sub Category',
-                              }} />
+                                        <label>Product Code</label>
+                                        <input
+                                            type="text"
+                                            value={productCode}
+                                            onChange={(e) => setProductCode(e.target.value)}
+                                            required />
                                     </div>
                                 </div>
-                                <div className="col-lg-3 col-sm-6 col-12">
+                                <div className="col-lg-2 col-sm-6 col-12">
                                     <div className="form-group">
-                                        <label>Brand</label>
-                                        <Select2
-                              className="select"
-                              data={options2}
-                              options={{
-                                placeholder: 'Choose Brand',
-                              }} />
+                                        <label>Selling Price</label>
+                                        <input
+                                            type="text"
+                                            pattern="[0-9]*"
+                                            value={sellingPrice}
+                                            onChange={(e) => setSellingPrice(e.target.value)}
+                                            required />
                                     </div>
                                 </div>
-                                <div className="col-lg-3 col-sm-6 col-12">
+                                <div className="col-lg-2 col-sm-6 col-12">
                                     <div className="form-group">
-                                        <label>Unit</label>
-                                        <Select2
-                              className="select"
-                              data={options3}
-                              options={{
-                                placeholder: 'Choose Unit',
-                              }} />
-                                    </div>
-                                </div>
-                                <div className="col-lg-3 col-sm-6 col-12">
-                                    <div className="form-group">
-                                        <label>SKU</label>
-                                        <input type="text" />
-                                    </div>
-                                </div>
-                                <div className="col-lg-3 col-sm-6 col-12">
-                                    <div className="form-group">
-                                        <label>Minimum Qty</label>
-                                        <input type="text" />
-                                    </div>
-                                </div>
-                                <div className="col-lg-3 col-sm-6 col-12">
-                                    <div className="form-group">
-                                        <label>Quantity</label>
-                                        <input type="text" />
+                                        <label>Buying Price</label>
+                                        <input
+                                            type="text"
+                                            pattern="[0-9]*"
+                                            value={buyingPrice}
+                                            onChange={(e) => setBuyingPrice(e.target.value)}
+                                            required />
                                     </div>
                                 </div>
                                 <div className="col-lg-12">
                                     <div className="form-group">
                                         <label>Description</label>
                                         <textarea className="form-control" defaultValue={""} />
-                                    </div>
-                                </div>
-                                <div className="col-lg-3 col-sm-6 col-12">
-                                    <div className="form-group">
-                                        <label>Tax</label>
-                                        <Select2
-                              className="select"
-                              data={options4}
-                              options={{
-                                placeholder: 'Choose Tax',
-                              }} />
-
-                                    </div>
-                                </div>
-                                <div className="col-lg-3 col-sm-6 col-12">
-                                    <div className="form-group">
-                                        <label>Discount Type</label>
-                                        <Select2
-                              className="select"
-                              data={options5}
-                              options={{
-                                placeholder: 'Percentage',
-                              }} />
-                                    </div>
-                                </div>
-                                <div className="col-lg-3 col-sm-6 col-12">
-                                    <div className="form-group">
-                                        <label>Price</label>
-                                        <input type="text" />
-                                    </div>
-                                </div>
-                                <div className="col-lg-3 col-sm-6 col-12">
-                                    <div className="form-group">
-                                        <label> Status</label>
-                                        <Select2
-                              className="select"
-                              data={options6}
-                              options={{
-                                placeholder: 'Choose Product',
-                              }} />
                                     </div>
                                 </div>
                                 <div className="col-lg-12">
@@ -178,7 +193,7 @@ const AddProduct = () => {
                                     </div>
                                 </div>
                                 <div className="col-lg-12">
-                                    <button className="btn btn-submit me-2">
+                                    <button className="btn btn-submit me-2" onClick={handlePost}>
                                         Submit
                                     </button>
                                     <button className="btn btn-cancel">
@@ -190,6 +205,7 @@ const AddProduct = () => {
                     </div>
                     {/* /add */}
                 </div>
+                <ToastContainer />
             </div>
         </>
     )

@@ -88,6 +88,7 @@
     "react-sticky-box": "^0.9.3",
     "react-stickynode": "^4.1.0",
     "react-summernote": "^2.0.2",
+    "react-toastify": "^8.1.0",
     "react-tooltip": "^4.4.3",
     "reactstrap": "^8.5.1",
     "recharts": "^1.8.5",
