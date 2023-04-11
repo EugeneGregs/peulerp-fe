@@ -63,7 +63,7 @@ const ProductList = () => {
       axios.get(`${baseUrl}/products`)
         .then(res => {
           const resData = res.data;
-          let products = resData ? [...resData.map(p => { return {name: p.name, sellingPrice: p.sellingPrice, barCode: p.barCode, productCategory: p.productCategory.name} })] : [];
+          let products = resData ? [...resData.map(p => { return {name: p.name, sellingPrice: p.sellingPrice, buyingPrice: p.buyingPrice, barCode: p.barCode, productCategory: p.productCategory.name, id: p.id} })] : [];
           updateData({products : [...products], filtered: [...products]});
           setBusy(false);
         })
@@ -94,26 +94,44 @@ const ProductList = () => {
     setFilterValue(inputValue);
   };
 
-  const confirmText = () => {
+  const deleteProduct = (product) => {
+    console.log(product);
+
+    axios.delete(`${baseUrl}/products/${product.id}`)
+      .then(res => {
+        const products = data.products;
+        const filtered = data.filtered;
+        const filteredIndex = filtered.indexOf(filtered.find(f => f.id == product.id));
+        const productIndex = products.indexOf(products.find(f => f.id == product.id));
+
+        productIndex >= 0 && products.splice(productIndex, 1);
+        filteredIndex >= 0 && filtered.splice(filteredIndex, 1);
+
+        updateData({ products: [...data.products], filtered: [...data.filtered] } );
+
+        Swal.fire({
+          type: "success",
+          title: "Deleted!",
+          text: `${product.name} Deleted Successfully`,
+          confirmButtonClass: "btn btn-success",
+        });
+    })
+  }
+
+  const confirmText = (product) => {
     Swal.fire({
-      title: "Are you sure?",
+      title: `Delete ${product.name}?`,
       text: "You won't be able to revert this!",
       type: "warning",
       showCancelButton: !0,
       confirmButtonColor: "#3085d6",
       cancelButtonColor: "#d33",
-      confirmButtonText: "Yes, delete it!",
+      confirmButtonText: "Confirm",
       confirmButtonClass: "btn btn-primary",
       cancelButtonClass: "btn btn-danger ml-1",
       buttonsStyling: !1,
     }).then(function (t) {
-      t.value &&
-        Swal.fire({
-          type: "success",
-          title: "Deleted!",
-          text: "Your file has been deleted.",
-          confirmButtonClass: "btn btn-success",
-        });
+      t.value && deleteProduct(product);
     });
   };
 
@@ -152,16 +170,16 @@ const ProductList = () => {
     },
     {
       title: "Action",
-      render: () => (
+      render: (text, record) => (
         <>
           <>
             <Link className="me-3" to="/dream-pos/product/product-details">
               <img src={EyeIcon} alt="img" />
             </Link>
-            <Link className="me-3" to="/dream-pos/product/editproduct-product">
+            <Link className="me-3" to={{ pathname: "/dream-pos/product/addproduct-product", state: { product: record } }}>
               <img src={EditIcon} alt="img" />
             </Link>
-            <Link className="confirm-text" to="#" onClick={confirmText}>
+            <Link className="confirm-text" to="#" onClick={() => confirmText(record)}>
               <img src={DeleteIcon} alt="img" />
             </Link>
           </>

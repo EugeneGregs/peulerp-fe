@@ -1,37 +1,26 @@
 import React, { useState, useEffect } from 'react'
+import { useLocation } from 'react-router-dom'
 import { Upload } from '../../EntryFile/imagePath';
 import Select2 from 'react-select2-wrapper';
 import 'react-select2-wrapper/css/select2.css';
 import axios from "axios";
+import { notify } from '../../common/ToastComponent';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-const options = [
-    { id: "", text: 'Choose Category', text: 'Choose Category' },
-    { id: '9e4828e9-e070-4a55-b824-0b6b397f37ad1', text: 'Beverages' },
-    { id: '9e4828e9-e070-4a55-b824-0b6b397f37ad2', text: 'Water' },
-    { id: '9e4828e9-e070-4a55-b824-0b6b397f37ad3', text: 'Spices' }
-]
 const baseUrl = "http://localhost:5071";
 
 const AddProduct = () => {
+    let product = {};
+    const location = useLocation();
+    const state = location.state;
+    const [saveType, setSaveType] = useState('post'); 
     const [productName, setProductName] = useState('');
     const [productCategory, setProductCategory] = useState('');
     const [productCode, setProductCode] = useState('');
     const [sellingPrice, setSellingPrice] = useState('');
     const [buyingPrice, setBuyingPrice] = useState('');
-    const [categories, setCategories] = useState([{ id: '9e4828e9-e070-4a55-b824-0b6b397f37ad1', text: 'Beverages' }]);
-
-    const toastProps = {
-        position: "top-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "colored",
-    }
+    const [categories, setCategories] = useState([]);
 
     //Load product categories
     useEffect(() => {
@@ -50,39 +39,53 @@ const AddProduct = () => {
         fetchData().catch(console.log(console.error));
     }, []);
 
-    const notify = (message, type) => { 
-        if(type == "success"){
-            toast.success(message, toastProps);
-        } else if(type == "info"){
-            toast.info(message, toastProps);
-        } else if(type == "warning"){
-            toast.warning(message, toastProps);
-        } else if(type == "error"){
-            toast.success(message, toastProps);
-        } else{
-            toast(message, toastProps);
+    useEffect(() => {
+        console.log("Here")
+        categories.length && initializeForm();
+    }, [categories])
+
+    const initializeForm = () => {
+        if(state){
+            const { product } = state;
+            console.log(categories);
+            const categoryId = categories.find( (c) => c.text == product.productCategory).id;
+            setProductName(product.name);
+            setProductCategory(categoryId);
+            setProductCode(product.barCode);
+            setSellingPrice(product.sellingPrice);
+            setBuyingPrice(product.buyingPrice);
+            setSaveType('update');
         }
     }
 
-    const PostProduct = (product) => {
-        axios.post(`${baseUrl}/products`, product)
-            .then(res => {
-                console.log("POST RES::")
-                console.log(res.data);
-                notify(`${productName} Added Successfully!`, "success")
-                clearInputs();
-            })
-            .catch(error => {
-                console.log(error)
-                notify("Error Creating new Product", "error")
-            })
+    const SaveProduct = (product) => {
+        if(saveType == 'post'){
+            axios.post(`${baseUrl}/products`, product).then(handleResponse).catch(handleError);
+        } else {
+            console.log(product.id);
+            axios.put(`${baseUrl}/products/${product.id}`, product).then(handleResponse).catch(handleError);
+        }
     }
 
-    const handlePost = () => {
+    const handleResponse = res => {
+        console.log("POST RES::")
+        console.log(res.data);
+        notify(`${productName} ${saveType == 'post' ? "Added" : "Updated"} Successfully!`, "success", toast);
+        clearInputs();
+    }
+
+    const handleError = res => {
+        console.log("POST RES::")
+        console.log(res.data);
+        notify(`Error ${saveType == 'post' ? "Adding" : "Updating"} ${productName}`, "error", toast);
+        clearInputs();
+    }
+
+    const handleSave = () => {
         //TODO: validate fields
 
         //Create Product
-        let product = {
+        product = {
             Name: productName,
             BarCode: productCode,
             SellingPrice: sellingPrice,
@@ -90,9 +93,13 @@ const AddProduct = () => {
             BuyingPrice: buyingPrice
         }
 
+        if(saveType == 'update'){
+            product.id = state.product.id;
+        }
+
         //Post Products
         console.log(product);
-        PostProduct(product);
+        SaveProduct(product);
     }
 
     const clearInputs = () => {
@@ -193,7 +200,7 @@ const AddProduct = () => {
                                     </div>
                                 </div>
                                 <div className="col-lg-12">
-                                    <button className="btn btn-submit me-2" onClick={handlePost}>
+                                    <button className="btn btn-submit me-2" onClick={handleSave}>
                                         Submit
                                     </button>
                                     <button className="btn btn-cancel">
