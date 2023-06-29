@@ -47,10 +47,8 @@ const AddProduct = () => {
     const initializeForm = () => {
         if(state){
             const { product } = state;
-            console.log(categories);
-            const categoryId = categories.find( (c) => c.text == product.productCategory).id;
             setProductName(product.name);
-            setProductCategory(categoryId);
+            setProductCategory(product.productCategory.id);
             setProductCode(product.barCode);
             setSellingPrice(product.sellingPrice);
             setBuyingPrice(product.buyingPrice);

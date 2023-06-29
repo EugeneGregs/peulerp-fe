@@ -1,8 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Table from "../../EntryFile/datatable";
 import Tabletop from "../../EntryFile/tabletop"
 import { Link } from "react-router-dom";
 import Swal from "sweetalert2";
+import axios from "axios";
+import { notify } from "../../common/ToastComponent";
+import { ToastContainer, toast } from "react-toastify";
 import {
   ClosesIcon,
   Noimage,
@@ -17,12 +20,30 @@ import {
   DeleteIcon,
 } from "../../EntryFile/imagePath";
 
+const baseUrl = "http://localhost:5071/suppliers";
+
 const SupplierList = () => {
   const [inputfilter, setInputfilter] = useState(false);
+  const [supplierList, setSupplierList] = useState([]);
+  const [isBusy, setBusy] = useState(false);
 
-  const confirmText = () => {
+  useEffect(() => {
+    setBusy(true);
+    const fetchData = async () => {
+      axios.get(`${baseUrl}`).then((res) => {
+        const resData = res.data;
+        console.log(resData);
+        setSupplierList([...resData]);
+        setBusy(false);
+      });
+    };
+
+    fetchData().catch((reason) => console.log(reason));
+  }, []);
+
+  const confirmText = (supplier) => {
     Swal.fire({
-      title: "Are you sure?",
+      title: `Delete ${supplier.name}?`,
       text: "You won't be able to revert this!",
       type: "warning",
       showCancelButton: !0,
@@ -33,66 +54,30 @@ const SupplierList = () => {
       cancelButtonClass: "btn btn-danger ml-1",
       buttonsStyling: !1,
     }).then(function (t) {
-      t.value &&
-        Swal.fire({
-          type: "success",
-          title: "Deleted!",
-          text: "Your file has been deleted.",
-          confirmButtonClass: "btn btn-success",
-        });
+      t.value && deleteSupplier(supplier.id)
     });
   };
   const togglefilter = (value) => {
     setInputfilter(value);
   };
 
-  const [data] = useState([
-    {
-      id: 1,
-      supplierName: "Apex Computers",
-      code: "201",
-      phone: "+12163547758",
-      email: "thomas@example.com",
-      country: "USA",
-    },
-    {
-      id: 2,
-      supplierName: "AIM Infotech",
-      code: "202",
-      phone: "123-456-776",
-      email: "benjamin@example.com",
-      country: "Germany",
-    },
-    {
-      id: 3,
-      supplierName: "Best Power Tools",
-      code: "203",
-      phone: "+123-890-876",
-      email: "james@example.com",
-      country: "Tailand",
-    },
-    {
-      id: 4,
-      supplierName: "Modern Automobile",
-      code: "204",
-      phone: "+123-876-876",
-      email: "bruklin@example.com",
-      country: "Angola",
-    },
-    {
-      id: 5,
-      supplierName: "Vinayak Tools",
-      code: "205",
-      phone: "+0987652112",
-      email: "beverly@example.com",
-      country: "Albania",
-    },
-  ]);
+  const deleteSupplier = (id) => {
+    axios.delete(`${baseUrl}/${id}`)
+    .then((res) => {
+      console.log(res.status);
+      setSupplierList([...supplierList.filter((supplier) => supplier.id !== id)]);
+      notify("Deleted Successfully", "success", toast);
+    })
+    .catch((err) => {
+      console.log(err);
+      notify("Delete Operation Failed", "error", toast);
+    });
+  }
 
   const columns = [
     {
       title: "Supplier Name",
-      dataIndex: "supplierName",
+      dataIndex: "name",
       render: (text, record) => (
         <div className="productimgname">
           <Link to="#" className="product-img">
@@ -101,13 +86,13 @@ const SupplierList = () => {
           <Link to="#">{text}</Link>
         </div>
       ),
-      sorter: (a, b) => a.supplierName.length - b.supplierName.length,
+      sorter: (a, b) => a.name.length - b.name.length,
       width: "250px",
     },
     {
-      title: "Code",
-      dataIndex: "code",
-      sorter: (a, b) => a.code.length - b.code.length,
+      title: "Address",
+      dataIndex: "address",
+      sorter: (a, b) => a.address.length - b.address.length,
     },
     {
       title: "Phone",
@@ -120,18 +105,18 @@ const SupplierList = () => {
       sorter: (a, b) => a.email.length - b.email.length,
     },
     {
-      title: "Country",
-      dataIndex: "country",
-      sorter: (a, b) => a.country.length - b.country.length,
+      title: "Description",
+      dataIndex: "description",
+      sorter: (a, b) => a.description.length - b.description.length,
     },
     {
       title: "Action",
-      render: () => (
+      render: (text, record) => (
         <>
-          <Link className="me-3" to="/dream-pos/people/editsupplier-people">
+          <Link className="me-3" to={ { pathname: "/dream-pos/people/addsupplier-people", state: { supplier: record } } }>
             <img src={EditIcon} alt="img" />
           </Link>
-          <Link className="confirm-text" to="#" onClick={confirmText}>
+          <Link className="confirm-text" to="#" onClick={() => confirmText(record)}>
             <img src={DeleteIcon} alt="img" />
           </Link>
         </>
@@ -201,12 +186,13 @@ const SupplierList = () => {
               </div>
               {/* /Filter */}
               <div className="table-responsive">
-                <Table columns={columns} dataSource={data} />
+               { !isBusy && <Table columns={columns} dataSource={supplierList} />}
               </div>
             </div>
           </div>
           {/* /product list */}
         </div>
+        <ToastContainer />
       </div>
     </>
   );

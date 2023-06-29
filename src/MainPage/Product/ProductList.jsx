@@ -63,7 +63,7 @@ const ProductList = () => {
       axios.get(`${baseUrl}/products`)
         .then(res => {
           const resData = res.data;
-          let products = resData ? [...resData.map(p => { return {name: p.name, sellingPrice: p.sellingPrice, buyingPrice: p.buyingPrice, barCode: p.barCode, productCategory: p.productCategory.name, id: p.id} })] : [];
+          let products = resData ? [...resData.map(p => { return {name: p.name, sellingPrice: p.sellingPrice, buyingPrice: p.buyingPrice, barCode: p.barCode, productCategory: { name: p.productCategory.name, id: p.productCategory.id}, id: p.id} })] : [];
           updateData({products : [...products], filtered: [...products]});
           setBusy(false);
         })
@@ -83,7 +83,7 @@ const ProductList = () => {
       console.log(data.products);
       updateData({products: [...data.products], filtered: [...data.products]});
     } else {
-      const filteredData = data.products.filter( p => p.name.replaceAll(' ','').toLowerCase().includes(filterValue) || p.productCategory.replaceAll(' ','').toLowerCase().includes(filterValue));
+      const filteredData = data.products.filter( p => p.name.replaceAll(' ','').toLowerCase().includes(filterValue) || p.productCategory.name.replaceAll(' ','').toLowerCase().includes(filterValue));
       (filteredData && filteredData.length) ? updateData({products: [...data.products], filtered: [...filteredData]}) : updateData({products: [...data.products], filtered: [...data.filtered]});
     }
   }, [filterValue])
@@ -160,8 +160,8 @@ const ProductList = () => {
     },
     {
       title: "Category",
-      dataIndex: "productCategory",
-      sorter: (a, b) => a.productCategory.length - b.productCategory.length,
+      render: (record) => record.productCategory.name,
+      sorter: (a, b) => a.productCategory.name.length - b.productCategory.name.length,
     },
     {
       title: "Price",

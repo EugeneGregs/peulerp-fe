@@ -14,6 +14,11 @@ import "react-datepicker/dist/react-datepicker.css";
 import Select2 from "react-select2-wrapper";
 import "react-select2-wrapper/css/select2.css";
 import { Table } from "antd";
+// import "bootstrap-select"
+// import "bootstrap-select/dist/css/bootstrap-select.min.css";
+// import "bootstrap-select/dist/js/bootstrap-select.min.js";
+// import 'bootstrap-select/dist/js/bootstrap-select.min.js';
+// import 'bootstrap-select/dist/css/bootstrap-select.min.css';
 
 const options = [
   { id: 1, text: "Select", text: "Select" },
@@ -33,6 +38,10 @@ const deleteRow = () => {
     $(this).parent().parent().hide();
   });
 };
+
+$(function() {
+  $('.selectpicker').selectpicker();
+});
 const AddPurchase = () => {
   const [startDate, setStartDate] = useState(new Date());
 
@@ -152,6 +161,22 @@ const AddPurchase = () => {
                       </div>
                     </div>
                   </div>
+                  <div class="form-group row">
+                    <label for="" class="col-sm-2 form-control-label">
+                      Country
+                    </label>
+                    <div class="col-sm-10">
+                      <select
+                        class="form-control selectpicker"
+                        id="select-country"
+                        data-live-search="true"
+                      >
+                        <option data-tokens="china">Chinaa</option>
+                        <option data-tokens="malayasia">Malayasia</option>
+                        <option data-tokens="singapore">Singapore</option>
+                      </select>
+                    </div>
+                  </div>
                 </div>
                 <div className="col-lg-3 col-sm-6 col-12">
                   <div className="form-group">
@@ -169,20 +194,20 @@ const AddPurchase = () => {
                 </div>
                 <div className="col-lg-3 col-sm-6 col-12">
                   <div className="form-group">
-                    <label>Product Name</label>
-                    <Select2
-                      className="select"
-                      data={options1}
-                      options={{
-                        placeholder: "Category",
-                      }}
-                    />
+                    <label>Reference No.</label>
+                    <input type="text" readOnly />
                   </div>
                 </div>
                 <div className="col-lg-3 col-sm-6 col-12">
                   <div className="form-group">
-                    <label>Reference No.</label>
-                    <input type="text" />
+                    <label>Status</label>
+                    <Select2
+                      className="select"
+                      data={options2}
+                      options={{
+                        placeholder: "Category",
+                      }}
+                    />
                   </div>
                 </div>
                 <div className="col-lg-12 col-sm-6 col-12">
@@ -234,36 +259,6 @@ const AddPurchase = () => {
                 </div>
               </div>
               <div className="row">
-                <div className="col-lg-3 col-sm-6 col-12">
-                  <div className="form-group">
-                    <label>Order Tax</label>
-                    <input type="text" />
-                  </div>
-                </div>
-                <div className="col-lg-3 col-sm-6 col-12">
-                  <div className="form-group">
-                    <label>Discount</label>
-                    <input type="text" />
-                  </div>
-                </div>
-                <div className="col-lg-3 col-sm-6 col-12">
-                  <div className="form-group">
-                    <label>Shipping</label>
-                    <input type="text" />
-                  </div>
-                </div>
-                <div className="col-lg-3 col-sm-6 col-12">
-                  <div className="form-group">
-                    <label>Status</label>
-                    <Select2
-                      className="select"
-                      data={options2}
-                      options={{
-                        placeholder: "Category",
-                      }}
-                    />
-                  </div>
-                </div>
                 <div className="col-lg-12">
                   <div className="form-group">
                     <label>Description</label>

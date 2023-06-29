@@ -1,7 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Table from "../../EntryFile/datatable";
 import { Link } from "react-router-dom";
 import Tabletop from "../../EntryFile/tabletop";
+import axios from "axios";
+import Loader from "react-js-loader";
+import { notify } from "../../common/ToastComponent";
+import { ToastContainer, toast } from "react-toastify";
 import {
   ClosesIcon,
   Excel,
@@ -24,6 +28,8 @@ import Select2 from "react-select2-wrapper";
 import "react-select2-wrapper/css/select2.css";
 import Swal from "sweetalert2";
 
+const baseUrl = "http://localhost:5071";
+
 const options = [
   { id: 1, text: "Choose Category", text: "Choose Category" },
   { id: 2, text: "Computers", text: "Computers" },
@@ -36,9 +42,9 @@ const options2 = [
   { id: 1, text: "Choose Sub Brand", text: "Choose Sub Brand" },
   { id: 2, text: "Brand", text: "Brand" },
 ];
-const confirmText = () => {
+const confirmText = (category, deleteCategory) => {
   Swal.fire({
-    title: "Are you sure?",
+    title: `Delete ${category.name}?`,
     text: "You won't be able to revert this!",
     type: "warning",
     showCancelButton: !0,
@@ -49,98 +55,58 @@ const confirmText = () => {
     cancelButtonClass: "btn btn-danger ml-1",
     buttonsStyling: !1,
   }).then(function (t) {
-    t.value &&
-      Swal.fire({
-        type: "success",
-        title: "Deleted!",
-        text: "Your file has been deleted.",
-        confirmButtonClass: "btn btn-success",
-      });
+    t.value && deleteCategory(category.id);
   });
 };
 const CategoryList = () => {
   const [inputfilter, setInputfilter] = useState(false);
+  const [categories, setCategories] = useState([]);
+  const [isBusy, setBusy] = useState(true);
+
+  useEffect(() => {
+    setBusy(true);
+    const fetchData = async () => {
+      axios.get(`${baseUrl}/productcategory`).then((res) => {
+        const resData = res.data;
+        let catList = resData.map(c => {return { id: c.id, code: c.id.split("-")[0], name: c.name, createdBy: "Admin", createdAt: c.createdDate.split("T")[0]}})
+        console.log(catList)
+        setCategories([...catList]);
+        setBusy(false);
+      });
+    };
+  
+    fetchData().catch(reason => console.log(reason));
+  }, []);
+
+  const deleteCategory = (id) => {
+    console.log(id)
+    axios.delete(`${baseUrl}/productcategory/${id}`).then((res) => {
+      const resData = res.data;
+      console.log(resData)
+      setCategories([...categories.filter(c => c.code !== id.split("-")[0])]);
+      notify("Category deleted successfully", "success", toast);
+    });
+  }
 
   const togglefilter = (value) => {
     setInputfilter(value);
   };
 
-  const [data] = useState([
-    {
-      id: 1,
-      image: MacbookIcon,
-      categoryName: "Macbook pro",
-      categoryCode: "PT001",
-      description: "Computer Description",
-      createdBy: "Admin",
-    },
-    {
-      id: 2,
-      image: OrangeImage,
-      categoryName: "Orange",
-      categoryCode: "CTO02",
-      description: "Fruit Description",
-      createdBy: "Admin",
-    },
-    {
-      id: 3,
-      image: PineappleImage,
-      categoryName: "Pinapple",
-      categoryCode: "CTO03",
-      description: "Fruit Description",
-      createdBy: "Admin",
-    },
-    {
-      id: 4,
-      image: StawberryImage,
-      categoryName: "Strawberry",
-      categoryCode: "CTO04",
-      description: "Fruit Description",
-      createdBy: "Admin",
-    },
-    {
-      id: 5,
-      image: AvocatImage,
-      categoryName: "Avocat",
-      categoryCode: "CTO05",
-      description: "Computer Description",
-      createdBy: "Admin",
-    },
-    {
-      id: 6,
-      image: MacbookIcon,
-      categoryName: "Macbook pro",
-      categoryCode: "CTO06",
-      description: "Computer Description",
-      createdBy: "Admin",
-    },
-  ]);
-
   const columns = [
     {
       title: "Category Name",
-      dataIndex: "categoryName",
-      render: (text, record) => (
-        <div className="productimgname">
-          <Link className="product-img">
-            <img alt="" src={record.image} />
-          </Link>
-          <Link style={{ fontSize: "15px", marginLeft: "10px" }}>
-            {record.categoryName}
-          </Link>
-        </div>
-      ),
-      sorter: (a, b) => a.categoryName.length - b.categoryName.length,
+      dataIndex: "name",
+      sorter: (a, b) => a.name.length - b.name.length,
     },
     {
       title: "Category Code",
-      dataIndex: "categoryCode",
-      sorter: (a, b) => a.categoryCode.length - b.categoryCode.length,
+      dataIndex: "code",
+      sorter: (a, b) => a.code.length - b.code.length,
     },
     {
-      title: " Description",
-      dataIndex: "description",
-      sorter: (a, b) => a.description.length - b.description.length,
+      title: "Created At",
+      dataIndex: "createdAt",
+      sorter: (a, b) => a.createdAt.length - b.createdAt.length,
     },
     {
       title: "Created By",
@@ -149,13 +115,13 @@ const CategoryList = () => {
     },
     {
       title: "Action",
-      render: () => (
+      render: (text, record) => (
         <>
           <>
-            <Link className="me-3" to="/dream-pos/product/editcategory-product">
+            <Link className="me-3" to={{ pathname: "/dream-pos/product/addcategory-product", state: { category: record } }}>
               <img src={EditIcon} alt="img" />
             </Link>
-            <Link className="confirm-text" to="#" onClick={confirmText}>
+            <Link className="confirm-text" to="#" onClick={() => { confirmText(record, deleteCategory)} }>
               <img src={DeleteIcon} alt="img" />
             </Link>
           </>
@@ -240,12 +206,13 @@ const CategoryList = () => {
               </div>
               {/* /Filter */}
               <div className="table-responsive">
-                <Table columns={columns} dataSource={data} />
+               { isBusy ? (<div className={"item"}> <Loader type="spinner-default" bgColor={"#FFFFFF"} title={"spinner-default"} color={'#FFFFFF'} size={100} /> </div>) : <Table columns={columns} dataSource={categories} /> }
               </div>
             </div>
           </div>
           {/* /product list */}
         </div>
+        <ToastContainer />
       </div>
     </>
   );

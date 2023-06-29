@@ -3,10 +3,11 @@ import Header from "./posheader";
 import { Link } from "react-router-dom";
 import Swal from "sweetalert2";
 import POS from "./posleft";
-import Transactions from "./transactions";
-import Select2 from "react-select2-wrapper";
 import "react-select2-wrapper/css/select2.css";
-import { 
+import CartComponent from "./cartcomponent";
+import { ToastContainer, toast } from "react-toastify";
+import { notify } from "../../common/ToastComponent";
+import {
   Product34,
   wallet1,
   transcation,
@@ -15,7 +16,7 @@ import {
   Edit6,
   pause1,
   debitcard,
-  cash,  
+  cash,
   Product30,
   Product31,
   Product35,
@@ -23,33 +24,155 @@ import {
   ellipise1,
   scanner1,
 } from "../../EntryFile/imagePath";
+import Loader from "react-js-loader";
+import axios from "axios";
 
 const Pos = () => {
-  useEffect(() => {
-    $("ul.tabs li").click(function () {
-      var $this = $(this);
-      var $theTab = $(this).attr("id");
-      console.log($theTab);
-      if ($this.hasClass("active")) {
-        // do nothing
+  const baseUrl = "http://localhost:5071";
+
+  const paymentTypes = ["Mobile", "Cash", "Bank"];
+  const [transactionId, setTransactionId] = useState("");
+  const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [isBusy, setBusy] = useState(true);
+  const [cartProducts, setCartProducts] = useState([]);
+  const [totalCost, setTotalCost] = useState(0);
+  const [cartItemsCount, setcartItemsCount] = useState(0);
+  const [totalMargin, setTotalMargin] = useState(0);
+  const [paymentTye, setPaymentType] = useState("");
+  const [amount, setAmount] = useState(0);
+
+  const updateCart = (prod, action) => {
+    let currentCartContent = [...cartProducts];
+    let index = currentCartContent.findIndex((cp) => cp.product.id == prod.id);
+    let cartProduct;
+    let costOfItems = totalCost;
+    let currentCount = cartItemsCount;
+    let currentMargin = totalMargin;
+    let productMargin;
+
+    if (index >= 0) {
+      cartProduct = currentCartContent[index];
+      productMargin = computeMargin(cartProduct);
+    }
+
+    if (action == "pop" && cartProduct) {
+      let removedItem = currentCartContent.splice(index, 1)[0];
+      costOfItems -= removedItem.quantity * removedItem.product.sellingPrice;
+      currentMargin -= removedItem.quantity * productMargin;
+      currentCount--;
+    }
+
+    if (action == "decrement") {
+      cartProduct.quantity == 1
+        ? currentCartContent.splice(index, 1)
+        : cartProduct.quantity--;
+      costOfItems -= cartProduct.product.sellingPrice;
+      currentMargin -= productMargin;
+      currentCount--;
+    }
+
+    if (action == "push") {
+      if (cartProduct) {
+        cartProduct.quantity++;
       } else {
-        $this
-          .closest(".tabs_wrapper")
-          .find("ul.tabs li, .tabs_container .tab_content")
-          .removeClass("active");
-        $(
-          '.tabs_container .tab_content[data-tab="' +
-            $theTab +
-            '"], ul.tabs li[id="' +
-            $theTab +
-            '"]'
-        ).addClass("active");
+        cartProduct = { product: prod, quantity: 1 };
+        productMargin = computeMargin(cartProduct);
+        currentCartContent.push(cartProduct);
       }
+
+      costOfItems += cartProduct.product.sellingPrice;
+      currentCount++;
+      currentMargin += productMargin;
+    }
+
+    setCartProducts([...currentCartContent]);
+    setTotalCost(costOfItems);
+    setcartItemsCount(currentCount);
+    setTotalMargin(currentMargin);
+  };
+
+  const computeMargin = (cp) =>
+    cp.product.sellingPrice - cp.product.buyingPrice;
+
+  const clearCart = () => {
+    setCartProducts([]);
+    setTotalCost(0);
+    setcartItemsCount(0);
+    setTotalMargin(0);
+  };
+
+  const initializeProducts = () => {
+    setBusy(true);
+    const fetchProducts = async () => {
+      axios.get(`${baseUrl}/products`).then((res) => {
+        const resData = res.data;
+        console.log("resData:::=>");
+        console.log(resData);
+        let prods = resData
+          ? [
+              ...resData.map((p) => {
+                return {
+                  name: p.name,
+                  sellingPrice: p.sellingPrice,
+                  buyingPrice: p.buyingPrice,
+                  barCode: p.barCode,
+                  category: {
+                    name: p.productCategory.name,
+                    id: p.productCategory.id,
+                  },
+                  id: p.id,
+                };
+              }),
+            ]
+          : [];
+        let cats = [];
+        prods.forEach((p) => {
+          if (!cats.find((c) => c.id == p.category.id)) {
+            cats.push(p.category);
+          }
+        });
+        setProducts([...prods]);
+        setCategories([...cats]);
+        setBusy(false);
+      });
+    };
+
+    fetchProducts().catch((reson) => console.log(reson));
+  };
+
+  useEffect(() => {
+    initializeProducts();
+    setTransactionId(generateTransactionId());
+    jQuery(function () {
+      $("ul.tabs li").on("click", function () {
+        console.log("Clicked!");
+        var $this = $(this);
+        var $theTab = $(this).attr("id");
+        console.log("theTab::");
+        console.log($theTab);
+        if ($this.hasClass("active")) {
+          // do nothing
+        } else {
+          $this
+            .closest(".tabs_wrapper")
+            .find("ul.tabs li, .tabs_container .tab_content")
+            .removeClass("active");
+          $(
+            '.tabs_container .tab_content[data-tab="' +
+              $theTab +
+              '"], ul.tabs li[id="' +
+              $theTab +
+              '"]'
+          ).addClass("active");
+        }
+      });
+      $(document).on("click", ".productset", function () {
+        $(this).toggleClass("active");
+      });
     });
-    $(document).on("click", ".productset", function () {
-      $(this).toggleClass("active");
-    });
-  });
+  }, []);
+
   const confirmText = () => {
     Swal.fire({
       title: "Are you sure?",
@@ -72,23 +195,78 @@ const Pos = () => {
         });
     });
   };
-  const [counter, setCounter] = useState(0);
-  const [counter1, setCounter1] = useState(0);
-  const [counter2, setCounter2] = useState(0);
-  const [counter3, setCounter3] = useState(0);
 
-  const options = [
-    { id: 1, text: "Walk-in Customer", text: "Walk-in Customer" },
-    { id: 2, text: "Chris Moris", text: "Chris Moris" },
-  ];
-  const options1 = [
-    { id: 1, text: "Product", text: "Product" },
-    { id: 2, text: "Barcode", text: "Barcode" },
-  ];
-  const options2 = [
-    { id: 1, text: "Exclusive", text: "Exclusive" },
-    { id: 2, text: "Inclusive", text: "Inclusive" },
-  ];
+  const generateTransactionId = () =>
+    ([1e7] + -1e3 + -4e3 + -8e3 + -1e11)
+      .replace(/[018]/g, (c) =>
+        (
+          c ^
+          (crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (c / 4)))
+        ).toString(16)
+      )
+      .substring(25)
+      .toUpperCase();
+
+  const createTransaction = () => {
+    return {
+      cartItems: [
+        ...cartProducts.map((p) => {
+          return { productId: p.product.id, quantity: p.quantity };
+        }),
+      ],
+      paymentType: paymentTye,
+      orderNumber: transactionId,
+      tellerId: "00000000-0000-0000-0000-000000000000",
+      discount: 0,
+      customerId: "00000000-0000-0000-0000-000000000000",
+      totalCost: totalCost,
+      totalMargin: totalMargin,
+    };
+  };
+
+  const HandleCheckout = () => {
+    const trans = createTransaction();
+    if (ValidateTransaction(trans)) {
+      console.log(trans);
+      axios
+        .post(`${baseUrl}/transaction`, trans)
+        .then(handleResponse)
+        .catch(handleError);
+    }
+  };
+
+  const handleResponse = (res) => {
+    console.log("POST RES::");
+    console.log(res.data);
+    clearCart();
+    setTransactionId(generateTransactionId());
+    setPaymentType("");
+    setAmount(0);
+    notify(
+      `Transaction Of Id: ${res.data.orderNumber} Sent!`,
+      "success",
+      toast
+    );
+  };
+
+  const handleError = (res) => {
+    console.log("POST RES::");
+    console.log(res.data);
+    notify(`Transaction Failed, Please Try Again`, "error", toast);
+  };
+
+  const ValidateTransaction = (trans) => {
+    console.log(trans);
+    if (!trans.cartItems.length) {
+      notify("Empty Cart!", "warning", toast);
+      return false;
+    } else if (!trans.paymentType) {
+      notify("Select Payment Type!", "warning", toast);
+      return false;
+    }
+    return true;
+  };
+
   return (
     <>
       <div className="main-wrappers">
@@ -96,98 +274,35 @@ const Pos = () => {
         <div className="page-wrapper ms-0">
           <div className="content">
             <div className="row">
-              <POS />
+              {isBusy && (
+                <div className={"item"}>
+                  {" "}
+                  <Loader
+                    type="spinner-default"
+                    bgColor={"#FFFFFF"}
+                    title={"spinner-default"}
+                    color={"#FFFFFF"}
+                    size={100}
+                  />{" "}
+                </div>
+              )}
+              {!isBusy && (
+                <POS
+                  products={products}
+                  categories={categories}
+                  updateCart={updateCart}
+                />
+              )}
               <div className="col-lg-4 col-sm-12 ">
                 <div className="order-list">
                   <div className="orderid">
                     <h4>Order List</h4>
-                    <h5>Transaction id : #65565</h5>
-                  </div>
-                  <div className="actionproducts">
-                    <ul>
-                      <li>
-                        <Link
-                          to="#"
-                          className="deletebg confirm-text"
-                          onClick={confirmText}
-                        >
-                          <img src={delete2} alt="img" />
-                        </Link>
-                      </li>
-                      <li>
-                        <Link
-                          to="#"
-                          data-bs-toggle="dropdown"
-                          aria-expanded="false"
-                          className="dropset"
-                        >
-                          <img src={ellipise1} alt="img" />
-                        </Link>
-                        <ul
-                          className="dropdown-menu"
-                          aria-labelledby="dropdownMenuButton"
-                          data-popper-placement="bottom-end"
-                        >
-                          <li>
-                            <Link to="#" className="dropdown-item">
-                              Action
-                            </Link>
-                          </li>
-                          <li>
-                            <Link to="#" className="dropdown-item">
-                              Another Action
-                            </Link>
-                          </li>
-                          <li>
-                            <Link to="#" className="dropdown-item">
-                              Something Elses
-                            </Link>
-                          </li>
-                        </ul>
-                      </li>
-                    </ul>
+                    <h5>Transaction id : {transactionId}</h5>
                   </div>
                 </div>
                 <div className="card card-order">
                   <div className="card-body">
                     <div className="row">
-                      <div className="col-12">
-                        <Link
-                          to="#"
-                          className="btn btn-adds"
-                          data-bs-toggle="modal"
-                          data-bs-target="#create"
-                        >
-                          <i className="fa fa-plus me-2" />
-                          Add Customer
-                        </Link>
-                      </div>
-                      <div className="col-lg-12">
-                        <div className="select-split ">
-                          <div className="select-group w-100">
-                            <Select2
-                              className="select"
-                              data={options}
-                              options={{
-                                placeholder: "Walk-in Customer",
-                              }}
-                            />
-                          </div>
-                        </div>
-                      </div>
-                      <div className="col-lg-12">
-                        <div className="select-split">
-                          <div className="select-group w-100">
-                            <Select2
-                              className="select"
-                              data={options1}
-                              options={{
-                                placeholder: "Product",
-                              }}
-                            />
-                          </div>
-                        </div>
-                      </div>
                       <div className="col-12">
                         <div className="text-end">
                           <Link to="#" className="btn btn-scanner-set">
@@ -201,245 +316,120 @@ const Pos = () => {
                   <div className="split-card"></div>
                   <div className="card-body pt-0">
                     <div className="totalitem">
-                      <h4>Total items : 4</h4>
-                      <Link to="#">Clear all</Link>
+                      <h4>Total items : {cartItemsCount}</h4>
+                      <h4>Current Margin : {totalMargin}</h4>
+                      <Link to="#" onClick={() => clearCart()}>
+                        Clear all
+                      </Link>
                     </div>
                     <div className="product-table">
-                      <ul className="product-lists">
-                        <li>
-                          <div className="productimg">
-                            <div className="productimgs">
-                              <img src={Product30} alt="img" />
-                            </div>
-                            <div className="productcontet">
-                              <h4>Pineapple</h4>
-                              <div className="productlinkset">
-                                <h5>PT001</h5>
-                              </div>
-                              <div className="increment-decrement">
-                                <div className="input-groups">
-                                  <input
-                                    onClick={() => setCounter(counter - 1)}
-                                    type="button"
-                                    defaultValue="-"
-                                    className="button-minus dec button"
-                                  />
-                                  <input
-                                    type="text"
-                                    name="child"
-                                    value={counter}
-                                    className="quantity-field"
-                                  />
-                                  <input
-                                    onClick={() => setCounter(counter + 1)}
-                                    type="button"
-                                    defaultValue="+"
-                                    className="button-plus inc button "
-                                  />
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </li>
-                        <li>3000.00 </li>
-                        <li>
-                          <Link
-                            to="#"
-                            className="confirm-text"
-                            onClick={confirmText}
-                          >
-                            <img src={delete2} alt="img" />
-                          </Link>
-                        </li>
-                      </ul>
-                      <ul className="product-lists">
-                        <li>
-                          <div className="productimg">
-                            <div className="productimgs">
-                              <img src={Product34} alt="img" />
-                            </div>
-                            <div className="productcontet">
-                              <h4>Green Nike</h4>
-                              <div className="productlinkset">
-                                <h5>PT001</h5>
-                              </div>
-                              <div className="increment-decrement">
-                                <div className="input-groups">
-                                  <input
-                                    onClick={() => setCounter1(counter1 - 1)}
-                                    type="button"
-                                    defaultValue="-"
-                                    className="button-minus dec button"
-                                  />
-                                  <input
-                                    type="text"
-                                    name="child"
-                                    value={counter1}
-                                    className="quantity-field"
-                                  />
-                                  <input
-                                    onClick={() => setCounter1(counter1 + 1)}
-                                    type="button"
-                                    defaultValue="+"
-                                    className="button-plus inc button "
-                                  />
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </li>
-                        <li>3000.00 </li>
-                        <li>
-                          <Link
-                            to="#"
-                            className="confirm-text"
-                            onClick={confirmText}
-                          >
-                            <img src={delete2} alt="img" />
-                          </Link>
-                        </li>
-                      </ul>
-                      <ul className="product-lists">
-                        <li>
-                          <div className="productimg">
-                            <div className="productimgs">
-                              <img src={Product35} alt="img" />
-                            </div>
-                            <div className="productcontet">
-                              <h4>Banana</h4>
-                              <div className="productlinkset">
-                                <h5>PT001</h5>
-                              </div>
-                              <div className="increment-decrement">
-                                <div className="input-groups">
-                                  <input
-                                    onClick={() => setCounter2(counter2 - 1)}
-                                    type="button"
-                                    defaultValue="-"
-                                    className="button-minus dec button"
-                                  />
-                                  <input
-                                    type="text"
-                                    name="child"
-                                    value={counter2}
-                                    className="quantity-field"
-                                  />
-                                  <input
-                                    onClick={() => setCounter2(counter2 + 1)}
-                                    type="button"
-                                    defaultValue="+"
-                                    className="button-plus inc button "
-                                  />
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </li>
-                        <li>3000.00 </li>
-                        <li>
-                          <Link
-                            to="#"
-                            className="confirm-text"
-                            onClick={confirmText}
-                          >
-                            <img src={delete2} alt="img" />
-                          </Link>
-                        </li>
-                      </ul>
-                      <ul className="product-lists">
-                        <li>
-                          <div className="productimg">
-                            <div className="productimgs">
-                              <img src={Product31} alt="img" />
-                            </div>
-                            <div className="productcontet">
-                              <h4>Strawberry</h4>
-                              <div className="productlinkset">
-                                <h5>PT001</h5>
-                              </div>
-                              <div className="increment-decrement">
-                                <div className="input-groups">
-                                  <input
-                                    onClick={() => setCounter3(counter3 - 1)}
-                                    type="button"
-                                    defaultValue="-"
-                                    className="button-minus dec button"
-                                  />
-                                  <input
-                                    type="text"
-                                    min={0}
-                                    name="child"
-                                    value={counter3}
-                                    className="quantity-field"
-                                  />
-                                  <input
-                                    onClick={() => setCounter3(counter3 + 1)}
-                                    type="button"
-                                    defaultValue="+"
-                                    className="button-plus inc button "
-                                  />
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </li>
-                        <li>3000.00 </li>
-                        <li>
-                          <Link
-                            to="#"
-                            className="confirm-text"
-                            onClick={confirmText}
-                          >
-                            <img src={delete2} alt="img" />
-                          </Link>
-                        </li>
-                      </ul>
+                      {products.length &&
+                        cartProducts.map((cp) => (
+                          <CartComponent
+                            cartProduct={cp}
+                            updateCart={updateCart}
+                          />
+                        ))}
                     </div>
                   </div>
                   <div className="split-card"></div>
                   <div className="card-body pt-0 pb-2">
                     <div className="setvalue">
                       <ul>
-                        <li>
-                          <h5>Subtotal </h5>
-                          <h6>55.00$</h6>
-                        </li>
-                        <li>
-                          <h5>Tax </h5>
-                          <h6>5.00$</h6>
-                        </li>
                         <li className="total-value">
                           <h5>Total</h5>
-                          <h6>60.00$</h6>
+                          <h6>Ksh. {totalCost}.00</h6>
                         </li>
+                        <div
+                          style={{
+                            display:
+                              paymentTye == paymentTypes[1] ? "block" : "none",
+                          }}
+                        >
+                          <li className="total-value">
+                            <h5>Amount </h5>
+                            <input
+                            className="form-control"
+                            style={{marginRight: "0", marginLeft: "80%"}}
+                              type="text"
+                              value={amount}
+                              onChange={(e) => setAmount(+e.target.value)}
+                              required
+                            />
+                          </li>
+                          <li className="total-value">
+                            <h5>Change </h5>
+                            <h6>Ksh. {amount - totalCost}</h6>
+                          </li>
+                        </div>
                       </ul>
                     </div>
                     <div className="setvaluecash">
                       <ul>
                         <li>
-                          <Link to="#" className="paymentmethod">
+                          <Link
+                            to="#"
+                            className="paymentmethod"
+                            style={{
+                              backgroundColor:
+                                paymentTye == paymentTypes[1]
+                                  ? "#7367F0"
+                                  : "#fff",
+                              color:
+                                paymentTye == paymentTypes[1] ? "#fff" : "#000",
+                            }}
+                            onClick={() => setPaymentType(paymentTypes[1])}
+                          >
                             <img src={cash} alt="img" className="me-2" />
                             Cash
                           </Link>
                         </li>
                         <li>
-                          <Link to="#" className="paymentmethod">
-                            <img src={debitcard} alt="img" className="me-2" />
-                            Debit
+                          <Link
+                            to="#"
+                            className="paymentmethod"
+                            style={{
+                              backgroundColor:
+                                paymentTye == paymentTypes[0]
+                                  ? "#7367F0"
+                                  : "#fff",
+                              color:
+                                paymentTye == paymentTypes[0] ? "#fff" : "#000",
+                            }}
+                            onClick={() => setPaymentType(paymentTypes[0])}
+                          >
+                            <img src={scan} alt="img" className="me-2" />
+                            Mpesa
                           </Link>
                         </li>
                         <li>
-                          <Link to="#" className="paymentmethod">
-                            <img src={scan} alt="img" className="me-2" />
-                            Scan
+                          <Link
+                            to="#"
+                            className="paymentmethod"
+                            style={{
+                              backgroundColor:
+                                paymentTye == paymentTypes[2]
+                                  ? "#7367F0"
+                                  : "#fff",
+                              color:
+                                paymentTye == paymentTypes[2] ? "#fff" : "#000",
+                            }}
+                            onClick={() => setPaymentType(paymentTypes[2])}
+                          >
+                            <img src={debitcard} alt="img" className="me-2" />
+                            Card
                           </Link>
                         </li>
                       </ul>
                     </div>
-                    <div className="btn-totallabel">
+                    <Link
+                      className="btn-totallabel"
+                      to="#"
+                      onClick={HandleCheckout}
+                    >
                       <h5>Checkout</h5>
-                      <h6>60.00$</h6>
-                    </div>
+                      <h6>Ksh. {totalCost}.00</h6>
+                    </Link>
                     <div className="btn-pos">
                       <ul>
                         <li>
@@ -560,7 +550,7 @@ const Pos = () => {
           </div>
         </div>
       </div>
-      <Transactions />
+      <ToastContainer />
     </>
   );
 };

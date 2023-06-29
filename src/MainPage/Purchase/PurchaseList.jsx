@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Table from "../../EntryFile/datatable";
 import Tabletop from "../../EntryFile/tabletop";
 import Select2 from "react-select2-wrapper";
 import "react-select2-wrapper/css/select2.css";
 import { Link } from "react-router-dom";
+import axios from "axios";
 import {
   ClosesIcon,
   Excel,
@@ -16,9 +17,51 @@ import {
   EditIcon,
   DeleteIcon,
 } from "../../EntryFile/imagePath";
+import { set } from "react-hook-form";
 
 const PurchaseList = () => {
   const [inputfilter, setInputfilter] = useState(false);
+  const [purchaseList, setPurchaseList] = useState([]);
+  const [productList, setProductList] = useState([]);
+  const [updatedPurchaseList, setUpdatedPurchaseList] = useState([]);
+  const [isBusy, setBusy] = useState(false);
+  const baseUrl = "http://localhost:5071";
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setBusy(true);
+      fetchProducts().then(() => {
+        fetchPurchases()
+      })
+    };
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    let purchaseListCopy = [...purchaseList];
+    purchaseListCopy.forEach((purchase) => {
+      purchase.stockList.map((stock) => {
+        const product = productList.find((product) => product.id === stock.productId);
+        stock.productName = product.name;
+        setUpdatedPurchaseList([...purchaseListCopy]);
+      })
+    });
+    setBusy(false);    
+  }, [purchaseList]);
+
+  const fetchProducts = async () => {
+    const productsRes = await axios(`${baseUrl}/products`);
+    const products = productsRes.data;
+    setProductList([...products]);
+    console.log(products);
+  };
+
+  const fetchPurchases = async () => {
+    const purchasesRes = await axios(`${baseUrl}/purchases`);
+    const purchases = purchasesRes.data;
+    setPurchaseList([...purchases]);
+    console.log(purchases);
+  }
 
   const options = [
     { id: 1, text: "Choose Product", text: "Choose Product" },
@@ -47,68 +90,20 @@ const PurchaseList = () => {
     setInputfilter(value);
   };
 
-  const [data] = useState([
-    {
-      id: 1,
-      supplierName: "Apex Computers",
-      reference: "PT001",
-      date: "19 Nov 2022",
-      status: "Received",
-      grandTotal: "550",
-      paid: "120",
-      due: "470",
-      paymentStatus: "Paid",
-    },
-    {
-      id: 2,
-      supplierName: "Best Power Tools",
-      reference: "PT001",
-      date: "19 Nov 2022",
-      status: "Pending",
-      grandTotal: "550",
-      paid: "120",
-      due: "470",
-      paymentStatus: "Unpaid",
-    },
-    {
-      id: 3,
-      supplierName: "Modern Automobile",
-      reference: "PT001",
-      date: "19 Nov 2022",
-      status: "Received",
-      grandTotal: "550",
-      paid: "120",
-      due: "470",
-      paymentStatus: "Paid",
-    },
-    {
-      id: 4,
-      supplierName: "AIM Infotech",
-      reference: "PT001",
-      date: "19 Nov 2022",
-      status: "Ordered",
-      grandTotal: "550",
-      paid: "120",
-      due: "470",
-      paymentStatus: "Partial",
-    },
-  ]);
-
   const columns = [
     {
       title: "Supplier Name",
-      dataIndex: "supplierName",
-      sorter: (a, b) => a.supplierName.length - b.supplierName.length,
+      dataIndex: "supplierId",
+      sorter: (a, b) => a.supplierId.length - b.supplierId.length,
     },
     {
-      title: "Reference",
-      dataIndex: "reference",
-      sorter: (a, b) => a.reference.length - b.reference.length,
+      title: "Payment Type",
+      dataIndex: "paymentType",
+      sorter: (a, b) => a.paymentType.length - b.paymentType.length,
     },
     {
-      title: "Date",
-      dataIndex: "date",
-      sorter: (a, b) => a.date.length - b.date.length,
+      title: "Purchse Date",
+      render: (text, record) => (record.createDate.split("T")[0])
     },
     {
       title: "Status",
@@ -116,57 +111,36 @@ const PurchaseList = () => {
       render: (text, record) => (
         <span
           className={
-            text === "Received"
+            text === 1
               ? "badges bg-lightgreen"
-              : text == "Pending"
+              : text == 2
               ? "badges bg-lightred"
               : "badges bg-lightyellow"
           }
         >
-          {text}
+          {text == 1 ? "Paid" : text == 2 ? "Unpaid" : "Partial"}
         </span>
       ),
       sorter: (a, b) => a.status.length - b.status.length,
     },
     {
       title: "Grand Total",
-      dataIndex: "grandTotal",
-      sorter: (a, b) => a.grandTotal.length - b.grandTotal.length,
+      dataIndex: "amount",
+      sorter: (a, b) => a.amount.length - b.amount.length,
       width: "125px",
     },
     {
       title: "Paid",
-      dataIndex: "paid",
+      dataIndex: "amount",
       sorter: (a, b) => a.paid.length - b.paid.length,
-    },
-    {
-      title: "Due",
-      dataIndex: "due",
-      sorter: (a, b) => a.due.length - b.due.length,
-    },
-    {
-      title: "Payment Status",
-      dataIndex: "paymentStatus",
-      render: (text, record) => (
-        <span
-          className={
-            text === "Paid"
-              ? "badges bg-lightgreen"
-              : text == "Unpaid"
-              ? "badges bg-lightred"
-              : "badges bg-lightyellow"
-          }
-        >
-          {text}
-        </span>
-      ),
-      sorter: (a, b) => a.paymentStatus.length - b.paymentStatus.length,
-      width: "120px",
     },
     {
       title: "Action",
       render: () => (
         <>
+          <Link className="me-3" to="">
+            <img src={Excel} alt="img" />
+          </Link>
           <Link className="me-3" to="/dream-pos/purchase/editpurchase-purchase">
             <img src={EditIcon} alt="img" />
           </Link>
@@ -280,7 +254,7 @@ const PurchaseList = () => {
               </div>
               {/* /Filter */}
               <div className="table-responsive">
-                <Table columns={columns} dataSource={data} />
+                { !isBusy && <Table columns={columns} dataSource={updatedPurchaseList} /> }
               </div>
             </div>
           </div>
