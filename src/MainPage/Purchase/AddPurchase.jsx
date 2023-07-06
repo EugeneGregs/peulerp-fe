@@ -16,24 +16,23 @@ import Table from "../../EntryFile/datatable";
 import Select from "react-select";
 import axios from "axios";
 import Modal from "react-bootstrap/Modal";
+import { notify } from "../../common/ToastComponent";
+import { ToastContainer, toast } from "react-toastify";
+import { useLocation } from "react-router-dom";
 
-const paymentStatus = [
+const paymentStatusOptions = [
   { value: 1, label: "Paid" },
   { value: 2, label: "Pending" },
   { value: 3, label: "Partial" },
 ];
 
-const deleteRow = () => {
-  $(document).on("click", ".delete-set", function () {
-    $(this).parent().parent().hide();
-  });
-};
-
 const baseUrl = "http://localhost:5071";
 
 const AddPurchase = () => {
-  const [startDate, setStartDate] = useState(new Date());
+  const { state } = useLocation();
+  const [purchase, setPurchase] = useState({});
   const [products, setProducts] = useState([]);
+  const [saveType, setSaveType] = useState("post");
   const [productOptions, setProductOptions] = useState([]);
   const [supplier, setSupplier] = useState([]);
   const [supplierOptions, setSupplierOptions] = useState([]);
@@ -43,16 +42,23 @@ const AddPurchase = () => {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [show, setShow] = useState(false);
   const [editingPrduct, setEditingProduct] = useState({});
+  const [supplierId, setSupplierId] = useState("");
+  const [paymentStatus, setPaymentStatus] = useState(1);
+  const [purchaseDate, setPurchaseDate] = useState(new Date());
+  const [purchaseDescription, setPurchaseDescription] = useState("");
 
   const handSaveEdit = () => {
     let purchasedProductsClone = [...purchaseProducts];
-    const index = purchasedProductsClone.findIndex(p => p.id === editingPrduct.id);
+    const index = purchasedProductsClone.findIndex(
+      (p) => p.id === editingPrduct.id
+    );
     purchasedProductsClone[index] = editingPrduct;
     setPurchaseProducts(purchasedProductsClone);
-  }
+    handleClose();
+  };
 
   const handleClose = () => {
-    setShow(false);    
+    setShow(false);
     setEditingProduct({});
   };
 
@@ -66,20 +72,53 @@ const AddPurchase = () => {
   const handleDetailsChange = (e, field) => {
     const { value } = e.target;
 
-    if(field === "quantity") {
+    if (field === "quantity") {
       const { purchasePrice } = editingPrduct;
-      setEditingProduct({ ...editingPrduct, quantity: value, totalCost: purchasePrice * value });
+      setEditingProduct({
+        ...editingPrduct,
+        quantity: +value,
+        totalCost: purchasePrice * value,
+      });
     }
 
-    if(field === "purchasePrice") {
+    console.log(editingPrduct);
+
+    if (field === "purchasePrice") {
       const { quantity } = editingPrduct;
-      setEditingProduct({ ...editingPrduct, purchasePrice: value, totalCost: quantity * value });
+      setEditingProduct({
+        ...editingPrduct,
+        purchasePrice: +value,
+        totalCost: quantity * value,
+      });   
     }
-  }
+  };
 
   useEffect(() => {
+    console.log(editingPrduct);
+  }, [editingPrduct]);
+
+  useEffect(() => {
+    if(state && state.purchase){
+      const { purchase } = state;
+      purchase.purchaseProducts.forEach((purchaseProduct) => {
+        purchaseProduct.totalCost =
+          purchaseProduct.quantity * purchaseProduct.purchasePrice;
+        purchaseProduct.id = purchaseProduct.productId;
+      })
+      setPurchase(purchase)
+      setSaveType("put")
+      setReffereceNo(purchase.refferenceNo)
+      setSupplierId(purchase.supplierId)
+      setPaymentStatus(purchase.paymentStatus === "Paid" ? 1 : purchase.paymentStatus === "Pending" ? 2 : 3)
+      setPurchaseDate(new Date(purchase.purchaseDate))
+      setPurchaseDescription(purchase.description)
+      setPurchaseProducts(purchase.purchaseProducts)
+      setGrandTotal(purchase.amount)
+    } else{
+      setReffereceNo(generateRefferenceNumber());
+    }
+
     Promise.all([fetchProducts(), fetchSuppliers()]);
-    setReffereceNo(generateRefferenceNumber());
   }, []);
 
   const generateRefferenceNumber = () =>
@@ -147,14 +186,104 @@ const AddPurchase = () => {
     setGrandTotal(total);
   }, [purchaseProducts]);
 
+  const handleSubmitPurchase = () => {
+    //vlaidate purchase details
+    if (!validatePurchaseDetails()) return
+
+    //Build Purchase object
+    const stockList = purchaseProducts.map((purchaseProduct) => {
+      return {
+        productId: purchaseProduct.id,
+        quantity: purchaseProduct.quantity,
+        purchasePrice: purchaseProduct.purchasePrice,
+        reorderLevel: purchaseProduct.reorderLevel,
+      };
+    });
+
+    const purchase = {
+      refferenceNo: reffereceNo,
+      supplierId: supplierId,
+      purchaseDate: purchaseDate,
+      paymentStatus: paymentStatus,
+      amount: grandTotal,
+      purchaseProducts: stockList,
+      description: purchaseDescription,
+    };
+
+    console.log(purchase);
+    console.log(JSON.stringify(purchase));
+
+    //post purchase
+    postPurchase(purchase).catch((err) => {
+      console.log(err);
+      notify("Purchase failed", "error", toast);
+    });
+  };
+
+  const validatePurchaseDetails = () => {
+    if (purchaseProducts.length === 0) {
+      notify("Please add products to purchase", "error", toast);
+      return false;
+    }
+
+    if (supplierId === "") {
+      notify("Please select supplier", "error", toast);
+      return false;
+    }
+
+    if (paymentStatus === "") {
+      notify("Please select payment status", "error", toast);
+      return false;
+    }
+
+    if (purchaseDate === "") {
+      notify("Please select purchase date", "error", toast);
+      return false;
+    }
+
+    return true;
+  }
+
+  const handleDelete = (product) => {
+    let purchaseProductsClone = [...purchaseProducts];
+    const index = purchaseProductsClone.findIndex((p) => p.id === product.id);
+    purchaseProductsClone.splice(index, 1);
+    setPurchaseProducts(purchaseProductsClone);
+  }
+
+  const clearPurchase = () => {
+    setPurchaseProducts([]);
+    setGrandTotal(0);
+    setReffereceNo(generateRefferenceNumber());
+    setSupplierId("");
+    setPaymentStatus(1);
+    setPurchaseDate(new Date());
+    setPurchaseDescription("");
+  }
+
+  const postPurchase = async (currentPurchase) => {
+    if(saveType === "put"){
+      console.log("putting purchase")
+      console.log(purchase)
+      currentPurchase.id = purchase.id;
+    }
+    const res = await axios.post(`${baseUrl}/purchases`, currentPurchase);
+    console.log(res);
+    if (res.status === 200 || res.status === 201) {
+      notify("Purchase saved successfully", "success", toast);
+      clearPurchase();
+    } else {
+      notify("Error saving purchase", "error", toast);
+    }
+  };
+
   const columns = [
     {
       title: "Product Name",
-      dataIndex: "name",
       render: (text, record) => (
         <div className="productimgname">
           <Link style={{ fontSize: "15px", marginLeft: "10px" }} to="#">
-            {record.name}
+            {record.name || record.productName}
           </Link>
         </div>
       ),
@@ -166,12 +295,12 @@ const AddPurchase = () => {
     {
       title: "Unit cost",
       dataIndex: "purchasePrice",
-      render: (text) => `Ksh ${text}`,
+      render: (text) => `Ksh. ${text.toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,")}`,
     },
     {
       title: "Total Cost",
       dataIndex: "totalCost",
-      render: (text) => `Ksh ${text}`,
+      render: (text, record) => `Ksh. ${(record.purchasePrice * record.quantity).toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,")}`,
     },
     {
       title: "Action",
@@ -180,7 +309,7 @@ const AddPurchase = () => {
           <Link className="me-3" to="#">
             <img src={EditIcon} alt="img" onClick={() => handleEdit(record)} />
           </Link>
-          <Link className="delete-set" to="#" onClick={deleteRow}>
+          <Link className="delete-set" to="#" onClick={handleDelete}>
             <img src={DeleteIcon} alt="img" />
           </Link>
         </>
@@ -195,7 +324,7 @@ const AddPurchase = () => {
           <div className="page-header">
             <div className="page-title">
               <h4>Purchase Add</h4>
-              <h6>Add/Update Purchase</h6>
+              <h6>{saveType == "post" ? "Add" : "Update" } Purchase</h6>
             </div>
           </div>
           <div className="card">
@@ -206,7 +335,11 @@ const AddPurchase = () => {
                     <label>Supplier Name</label>
                     <div className="row">
                       <div className="col-lg-10 col-sm-10 col-10">
-                        <Select options={supplierOptions} />
+                        <Select
+                          options={supplierOptions}
+                          onChange={(s) => setSupplierId(s.value)}
+                          value={supplierOptions.find((obj) => obj.value === supplierId)}
+                        />
                       </div>
                     </div>
                   </div>
@@ -216,8 +349,10 @@ const AddPurchase = () => {
                     <label>Purchase Date </label>
                     <div className="input-groupicon">
                       <DatePicker
-                        selected={startDate}
-                        onChange={(date) => setStartDate(date)}
+                        selected={purchaseDate}
+                        onChange={(date) => setPurchaseDate(date)}
+                        dateFormat="dd/MM/yyyy"
+                        className="form-control"
                       />
                       <div className="addonset">
                         <img src={Calendar} alt="img" />
@@ -234,7 +369,11 @@ const AddPurchase = () => {
                 <div className="col-lg-3 col-sm-6 col-12">
                   <div className="form-group">
                     <label>Payment Status</label>
-                    <Select options={paymentStatus} />
+                    <Select
+                      options={paymentStatusOptions}
+                      onChange={(ps) => setPaymentStatus(ps.value)}
+                      value={paymentStatusOptions.find((obj) => obj.value === paymentStatus)}
+                    />
                   </div>
                 </div>
                 <div className="col-lg-12 col-sm-6 col-12">
@@ -285,7 +424,9 @@ const AddPurchase = () => {
                           <input
                             type="number"
                             value={editingPrduct.purchasePrice}
-                            onChange={(e) => handleDetailsChange(e, "purchasePrice")}
+                            onChange={(e) =>
+                              handleDetailsChange(e, "purchasePrice")
+                            }
                             className="form-control"
                           />
                         </div>
@@ -314,7 +455,7 @@ const AddPurchase = () => {
                     <ul>
                       <li className="total">
                         <h4>Grand Total</h4>
-                        <h5>ksh. {grandTotal}</h5>
+                        <h5>ksh. {grandTotal.toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,")}</h5>
                       </li>
                     </ul>
                   </div>
@@ -324,17 +465,21 @@ const AddPurchase = () => {
                 <div className="col-lg-12">
                   <div className="form-group">
                     <label>Description</label>
-                    <textarea className="form-control" defaultValue={""} />
+                    <textarea className="form-control"
+                    value={purchaseDescription}
+                    onChange={(e) => setPurchaseDescription(e.target.value)}
+                    />
                   </div>
                 </div>
                 <div className="col-lg-12">
-                  <button className="btn btn-submit me-2">Submit</button>
-                  <button className="btn btn-cancel">Cancel</button>
+                  <button className="btn btn-submit me-2" onClick={handleSubmitPurchase}>Submit</button>
+                  <button className="btn btn-cancel" onClick={clearPurchase}>Cancel</button>
                 </div>
               </div>
             </div>
           </div>
         </div>
+        <ToastContainer />
       </div>
     </>
   );

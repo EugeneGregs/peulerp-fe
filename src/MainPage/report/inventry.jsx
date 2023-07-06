@@ -1,8 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Table from "../../EntryFile/datatable";
 import { Link } from "react-router-dom";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { notify } from "../../common/ToastComponent";
+import { ToastContainer, toast } from "react-toastify";
+import axios from "axios";
 import {
   ClosesIcon,
   Excel,
@@ -24,6 +27,9 @@ import {
 } from "../../EntryFile/imagePath";
 import Select2 from "react-select2-wrapper";
 import "react-select2-wrapper/css/select2.css";
+import { set } from "react-hook-form";
+
+const baseUrl = "http://localhost:5071";
 
 const Invertry = () => {
   const [startDate, setStartDate] = useState(new Date());
@@ -33,207 +39,81 @@ const Invertry = () => {
     { id: 2, text: "Supplier", text: "Supplier" },
   ];
   const [inputfilter, setInputfilter] = useState(false);
+  const [inventoryList, setInventoryList] = useState([]);
+  const [isBusy, setBusy] = useState(false);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setBusy(true);
+      console.log("fetching data");
+      axios.get(`${baseUrl}/stock`).then((res) => handleResponse(res));
+    };
+
+    fetchData().catch((reason) => console.log(reason));
+  }, []);
+
+  const handleResponse = (response) => {
+    console.log("Fetched Data");
+    setBusy(false);
+    if (response.status === 200) {
+        const resData = response.data;
+        console.log(resData);
+        setInventoryList([...resData]);
+    } else {
+      notify("Error Fetching Data", "Error", toast);
+    }
+  }
 
   const togglefilter = (value) => {
     setInputfilter(value);
   };
-  const [data] = useState([
-    {
-      Name: "Macbook pro",
-      Sku: "PT001",
-      Category: "Computer",
-      Brand: "N/D",
-      Price: "1500.00",
-      Unit: "pc",
-      Instock: 1356,
-      image: Product1,
-    },
-    {
-      Name: "Orange",
-      amount: 36080,
-      Sku: "PT002",
-      Category: "Fruits",
-      Brand: "N/D",
-      Price: "10.00",
-      Unit: "kg",
-      Instock: 131,
-      image: OrangeImage,
-    },
-    {
-      Name: "Pineapple",
-      Sku: "PT003",
-      Category: "Fruits",
-      Brand: "N/D",
-      Price: "10.00",
-      Unit: "kg",
-      Instock: 131,
-      image: PineappleImage,
-    },
-    {
-      Name: "Strawberry",
-      Sku: "PT004",
-      Category: "Fruits",
-      Brand: "N/D",
-      Price: "10.00",
-      Unit: "kg",
-      Instock: 100,
-      image: StawberryImage,
-    },
-    {
-      Name: "Sunglasses",
-      Sku: "PT005",
-      Category: "Accessories",
-      Brand: "N/D",
-      Price: "10.00",
-      Unit: "pc",
-      Instock: 100,
-      image: AvocatImage,
-    },
-    {
-      Name: "Unpaired gray",
-      Sku: "PT006",
-      Category: "Shoes",
-      Brand: "Adidas",
-      Price: "100.00",
-      Unit: "pc",
-      Instock: 50,
-      image: MacbookIcon,
-    },
-    {
-      Name: "Avocat",
-      Sku: "PT007",
-      Category: "Fruits",
-      Brand: "N/D",
-      Price: "5.00",
-      Unit: "kg",
-      Instock: 29,
-      image: Product7,
-    },
-    {
-      Name: "Banana",
-      Sku: "PT008",
-      Category: "Fruits",
-      Brand: "N/D",
-      Price: "5.00",
-      Unit: "kg",
-      Instock: 24,
-      image: Product8,
-    },
-    {
-      Name: "Earphones",
-      Sku: "PT009",
-      Category: "Fruits",
-      Brand: "N/D",
-      Price: "5.00",
-      Unit: "kg",
-      Instock: 11,
-      image: Product9,
-    },
-    {
-      Name: "Banana",
-      Sku: "PT010",
-      Category: "Fruits",
-      Brand: "N/D",
-      Price: "5.00",
-      Unit: "kg",
-      Instock: 24,
-      image: Product8,
-    },
-    {
-      Name: "Earphones",
-      Sku: "PT007",
-      Category: "Fruits",
-      Brand: "N/D",
-      Price: "5.00",
-      Unit: "kg",
-      Instock: 11,
-      image: Product9,
-    },
-    {
-      Name: "Unpaired gray",
-      Sku: "PT006",
-      Category: "Shoes",
-      Brand: "Adidas",
-      Price: "100.00",
-      Unit: "pc",
-      Instock: 50,
-      image: MacbookIcon,
-    },
-    {
-      Name: "Avocat",
-      Sku: "PT007",
-      Category: "Fruits",
-      Brand: "N/D",
-      Price: "5.00",
-      Unit: "kg",
-      Instock: 29,
-      image: Product7,
-    },
-    {
-      Name: "Banana",
-      Sku: "PT008",
-      Category: "Fruits",
-      Brand: "N/D",
-      Price: "5.00",
-      Unit: "kg",
-      Instock: 24,
-      image: Product8,
-    },
-    {
-      Name: "Earphones",
-      Sku: "PT009",
-      Category: "Fruits",
-      Brand: "N/D",
-      Price: "5.00",
-      Unit: "kg",
-      Instock: 11,
-      image: Product9,
-    },
-  ]);
 
   const columns = [
     {
       title: "Product Name",
-      dataIndex: "Name",
+      dataIndex: "name",
       render: (text, record) => (
         <div className="productimgname">
-          <Link to="#" className="product-img">
-            <img src={record.image} alt="product" />
-          </Link>
           <Link to="#">{text}</Link>
         </div>
       ),
-      sorter: (a, b) => a.Name.length - b.Name.length,
+      sorter: (a, b) => a.name.length - b.name.length,
     },
     {
-      title: "SKU",
-      dataIndex: "Sku",
-      sorter: (a, b) => a.Sku.length - b.Sku.length,
+      title: "Product Code",
+      dataIndex: "barCode",
+      sorter: (a, b) => a.barCode.length - b.barCode.length,
     },
     {
       title: "Category",
       dataIndex: "Category",
+      render: (text, record) => (
+        <span>{record.productCategory.name}</span>
+      ),
       sorter: (a, b) => a.Category.length - b.Category.length,
     },
     {
-      title: "Brand",
-      dataIndex: "Brand",
-      sorter: (a, b) => a.Brand.length - b.Brand.length,
+      title: "Buying Price",
+      dataIndex: "buyingPrice",
+      sorter: (a, b) => a.buyingPrice.length - b.buyingPrice.length,
     },
     {
-      title: "Price",
-      dataIndex: "Price",
-      sorter: (a, b) => a.Price.length - b.Price.length,
+      title: "Selling Price",
+      dataIndex: "sellingPrice",
+      sorter: (a, b) => a.sellingPrice.length - b.sellingPrice.length,
     },
     {
-      title: "Unit",
-      dataIndex: "Unit",
-      sorter: (a, b) => a.Unit.length - b.Unit.length,
+      title: "Quantity",
+      dataIndex: "quantity",
+      sorter: (a, b) => a.quantity.length - b.quantity.length,
     },
     {
-      title: "Instock QTY",
-      dataIndex: "Instock",
-      sorter: (a, b) => a.Instock.length - b.Instock.length,
+      title: "Updated At",
+      dataIndex: "updatedDate",
+      render: (text, record) => (
+        <span>{new Date(record.updatedDate).toLocaleDateString()}</span>
+      ),
+      sorter: (a, b) => a.updatedDate.length - b.updatedDate.length,
     },
   ];
 
@@ -243,7 +123,6 @@ const Invertry = () => {
         <div className="page-header">
           <div className="page-title">
             <h4>Inventory Report</h4>
-            <h6>Manage your Inventory Report</h6>
           </div>
         </div>
         {/* /product list */}
@@ -365,12 +244,13 @@ const Invertry = () => {
             </div>
             {/* /Filter */}
             <div className="table-responsive">
-              <Table columns={columns} dataSource={data} />
+              { !isBusy && <Table columns={columns} dataSource={inventoryList} />}
             </div>
           </div>
         </div>
         {/* /product list */}
       </div>
+      <ToastContainer />
     </div>
   );
 };
