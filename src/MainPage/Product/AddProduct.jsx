@@ -8,6 +8,8 @@ import { notify } from "../../common/ToastComponent";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Link } from "react-router-dom";
+import * as xlsx from "xlsx";
+import Table from "../../EntryFile/datatable";
 
 const baseUrl = "http://localhost:5071";
 
@@ -23,13 +25,14 @@ const AddProduct = () => {
   const [buyingPrice, setBuyingPrice] = useState("");
   const [categories, setCategories] = useState([]);
   const [isBulkUpload, setIsBulkUpload] = useState(false);
+  const [productList, setProductList] = useState([]);
 
   //Load product categories
   useEffect(() => {
     const fetchData = async () => {
       axios.get(`${baseUrl}/productcategory`).then((res) => {
         const resData = res.data.map((category) => {
-          return { id: category.id, text: category.name };
+          return { id: category.id, name: category.name, text: category.name };
         });
         setCategories([...resData]);
       });
@@ -72,6 +75,73 @@ const AddProduct = () => {
     }
   };
 
+  const saveProducts = () => {
+    const productListToPost = [];
+    for (let product of productList) {
+      const newProduct = {
+        Name: product.Name,
+        BarCode: product.BarCode,
+        SellingPrice: product.SellingPrice,
+        CategoryId: product.CategoryId,
+        BuyingPrice: product.BuyingPrice,
+      };
+
+      productListToPost.push(newProduct);
+    }
+
+    axios
+      .post(`${baseUrl}/products/colection`, productListToPost)
+      .then((res) => {
+        notify("Products Added Successfully!", "success", toast);
+      })
+      .catch((err) => {
+        console.log(err);
+        notify("Error Adding Products!", "error", toast);
+      });
+  };
+
+  const readUploadFile = (e) => {
+    e.preventDefault();
+    if (e.target.files) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const data = e.target.result;
+        const workbook = xlsx.read(data, { type: "array" });
+        const sheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[sheetName];
+        const json = xlsx.utils.sheet_to_json(worksheet);
+        console.log(json);
+        populateProductList(json);
+      };
+      reader.readAsArrayBuffer(e.target.files[0]);
+    }
+  };
+
+  const populateProductList = (uploadedProducts) => {
+    const localProductList = [];
+    for (let product of uploadedProducts) {
+      const productCategory = categories.find(
+        (category) =>
+          category.name.toLowerCase() == product.category.toLowerCase()
+      );
+
+      if (!productCategory)
+        return notify(`Category ${product.category} not found`, "error", toast);
+
+      const newProduct = {
+        Name: product.name,
+        BarCode: product.barCode.toString(),
+        SellingPrice: product.sellingPrice,
+        CategoryId: productCategory.id,
+        BuyingPrice: product.buyingPrice,
+        Category: productCategory.name,
+      };
+      localProductList.push(newProduct);
+    }
+
+    setProductList(localProductList);
+  };
+
   const handleResponse = (res) => {
     console.log("POST RES::");
     console.log(res.data);
@@ -97,24 +167,48 @@ const AddProduct = () => {
   };
 
   const handleSave = () => {
-    //TODO: validate fields
+    if (isInputsVaid()) {
+      if (isBulkUpload) return saveProducts();
 
-    //Create Product
-    product = {
-      Name: productName,
-      BarCode: productCode,
-      SellingPrice: sellingPrice,
-      CategoryId: productCategory,
-      BuyingPrice: buyingPrice,
-    };
+      product = {
+        Name: productName,
+        BarCode: productCode,
+        SellingPrice: sellingPrice,
+        CategoryId: productCategory,
+        BuyingPrice: buyingPrice,
+      };
 
-    if (saveType == "update") {
-      product.id = state.product.id;
+      if (saveType == "update") {
+        product.id = state.product.id;
+      }
+
+      //Post Products
+      console.log(product);
+      SaveProduct(product);
+    }
+  };
+
+  const isInputsVaid = () => {
+    if (isBulkUpload) {
+      if (!productList.length)
+        return notify("Please upload a file", "error", toast);
+
+      return true;
     }
 
-    //Post Products
-    console.log(product);
-    SaveProduct(product);
+    if (!productName) return notify("Product Name is required", "error", toast);
+
+    if (!productCode) return notify("Product Code is required", "error", toast);
+
+    if (!productCategory)
+      return notify("Product Category is required", "error", toast);
+
+    if (!sellingPrice)
+      return notify("Selling Price is required", "error", toast);
+
+    if (!buyingPrice) return notify("Buying Price is required", "error", toast);
+
+    return true;
   };
 
   const clearInputs = () => {
@@ -125,18 +219,48 @@ const AddProduct = () => {
     setBuyingPrice("");
   };
 
+  const columns = [
+    {
+      title: "Product Name",
+      dataIndex: "Name",
+      sorter: (a, b) => a.Name.length - b.Name.length,
+    },
+    {
+      title: "Code",
+      dataIndex: "BarCode",
+      sorter: (a, b) => a.BarCode.length - b.BarCode.length,
+    },
+    {
+      title: "Category",
+      dataIndex: "Category",
+      sorter: (a, b) => a.Category.length - b.Category.length,
+    },
+    {
+      title: "Buying Price",
+      dataIndex: "BuyingPrice",
+      sorter: (a, b) => a.BuyingPrice.length - b.BuyingPrice.length,
+    },
+    {
+      title: "Sell Price",
+      dataIndex: "SellingPrice",
+      sorter: (a, b) => a.SellingPrice.length - b.SellingPrice.length,
+    },
+  ];
+
   return (
     <>
       <div className="page-wrapper">
         <div className="content">
           <div className="page-header">
             <div className="page-title">
-              <h4>Product Add</h4>
-              <h6>Create new product</h6>
+              <h4>{saveType == "post" ? "Add" : "Update"} Product</h4>
             </div>
-            <div className="page-btn">
+            <div
+              className="page-btn"
+              style={{ display: saveType == "post" ? "block" : "none" }}
+            >
               <Link
-                to="/dream-pos/product/addproduct-product"
+                to="#"
                 className="btn btn-added"
                 onClick={toggleBulckUpload}
               >
@@ -224,13 +348,16 @@ const AddProduct = () => {
               </div>
               <div
                 className="row"
-                style={{ display: isBulkUpload ? "block" : "none" }}
+                style={{
+                  display:
+                    isBulkUpload && !productList.length ? "block" : "none",
+                }}
               >
                 <div className="col-lg-12">
                   <div className="form-group">
                     <label> Product Image</label>
                     <div className="image-upload">
-                      <input type="file" />
+                      <input type="file" onChange={readUploadFile} />
                       <div className="image-uploads">
                         <img src={Upload} alt="img" />
                         <h4>Drag and drop a file to upload</h4>
@@ -238,6 +365,11 @@ const AddProduct = () => {
                     </div>
                   </div>
                 </div>
+              </div>
+              <div className="table-responsive">
+                {isBulkUpload && productList.length && (
+                  <Table columns={columns} dataSource={productList} />
+                )}
               </div>
             </div>
             <div className="card-footer">
