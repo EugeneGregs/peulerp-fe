@@ -42,6 +42,7 @@ const Pos = () => {
   const [totalMargin, setTotalMargin] = useState(0);
   const [paymentTye, setPaymentType] = useState("");
   const [amount, setAmount] = useState(0);
+  const [discount, setDiscount] = useState(0);
 
   const updateCart = (prod, action) => {
     let currentCartContent = [...cartProducts];
@@ -174,28 +175,10 @@ const Pos = () => {
     });
   }, []);
 
-  const confirmText = () => {
-    Swal.fire({
-      title: "Are you sure?",
-      text: "You won't be able to revert this!",
-      type: "warning",
-      showCancelButton: !0,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Yes, delete it!",
-      confirmButtonClass: "btn btn-primary",
-      cancelButtonClass: "btn btn-danger ml-1",
-      buttonsStyling: !1,
-    }).then(function (t) {
-      t.value &&
-        Swal.fire({
-          type: "success",
-          title: "Deleted!",
-          text: "Your file has been deleted.",
-          confirmButtonClass: "btn btn-success",
-        });
-    });
-  };
+  useEffect(() => {
+    setTotalMargin(totalMargin - discount);
+    setTotalCost(totalCost - discount);
+  }, [discount]);
 
   const generateTransactionId = () =>
     ([1e7] + -1e3 + -4e3 + -8e3 + -1e11)
@@ -218,10 +201,10 @@ const Pos = () => {
       paymentType: paymentTye,
       orderNumber: transactionId,
       tellerId: "00000000-0000-0000-0000-000000000000",
-      discount: 0,
+      discount: discount,
       customerId: "00000000-0000-0000-0000-000000000000",
       totalCost: totalCost,
-      totalMargin: totalMargin,
+      totalMargin: totalMargin - discount,
     };
   };
 
@@ -341,6 +324,16 @@ const Pos = () => {
                           <h5>Total</h5>
                           <h6>Ksh. {totalCost}.00</h6>
                         </li>
+                        <li className="total-value">
+                          <h5>Discount</h5>
+                          <input
+                            className="form-control"
+                            style={{marginRight: "0", marginLeft: "60%"}}
+                              type="text"
+                              value={discount}
+                              onChange={(e) => setDiscount(+e.target.value)}
+                            />
+                        </li>
                         <div
                           style={{
                             display:
@@ -351,7 +344,7 @@ const Pos = () => {
                             <h5>Amount </h5>
                             <input
                             className="form-control"
-                            style={{marginRight: "0", marginLeft: "80%"}}
+                            style={{marginRight: "0", marginLeft: "60%"}}
                               type="text"
                               value={amount}
                               onChange={(e) => setAmount(+e.target.value)}

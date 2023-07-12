@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Table from "../../EntryFile/datatable";
 import { Link } from "react-router-dom";
-import Tabletop from "../../EntryFile/tabletop"
+import Tabletop from "../../EntryFile/tabletop";
 import Select2 from "react-select2-wrapper";
 import "react-select2-wrapper/css/select2.css";
 import {
@@ -17,174 +17,178 @@ import {
   DeleteIcon,
 } from "../../EntryFile/imagePath";
 import Swal from "sweetalert2";
+import * as Constants from "../../common/Constants";
+import { notify } from "../../common/ToastComponent";
+import { ToastContainer, toast } from "react-toastify";
+import axios from "axios";
+
+const options = [
+  { id: 1, text: "Choose Product", text: "Choose Product" },
+  { id: 2, text: "Macbook pro", text: "Macbook pro" },
+  { id: 3, text: "Orange", text: "Orange" },
+];
+const options2 = [
+  { id: 1, text: "Choose Category", text: "Choose Category" },
+  { id: 2, text: "Computers", text: "Computers" },
+  { id: 3, text: "Fruits", text: "Fruits" },
+];
+const options3 = [
+  { id: 1, text: "Choose Sub Category", text: "Choose Sub Category" },
+  { id: 2, text: "Computers", text: "Computers" },
+];
+const options4 = [
+  { id: 1, text: "Brand", text: "Brand" },
+  { id: 2, text: "N/D", text: "N/D" },
+];
+const options5 = [
+  { id: 1, text: "Price", text: "Price" },
+  { id: 2, text: "150.00", text: "150.00" },
+];
+
+const baseUrl = Constants.BASE_URL + "/expense";
+const expenseTypes = Constants.EXPENSE_TYPES;
 
 const ExpenseList = () => {
   const [inputfilter, setInputfilter] = useState(false);
+  const [isBusy, setBusy] = useState(false);
+  const [expenseList, setExpenseList] = useState([]);
 
-  const options = [
-    { id: 1, text: "Choose Product", text: "Choose Product" },
-    { id: 2, text: "Macbook pro", text: "Macbook pro" },
-    { id: 3, text: "Orange", text: "Orange" },
-  ];
-  const options2 = [
-    { id: 1, text: "Choose Category", text: "Choose Category" },
-    { id: 2, text: "Computers", text: "Computers" },
-    { id: 3, text: "Fruits", text: "Fruits" },
-  ];
-  const options3 = [
-    { id: 1, text: "Choose Sub Category", text: "Choose Sub Category" },
-    { id: 2, text: "Computers", text: "Computers" },
-  ];
-  const options4 = [
-    { id: 1, text: "Brand", text: "Brand" },
-    { id: 2, text: "N/D", text: "N/D" },
-  ];
-  const options5 = [
-    { id: 1, text: "Price", text: "Price" },
-    { id: 2, text: "150.00", text: "150.00" },
-  ];
+  useEffect(() => {
+    fetchExpenseList();
+  }, []);
 
-  const confirmText = () => {
+  const fetchExpenseList = async () => {
+    setBusy(true);
+    await axios
+      .get(baseUrl)
+      .then((response) => {
+        handleResponse(response, "load", null);
+      })
+      .catch((error) => {
+        handleErrors(error, "load");
+      });
+  };
+
+  const deleteExpense = async (id) => {
+    setBusy(true);
+    await axios
+      .delete(baseUrl + "/" + id)
+      .then((response) => {
+        handleResponse(response, "delete", id);
+      })
+      .catch((error) => {
+        handleErrors(error, "delete");
+      });
+  };
+
+  const handleResponse = (response, type, expenseId) => {
+    setBusy(false);
+    console.log(response);
+    const message =
+      type === "load"
+        ? "Expense Loaded Successfully"
+        : "Expense Deleted Successfully";
+
+    if (response.status === 200 || response.status === 204) {
+      if (type === "load") {
+        setExpenseList(response.data);
+      }
+
+      if (type === "delete") {
+        const expenseListCopy = [...expenseList];
+        const deletedIndex = expenseListCopy.findIndex(
+          (expense) => expense.id === expenseId
+        );
+
+        expenseListCopy.splice(deletedIndex, 1);
+        setExpenseList(expenseListCopy);
+      }
+
+      notify(message, "success", toast);
+    }
+  };
+
+  const handleErrors = (error, type) => {
+    setBusy(false);
+    console.log(error);
+    const message =
+      type === "load" ? "Error Loading Expense" : "Error Deleting Expense";
+    notify(message, "error", toast);
+  };
+
+  const confirmText = (expense) => {
     Swal.fire({
-      title: "Are you sure?",
+      title: `Delete Expense: ${expense.name}?`,
       text: "You won't be able to revert this!",
       type: "warning",
       showCancelButton: !0,
       confirmButtonColor: "#3085d6",
       cancelButtonColor: "#d33",
-      confirmButtonText: "Yes, delete it!",
+      confirmButtonText: "Confirm",
       confirmButtonClass: "btn btn-primary",
       cancelButtonClass: "btn btn-danger ml-1",
       buttonsStyling: !1,
     }).then(function (t) {
-      t.value &&
-        Swal.fire({
-          type: "success",
-          title: "Deleted!",
-          text: "Your file has been deleted.",
-          confirmButtonClass: "btn btn-success",
-        });
+      t.value && deleteExpense(expense.id);
     });
   };
   const togglefilter = (value) => {
     setInputfilter(value);
   };
 
-  const [data] = useState([
-    {
-      id: 1,
-      categoryName: "Employee Benefits",
-      reference: "PT001",
-      date: "19 Nov 2022",
-      status: "Active",
-      amount: "550",
-      description: "Employee Vechicle",
-    },
-    {
-      id: 2,
-      categoryName: "Foods & Snacks",
-      reference: "PT002",
-      date: "19 Nov 2022",
-      status: "In Active",
-      amount: "127",
-      description: "Employee Foods",
-    },
-    {
-      id: 3,
-      categoryName: "Entertainment",
-      reference: "PT003",
-      date: "20 Nov 2022",
-      status: "Active",
-      amount: "765",
-      description: "Office Vechicle",
-    },
-    {
-      id: 4,
-      categoryName: "Office Expenses & Postage",
-      reference: "PT004",
-      date: "19 Nov 2022",
-      status: "Active",
-      amount: "890",
-      description: "Employee Foods",
-    },
-    {
-      id: 5,
-      categoryName: "Entertainment",
-      reference: "PT005",
-      date: "20 Nov 2022",
-      status: "Active",
-      amount: "654",
-      description: "Office Vechicle",
-    },
-    {
-      id: 6,
-      categoryName: "Foods & Snacks",
-      reference: "PT006",
-      date: "19 Nov 2022",
-      status: "In Active",
-      amount: "987",
-      description: "Employee Foods",
-    },
-    {
-      id: 7,
-      categoryName: "Entertainment",
-      reference: "PT007",
-      date: "19 Nov 2022",
-      status: "Active",
-      amount: "878",
-      description: "Office Vechicle",
-    },
-  ]);
-
   const columns = [
     {
-      title: "Category Name",
-      dataIndex: "categoryName",
-      sorter: (a, b) => a.categoryName.length - b.categoryName.length,
-    },
-    {
       title: "Reference",
-      dataIndex: "reference",
-      sorter: (a, b) => a.reference.length - b.reference.length,
+      dataIndex: "id",
+      render: (text, record) => <span>{text.substring(0, 8)}</span>,
     },
     {
-      title: "Date",
-      dataIndex: "date",
-      sorter: (a, b) => a.date.length - b.date.length,
+      title: "Category Name",
+      dataIndex: "expenseType",
+      sorter: (a, b) => a.expenseType.length - b.expenseType.length,
     },
     {
-      title: "Status",
-      dataIndex: "status",
-      render: (text, record) => (
-        <span
-          className={
-            text === "Active" ? "badges bg-lightgreen" : "badges bg-lightred"
-          }
-        >
-          {text}
-        </span>
-      ),
-      sorter: (a, b) => a.status.length - b.status.length,
+      title: "Description",
+      dataIndex: "name",
+      sorter: (a, b) => a.name.length - b.name.length,
     },
     {
       title: "Amount",
       dataIndex: "amount",
       sorter: (a, b) => a.amount.length - b.amount.length,
       width: "125px",
+      render: (text, record) => (
+        <span>
+          Ksh. {text.toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,")}
+        </span>
+      ),
     },
     {
-      title: "Description",
-      dataIndex: "description",
-      sorter: (a, b) => a.description.length - b.description.length,
+      title: "Payment Type",
+      dataIndex: "paymentType",
+      sorter: (a, b) => a.paymentType.length - b.paymentType.length,
+      render: (text, record) => (
+        <span className={"badges bg-lightgreen"}>{text}</span>
+      ),
+    },
+    {
+      title: "Expense Date",
+      dataIndex: "expenseDate",
+      render: (text, record) => <span>{text.split("T")[0]}</span>,
+      sorter: (a, b) => a.expenseDate.length - b.expenseDate.length,
     },
     {
       title: "Action",
-      render: () => (
+      render: (text, record) => (
         <>
-          <Link className="me-3" to="/dream-pos/expense/editexpense-expense">
+          <Link className="me-3" to={ { pathname: "/dream-pos/expense/addexpense-expense", state: { expense: record}} }>
             <img src={EditIcon} alt="img" />
           </Link>
-          <Link className="confirm-text" to="#" onClick={confirmText}>
+          <Link
+            className="confirm-text"
+            to="#"
+            onClick={() => confirmText(record)}
+          >
             <img src={DeleteIcon} alt="img" />
           </Link>
         </>
@@ -217,9 +221,9 @@ const ExpenseList = () => {
               <Tabletop inputfilter={inputfilter} togglefilter={togglefilter} />
               {/* /Filter */}
               <div
-                className={`card mb-0 ${ inputfilter ? "toggleCls" : ""}`}
+                className={`card mb-0 ${inputfilter ? "toggleCls" : ""}`}
                 id="filter_inputs"
-                style={{ display: inputfilter ? "block" :"none"}}
+                style={{ display: inputfilter ? "block" : "none" }}
               >
                 <div className="card-body pb-0">
                   <div className="row">
@@ -294,12 +298,15 @@ const ExpenseList = () => {
               </div>
               {/* /Filter */}
               <div className="table-responsive">
-                <Table columns={columns} dataSource={data} />
+                {expenseList.length && (
+                  <Table columns={columns} dataSource={expenseList} />
+                )}
               </div>
             </div>
           </div>
           {/* /product list */}
         </div>
+        <ToastContainer />
       </div>
     </>
   );
