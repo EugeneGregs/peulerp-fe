@@ -263,7 +263,7 @@ const Header = (props) => {
                         </span>
                         <div className="media-body flex-grow-1">
                           <p className="noti-details">
-                            <span className="noti-title">Bernardo Galaviz</span>{" "}
+                            <span className="noti-title">Eugene Greg</span>{" "}
                             added new task{" "}
                             <span className="noti-title">
                               Private chat module

@@ -1,9 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Table from "../../EntryFile/datatable";
 import Tabletop from "../../EntryFile/tabletop";
 import Select2 from "react-select2-wrapper";
 import "react-select2-wrapper/css/select2.css";
 import { Link } from "react-router-dom";
+import axios from "axios";
+import Modal from "react-bootstrap/Modal";
+import { notify } from "../../common/ToastComponent";
+import { ToastContainer, toast } from "react-toastify";
 import {
   ClosesIcon,
   Excel,
@@ -16,9 +20,109 @@ import {
   EditIcon,
   DeleteIcon,
 } from "../../EntryFile/imagePath";
+import * as Constants from "../../common/Constants";
 
 const PurchaseList = () => {
   const [inputfilter, setInputfilter] = useState(false);
+  const [purchaseList, setPurchaseList] = useState([]);
+  const [productList, setProductList] = useState([]);
+  const [updatedPurchaseList, setUpdatedPurchaseList] = useState([]);
+  const [isBusy, setBusy] = useState(false);
+  const [supplierList, setSupplierList] = useState([]);
+  const [currentPoductList, setCurrentProductList] = useState([]);
+  const [show, setShow] = useState(false);
+  const baseUrl = Constants.BASE_URL;
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setBusy(true);
+      fetchProducts().then(() => {
+        fetchSuppliers();
+      });
+    };
+    fetchData();
+  }, []);
+
+  const handleClose = () => {
+    setShow(false);
+    setEditingProduct({});
+  };
+
+  const handleShow = () => setShow(true);
+
+  useEffect(() => {
+    let purchaseListCopy = [...purchaseList];
+    purchaseListCopy.forEach((purchase) => {
+      purchase.purchaseProducts.map((purchaseProduct) => {
+        const product = productList.find(
+          (product) => product.id === purchaseProduct.productId
+        );
+        purchaseProduct.productName = product.name;
+        purchaseProduct.barCode = product.barCode;
+        purchaseProduct.productCategory = product.productCategory.name;
+        purchaseProduct.purchasePrice = product.buyingPrice;
+      });
+    });
+    setUpdatedPurchaseList([...purchaseListCopy]);
+    setBusy(false);
+  }, [purchaseList]);
+
+  const fetchSuppliers = async () => {
+    const suppliersRes = await axios(`${baseUrl}/suppliers`);
+    const suppliers = suppliersRes.data;
+    setSupplierList([...suppliers]);
+  };
+
+  useEffect(() => {
+    console.log("supplierList: ");
+    console.log(supplierList);
+    fetchPurchases();
+  }, [supplierList]);
+
+  const fetchProducts = async () => {
+    const productsRes = await axios(`${baseUrl}/products`);
+    const products = productsRes.data;
+    setProductList([...products]);
+    console.log(products);
+  };
+
+  const fetchPurchases = async () => {
+    const purchasesRes = await axios(`${baseUrl}/purchases`);
+    const purchases = purchasesRes.data;
+    const supplierListCopy = [...supplierList];
+    console.log(supplierListCopy);
+    purchases.forEach((purchase) => {
+      const supplier = supplierListCopy.find(
+        (supplier) => supplier.id === purchase.supplierId
+      );
+      console.log(supplier);
+      purchase.supplierName = supplier.name;
+    });
+    setPurchaseList([...purchases]);
+    console.log(purchases);
+  };
+
+  const handleDelete = async (id) => {
+    const response = await axios.delete(`${baseUrl}/purchases/${id}`);
+    console.log(response);
+    if (response.status === 200 || response.status === 201 || response.status === 204) {
+      notify("Purchase deleted successfully","success",toast);
+    } else {
+      notify("Purchase deletion failed","error",toast);
+    }
+    const newPurchaseList = purchaseList.filter((purchase) => purchase.id !== id);
+    setPurchaseList([...newPurchaseList]);
+  };
+
+  const handleShowProductList = (currentProductList) => {
+    // console.log(currentProductList);
+    setCurrentProductList([...currentProductList]);
+    handleShow();
+  };
+
+  useEffect(() => {
+    console.log(currentPoductList);
+  }, [currentPoductList]);
 
   const options = [
     { id: 1, text: "Choose Product", text: "Choose Product" },
@@ -47,76 +151,33 @@ const PurchaseList = () => {
     setInputfilter(value);
   };
 
-  const [data] = useState([
-    {
-      id: 1,
-      supplierName: "Apex Computers",
-      reference: "PT001",
-      date: "19 Nov 2022",
-      status: "Received",
-      grandTotal: "550",
-      paid: "120",
-      due: "470",
-      paymentStatus: "Paid",
-    },
-    {
-      id: 2,
-      supplierName: "Best Power Tools",
-      reference: "PT001",
-      date: "19 Nov 2022",
-      status: "Pending",
-      grandTotal: "550",
-      paid: "120",
-      due: "470",
-      paymentStatus: "Unpaid",
-    },
-    {
-      id: 3,
-      supplierName: "Modern Automobile",
-      reference: "PT001",
-      date: "19 Nov 2022",
-      status: "Received",
-      grandTotal: "550",
-      paid: "120",
-      due: "470",
-      paymentStatus: "Paid",
-    },
-    {
-      id: 4,
-      supplierName: "AIM Infotech",
-      reference: "PT001",
-      date: "19 Nov 2022",
-      status: "Ordered",
-      grandTotal: "550",
-      paid: "120",
-      due: "470",
-      paymentStatus: "Partial",
-    },
-  ]);
-
   const columns = [
+    {
+      title: "Refference Number",
+      dataIndex: "refferenceNo",
+      sorter: (a, b) => a.refferenceNo.length - b.refferenceNo.length,
+    },
     {
       title: "Supplier Name",
       dataIndex: "supplierName",
       sorter: (a, b) => a.supplierName.length - b.supplierName.length,
     },
     {
-      title: "Reference",
-      dataIndex: "reference",
-      sorter: (a, b) => a.reference.length - b.reference.length,
+      title: "Description",
+      dataIndex: "description",
+      sorter: (a, b) => a.description.length - b.description.length,
     },
     {
-      title: "Date",
-      dataIndex: "date",
-      sorter: (a, b) => a.date.length - b.date.length,
+      title: "Purchse Date",
+      render: (text, record) => record.createDate.split("T")[0],
     },
     {
       title: "Status",
-      dataIndex: "status",
+      dataIndex: "paymentStatus",
       render: (text, record) => (
         <span
           className={
-            text === "Received"
+            text === "Paid"
               ? "badges bg-lightgreen"
               : text == "Pending"
               ? "badges bg-lightred"
@@ -130,47 +191,42 @@ const PurchaseList = () => {
     },
     {
       title: "Grand Total",
-      dataIndex: "grandTotal",
-      sorter: (a, b) => a.grandTotal.length - b.grandTotal.length,
+      dataIndex: "amount",
+      sorter: (a, b) => a.amount.length - b.amount.length,
       width: "125px",
+      render: (text, record) => (
+        <span>
+          Ksh.{" "}
+          {record.amount.toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,")}
+        </span>
+      ),
     },
     {
       title: "Paid",
-      dataIndex: "paid",
+      dataIndex: "amount",
       sorter: (a, b) => a.paid.length - b.paid.length,
-    },
-    {
-      title: "Due",
-      dataIndex: "due",
-      sorter: (a, b) => a.due.length - b.due.length,
-    },
-    {
-      title: "Payment Status",
-      dataIndex: "paymentStatus",
       render: (text, record) => (
-        <span
-          className={
-            text === "Paid"
-              ? "badges bg-lightgreen"
-              : text == "Unpaid"
-              ? "badges bg-lightred"
-              : "badges bg-lightyellow"
-          }
-        >
-          {text}
+        <span>
+          Ksh.{" "}
+          {record.amount.toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,")}
         </span>
       ),
-      sorter: (a, b) => a.paymentStatus.length - b.paymentStatus.length,
-      width: "120px",
     },
     {
       title: "Action",
-      render: () => (
+      render: (text, record) => (
         <>
-          <Link className="me-3" to="/dream-pos/purchase/editpurchase-purchase">
+          <Link
+            className="me-3"
+            to="#"
+            onClick={() => handleShowProductList(record.purchaseProducts)}
+          >
+            <img src={Excel} alt="img" />
+          </Link>
+          <Link className="me-3" to={ { pathname: "/dream-pos/purchase/addpurchase-purchase", state: { purchase: record } } } >
             <img src={EditIcon} alt="img" />
           </Link>
-          <Link className="confirm-text" to="">
+          <Link className="confirm-text" to="#" onClick={() => handleDelete(record.id)}>
             <img src={DeleteIcon} alt="img" />
           </Link>
         </>
@@ -203,9 +259,9 @@ const PurchaseList = () => {
               <Tabletop inputfilter={inputfilter} togglefilter={togglefilter} />
               {/* /Filter */}
               <div
-                className={`card mb-0 ${ inputfilter ? "toggleCls" : ""}`}
+                className={`card mb-0 ${inputfilter ? "toggleCls" : ""}`}
                 id="filter_inputs"
-                style={{ display: inputfilter ? "block" :"none"}}
+                style={{ display: inputfilter ? "block" : "none" }}
               >
                 <div className="card-body pb-0">
                   <div className="row">
@@ -280,12 +336,54 @@ const PurchaseList = () => {
               </div>
               {/* /Filter */}
               <div className="table-responsive">
-                <Table columns={columns} dataSource={data} />
+                {!isBusy && (
+                  <Table columns={columns} dataSource={updatedPurchaseList} />
+                )}
+                <Modal dialogClassName="modal-lg" show={show} onHide={handleClose}>
+                  <Modal.Header closeButton>
+                    <Modal.Title>{`Product List`}</Modal.Title>
+                  </Modal.Header>
+                  <Modal.Body>
+                    <table className="table table-striped table-responsive">
+                      <thead>
+                        <tr>
+                          <th scope="col">#</th>
+                          <th scope="col">Name</th>
+                          <th scope="col">Product Code</th>
+                          <th scope="col">Category</th>
+                          <th scope="col">Quantity</th>
+                          <th scope="col">Purchase Price</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {currentPoductList.map((product, index) => (
+                          <tr>
+                          <th scope="row">{index+1}</th>
+                          <td>{product.productName}</td>
+                          <td>{product.barCode}</td>
+                          <td>{product.productCategory}</td>
+                          <td>{product.quantity.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,")}</td>
+                          <td>Ksh. {product.purchasePrice.toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,")}</td>
+                        </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </Modal.Body>
+                  <Modal.Footer>
+                    <button
+                      className="btn btn-secondary btn-sm"
+                      onClick={handleClose}
+                    >
+                      Close
+                    </button>
+                  </Modal.Footer>
+                </Modal>
               </div>
             </div>
           </div>
           {/* /product list */}
         </div>
+        <ToastContainer />
       </div>
     </>
   );

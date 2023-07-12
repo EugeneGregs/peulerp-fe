@@ -10,7 +10,7 @@ import {
     Search    
   } from "../EntryFile/imagePath";
 
-const Tabletop = ({inputfilter,togglefilter}) => {
+const Tabletop = ({inputfilter, togglefilter, filterFunction, filterValue}) => {
   return (
     <div className="table-top">
       <div className="search-set">
@@ -33,6 +33,8 @@ const Tabletop = ({inputfilter,togglefilter}) => {
             className="form-control form-control-sm search-icon"
             type="text"
             placeholder="Search..."
+            value={filterValue}
+            onChange={filterFunction}
           />
           <Link to="#" className="btn btn-searchset">
             <img src={Search} alt="img" />

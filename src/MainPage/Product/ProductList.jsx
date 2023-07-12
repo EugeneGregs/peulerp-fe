@@ -21,9 +21,12 @@ import {
 } from "../../EntryFile/imagePath";
 import Select2 from "react-select2-wrapper";
 import "react-select2-wrapper/css/select2.css";
+import Loader from "react-js-loader";
+import axios from "axios";
+import * as Constants from "../../common/Constants";
 
 const ProductList = () => {
-  const [inputfilter, setInputfilter] = useState(false);  
+  const [inputfilter, setInputfilter] = useState(false);
 
   //select2
   const options = [
@@ -49,264 +52,137 @@ const ProductList = () => {
     { id: 2, text: "150.00", text: "150.00" },
   ];
 
-  const products = [
-    {
-      id: 1,
-      image: MacbookIcon,
-      productName: "Macbook pro",
-      sku: "PT001",
-      category: "Computer",
-      brand: "N/D",
-      price: "1500.00",
-      unit: "pc",
-      qty: "100.00",
-      createdBy: "Admin",
-    },
-    {
-      id: 2,
-      image: OrangeImage,
-      productName: "Orange",
-      sku: "PT002",
-      category: "Fruits",
-      brand: "N/D",
-      price: "20.00",
-      unit: "pc",
-      qty: "100.00",
-      createdBy: "Admin",
-    },
-    {
-      id: 3,
-      image: PineappleImage,
-      productName: "Pinapple",
-      sku: "PT003",
-      category: "Fruits",
-      brand: "N/D",
-      price: "10.00",
-      unit: "pc",
-      qty: "100.00",
-      createdBy: "Admin",
-    },
-    {
-      id: 4,
-      image: StawberryImage,
-      productName: "Strawberry",
-      sku: "PT004",
-      category: "Fruits",
-      brand: "N/D",
-      price: "150.00",
-      unit: "pc",
-      qty: "100.00",
-      createdBy: "Admin",
-    },
-    {
-      id: 5,
-      image: AvocatImage,
-      productName: "Avocat",
-      sku: "PT005",
-      category: "Fruits",
-      brand: "N/D",
-      price: "1 500.00",
-      unit: "pc",
-      qty: "100.00",
-      createdBy: "Admin",
-    },
-    {
-      id: 6,
-      image: MacbookIcon,
-      productName: "Macbook pro",
-      sku: "PT006",
-      category: "Computer",
-      brand: "N/D",
-      price: "1500.00",
-      unit: "pc",
-      qty: "100.00",
-      createdBy: "Admin",
-    },
-    {
-      id: 7,
-      image: EarpodIcon,
-      productName: "Apple Earpods",
-      sku: "PT007",
-      category: "Computer",
-      brand: "N/D",
-      price: "1500.00",
-      unit: "pc",
-      qty: "100.00",
-      createdBy: "Admin",
-    },
-    {
-      id: 8,
-      image: IphoneIcon,
-      productName: "iPhone 11",
-      sku: "PT008",
-      category: "Computer",
-      brand: "N/D",
-      price: "1500.00",
-      unit: "pc",
-      qty: "100.00",
-      createdBy: "Admin",
-    },
-    {
-      id: 9,
-      image: SamsungIcon,
-      productName: "Samsung",
-      sku: "PT009",
-      category: "Computer",
-      brand: "N/D",
-      price: "120.00",
-      unit: "pc",
-      qty: "100.00",
-      createdBy: "Admin",
-    },
-    {
-      id: 10,
-      image: EarpodIcon,
-      productName: "Banana",
-      sku: "PT0010",
-      category: "Computer",
-      brand: "N/D",
-      price: "4500.00",
-      unit: "pc",
-      qty: "100.00",
-      createdBy: "Admin",
-    },
-    {
-      id: 11,
-      image: MacbookIcon,
-      productName: "Macbook pro",
-      sku: "PT0011",
-      category: "Computer",
-      brand: "N/D",
-      price: "1550.00",
-      unit: "pc",
-      qty: "100.00",
-      createdBy: "Admin",
-    },
-    {
-      id: 12,
-      image: AvocatImage,
-      productName: "Avocat",
-      sku: "PT0012",
-      category: "Computer",
-      brand: "N/D",
-      price: "1505.00",
-      unit: "pc",
-      qty: "100.00",
-      createdBy: "Admin",
-    },
-    {
-      id: 13,
-      image: AvocatImage,
-      productName: "Sabuni",
-      sku: "PT00123",
-      category: "Soaps",
-      brand: "N/D",
-      price: "200.00",
-      unit: "pc",
-      qty: "100.00",
-      createdBy: "Greg",
-    }
-  ];
-
-  const [data, updateData] = useState([]);
-  let people = [];
+  let products = []
+  const [data, updateData] = useState({ products: [], filtered: [] });
+  const [isBusy, setBusy] = useState(true);
+  const [filterValue, setFilterValue] = useState('');
+  const baseUrl = Constants.BASE_URL;
 
   useEffect(() => {
-    console.log(products);
-    updateData(products);
-    getUsers();
-    getProducts();
+    console.log("BASE_URL::")
+    console.log(baseUrl)
+    setBusy(true);
+    const fetchData = async () => {
+      axios.get(`${baseUrl}/products`)
+        .then(res => {
+          const resData = res.data;
+          let products = resData ? [...resData.map(p => { return {name: p.name, sellingPrice: p.sellingPrice, buyingPrice: p.buyingPrice, barCode: p.barCode, productCategory: { name: p.productCategory.name, id: p.productCategory.id}, id: p.id} })] : [];
+          updateData({products : [...products], filtered: [...products]});
+          setBusy(false);
+        })
+    }
+
+    fetchData().catch(console.log(console.error));
   }, []);
-  
-  const togglefilter = (value) => {    
-    setInputfilter(value);  
+
+  const togglefilter = (value) => {
+    setInputfilter(value);
+    // updateData(data.splice(0,10));
   };
-  const confirmText = () => {
+
+  useEffect(() => {
+    console.log("SearchKey::" + filterValue);
+    if(!filterValue){
+      console.log(data.products);
+      updateData({products: [...data.products], filtered: [...data.products]});
+    } else {
+      const filteredData = data.products.filter( p => p.name.replaceAll(' ','').toLowerCase().includes(filterValue) || p.productCategory.name.replaceAll(' ','').toLowerCase().includes(filterValue));
+      (filteredData && filteredData.length) ? updateData({products: [...data.products], filtered: [...filteredData]}) : updateData({products: [...data.products], filtered: [...data.filtered]});
+    }
+  }, [filterValue])
+
+  const filterData = (e) => {
+    console.log(data);
+    let inputValue = e.target.value.trim().toLowerCase();
+    setFilterValue(inputValue);
+  };
+
+  const deleteProduct = (product) => {
+    console.log(product);
+
+    axios.delete(`${baseUrl}/products/${product.id}`)
+      .then(res => {
+        const products = data.products;
+        const filtered = data.filtered;
+        const filteredIndex = filtered.indexOf(filtered.find(f => f.id == product.id));
+        const productIndex = products.indexOf(products.find(f => f.id == product.id));
+
+        productIndex >= 0 && products.splice(productIndex, 1);
+        filteredIndex >= 0 && filtered.splice(filteredIndex, 1);
+
+        updateData({ products: [...data.products], filtered: [...data.filtered] } );
+
+        Swal.fire({
+          type: "success",
+          title: "Deleted!",
+          text: `${product.name} Deleted Successfully`,
+          confirmButtonClass: "btn btn-success",
+        });
+    })
+  }
+
+  const confirmText = (product) => {
     Swal.fire({
-      title: "Are you sure?",
+      title: `Delete ${product.name}?`,
       text: "You won't be able to revert this!",
       type: "warning",
       showCancelButton: !0,
       confirmButtonColor: "#3085d6",
       cancelButtonColor: "#d33",
-      confirmButtonText: "Yes, delete it!",
+      confirmButtonText: "Confirm",
       confirmButtonClass: "btn btn-primary",
       cancelButtonClass: "btn btn-danger ml-1",
       buttonsStyling: !1,
     }).then(function (t) {
-      t.value &&
-        Swal.fire({
-          type: "success",
-          title: "Deleted!",
-          text: "Your file has been deleted.",
-          confirmButtonClass: "btn btn-success",
-        });
+      t.value && deleteProduct(product);
     });
   };
+
+  const imageAddress = "https://cdn-icons-png.flaticon.com/512/3703/3703259.png";
 
   const columns = [
     {
       title: "Product Name",
-      dataIndex: "productName",
+      dataIndex: "name",
       render: (text, record) => (
         <div className="productimgname">
           <Link className="product-img">
-            <img alt="" src={record.image} />
+            <img alt="" src={imageAddress} />
           </Link>
           <Link style={{ fontSize: "15px", marginLeft: "10px" }}>
-            {record.productName}
+            {record.name}
           </Link>
         </div>
       ),
-      sorter: (a, b) => a.productName.length - b.productName.length,
+      sorter: (a, b) => a.name.length - b.name.length,
     },
     {
-      title: "SKU",
-      dataIndex: "sku",
-      sorter: (a, b) => a.sku.length - b.sku.length,
+      title: "Code",
+      dataIndex: "barCode",
+      sorter: (a, b) => a.barCode.length - b.barCode.length,
     },
     {
       title: "Category",
-      dataIndex: "category",
-      sorter: (a, b) => a.category.length - b.category.length,
-    },
-    {
-      title: "Brand",
-      dataIndex: "brand",
-      sorter: (a, b) => a.brand.length - b.brand.length,
+      render: (record) => record.productCategory.name,
+      sorter: (a, b) => a.productCategory.name.length - b.productCategory.name.length,
     },
     {
       title: "Price",
-      dataIndex: "price",
-      sorter: (a, b) => a.price.length - b.price.length,
-    },
-    {
-      title: "Unit",
-      dataIndex: "unit",
-      sorter: (a, b) => a.unit.length - b.unit.length,
-    },
-    {
-      title: "Qty",
-      dataIndex: "qty",
-      sorter: (a, b) => a.qty.length - b.qty.length,
-    },
-    {
-      title: "Created By",
-      dataIndex: "createdBy",
-      sorter: (a, b) => a.createdBy.length - b.createdBy.length,
+      dataIndex: "sellingPrice",
+      sorter: (a, b) => a.sellingPrice.length - b.sellingPrice.length,
     },
     {
       title: "Action",
-      render: () => (
+      render: (text, record) => (
         <>
           <>
             <Link className="me-3" to="/dream-pos/product/product-details">
               <img src={EyeIcon} alt="img" />
             </Link>
-            <Link className="me-3" to="/dream-pos/product/editproduct-product">
+            <Link className="me-3" to={{ pathname: "/dream-pos/product/addproduct-product", state: { product: record } }}>
               <img src={EditIcon} alt="img" />
             </Link>
-            <Link className="confirm-text" to="#" onClick={confirmText}>
+            <Link className="confirm-text" to="#" onClick={() => confirmText(record)}>
               <img src={DeleteIcon} alt="img" />
             </Link>
           </>
@@ -337,15 +213,17 @@ const ProductList = () => {
           {/* /product list */}
           <div className="card">
             <div className="card-body">
-            <Tabletop 
-              inputfilter={inputfilter}
-              togglefilter={togglefilter}
-            />
+              <Tabletop
+                inputfilter={inputfilter}
+                togglefilter={togglefilter}
+                filterFunction={filterData}
+                filterValue = {filterValue}
+              />
               {/* /Filter */}
               <div
-                className={`card mb-0 ${ inputfilter ? "toggleCls" : ""}`}
+                className={`card mb-0 ${inputfilter ? "toggleCls" : ""}`}
                 id="filter_inputs"
-                style={{ display: inputfilter ? "block" :"none"}}
+                style={{ display: inputfilter ? "block" : "none" }}
               >
                 <div className="card-body pb-0">
                   <div className="row">
@@ -420,10 +298,9 @@ const ProductList = () => {
               </div>
               {/* /Filter */}
               <div className="table-responsive">
-                <Table                                    
-                  columns={columns}
-                  dataSource={data}                 
-                />
+                {
+                  isBusy ? (<div className={"item"}> <Loader type="spinner-default" bgColor={"#FFFFFF"} title={"spinner-default"} color={'#FFFFFF'} size={100} /> </div>)
+                    : <Table columns={columns} dataSource={data.filtered} /> }
               </div>
             </div>
           </div>

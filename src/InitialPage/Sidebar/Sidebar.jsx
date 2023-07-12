@@ -127,7 +127,7 @@ const Sidebar = (props) => {
                           Add Category{" "}
                         </Link>
                       </li>
-                      <li>
+                      {/* <li>
                         <Link
                           className={
                             pathname.includes("subcategorytable-")
@@ -188,7 +188,7 @@ const Sidebar = (props) => {
                         >
                           Print Barcode
                         </Link>
-                      </li>
+                      </li> */}
                     </ul>
                   ) : (
                     ""
@@ -226,7 +226,7 @@ const Sidebar = (props) => {
                       <li>
                         <Link to="/pos">POS</Link>
                       </li>
-                      <li>
+                      {/* <li>
                         <Link
                           to="/dream-pos/sales/add-sales"
                           className={
@@ -235,7 +235,7 @@ const Sidebar = (props) => {
                         >
                           New Sales
                         </Link>
-                      </li>
+                      </li> */}
                       <li>
                         <Link
                           className={
@@ -301,7 +301,7 @@ const Sidebar = (props) => {
                           Add Purchase
                         </Link>
                       </li>
-                      <li>
+                      {/* <li>
                         <Link
                           className={
                             pathname.includes("importpurchase-") ? "active" : ""
@@ -310,7 +310,7 @@ const Sidebar = (props) => {
                         >
                           Import Purchase
                         </Link>
-                      </li>
+                      </li> */}
                     </ul>
                   ) : (
                     ""
@@ -373,7 +373,7 @@ const Sidebar = (props) => {
                     ""
                   )}
                 </li>
-                <li className="submenu">
+                {/* <li className="submenu">
                   <a
                     href="#"
                     className={
@@ -419,7 +419,7 @@ const Sidebar = (props) => {
                   ) : (
                     ""
                   )}
-                </li>
+                </li> */}
                 <li className="submenu">
                   <a
                     href="#"
@@ -460,7 +460,7 @@ const Sidebar = (props) => {
                           Add Transfer
                         </Link>
                       </li>
-                      <li>
+                      {/* <li>
                         <Link
                           className={
                             pathname.includes("importtransfer-") ? "active" : ""
@@ -469,7 +469,7 @@ const Sidebar = (props) => {
                         >
                           Import Transfer
                         </Link>
-                      </li>
+                      </li> */}
                     </ul>
                   ) : (
                     ""
@@ -566,7 +566,7 @@ const Sidebar = (props) => {
                   </a>
                   {isSideMenu == "people" ? (
                     <ul>
-                      <li>
+                      {/* <li>
                         <Link
                           className={
                             pathname.includes("customerlist-") ? "active" : ""
@@ -585,7 +585,7 @@ const Sidebar = (props) => {
                         >
                           Add Customer
                         </Link>
-                      </li>
+                      </li> */}
                       <li>
                         <Link
                           className={
@@ -626,7 +626,7 @@ const Sidebar = (props) => {
                           Add User
                         </Link>
                       </li>
-                      <li>
+                      {/* <li>
                         <Link
                           className={
                             pathname.includes("storelist-") ? "active" : ""
@@ -645,13 +645,13 @@ const Sidebar = (props) => {
                         >
                           Add Store
                         </Link>
-                      </li>
+                      </li> */}
                     </ul>
                   ) : (
                     ""
                   )}
                 </li>
-                <li className="submenu">
+                {/* <li className="submenu">
                   <a
                     href="#"
                     className={
@@ -715,8 +715,8 @@ const Sidebar = (props) => {
                   ) : (
                     ""
                   )}
-                </li>
-                <li className={pathname.includes("components") ? "active" : ""}>
+                </li> */}
+                {/* <li className={pathname.includes("components") ? "active" : ""}>
                   <Link
                     to="/dream-pos/components"
                     onClick={() => toggleSidebar(isSideMenu == "" ? "" : "")}
@@ -1378,7 +1378,7 @@ const Sidebar = (props) => {
                   ) : (
                     ""
                   )}
-                </li>
+                </li> */}
                 <li className="submenu">
                   <Link
                     to="#"
@@ -1460,7 +1460,7 @@ const Sidebar = (props) => {
                           Supplier Report
                         </Link>
                       </li>
-                      <li>
+                      {/* <li>
                         <Link
                           to="/dream-pos/report/customerreport"
                           className={
@@ -1469,7 +1469,7 @@ const Sidebar = (props) => {
                         >
                           Customer Report
                         </Link>
-                      </li>
+                      </li> */}
                     </ul>
                   ) : (
                     ""
@@ -1519,7 +1519,7 @@ const Sidebar = (props) => {
                     ""
                   )}
                 </li>
-                <li className="submenu">
+                {/* <li className="submenu">
                   <Link
                     to="#"
                     className={
@@ -1604,7 +1604,7 @@ const Sidebar = (props) => {
                   ) : (
                     ""
                   )}
-                </li>
+                </li> */}
               </ul>
             </div>
           </div>
