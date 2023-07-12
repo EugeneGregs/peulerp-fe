@@ -1,6 +1,8 @@
 import axios from "axios";
 
-const baseUrl = "http://localhost:5071";
+import * as Constants from "../common/Constants";
+
+const baseUrl = Constants.BASE_URL;
 const products = [
     {
       id: 1,

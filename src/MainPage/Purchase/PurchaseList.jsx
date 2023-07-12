@@ -20,6 +20,7 @@ import {
   EditIcon,
   DeleteIcon,
 } from "../../EntryFile/imagePath";
+import * as Constants from "../../common/Constants";
 
 const PurchaseList = () => {
   const [inputfilter, setInputfilter] = useState(false);
@@ -30,7 +31,7 @@ const PurchaseList = () => {
   const [supplierList, setSupplierList] = useState([]);
   const [currentPoductList, setCurrentProductList] = useState([]);
   const [show, setShow] = useState(false);
-  const baseUrl = "http://localhost:5071";
+  const baseUrl = Constants.BASE_URL;
 
   useEffect(() => {
     const fetchData = async () => {

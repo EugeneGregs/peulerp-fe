@@ -8,10 +8,11 @@ import { Link } from "react-router-dom";
 import * as xlsx from "xlsx";
 import Table from "../../EntryFile/datatable";
 import { set } from "react-hook-form";
+import * as Constants from "../../common/Constants";
 
 const AddCategory = () => {
   const [category, setCategory] = React.useState("");
-  const baseUrl = "http://localhost:5071";
+  const baseUrl = Constants.BASE_URL;
   const { state } = useLocation();
   const [saveType, setSaveType] = React.useState("post");
   const [isBulkUpload, setIsBulkUpload] = React.useState(false);

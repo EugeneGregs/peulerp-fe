@@ -19,6 +19,7 @@ import Modal from "react-bootstrap/Modal";
 import { notify } from "../../common/ToastComponent";
 import { ToastContainer, toast } from "react-toastify";
 import { useLocation } from "react-router-dom";
+import * as Constants from "../../common/Constants";
 
 const paymentStatusOptions = [
   { value: 1, label: "Paid" },
@@ -26,7 +27,7 @@ const paymentStatusOptions = [
   { value: 3, label: "Partial" },
 ];
 
-const baseUrl = "http://localhost:5071";
+const baseUrl = Constants.BASE_URL;
 
 const AddPurchase = () => {
   const { state } = useLocation();

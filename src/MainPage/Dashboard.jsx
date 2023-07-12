@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 import {
   AvocatImage,
   Dash1,
@@ -21,193 +22,230 @@ import { Link } from "react-router-dom";
 import FeatherIcon from "feather-icons-react";
 import CountUp from "react-countup";
 import { Helmet } from "react-helmet";
+import * as Constants from "../common/Constants";
+import { notify } from "../common/ToastComponent";
+import { ToastContainer, toast } from "react-toastify";
 
-const state = {
-  series: [
-    {
-      name: "Sales",
-      data: [50, 45, 60, 70, 50, 45, 60, 70],
-    },
-    {
-      name: "Purchase",
-      data: [-21, -54, -45, -35, -21, -54, -45, -35],
-    },
-  ],
-  options: {
-    colors: ["#28C76F", "#EA5455"],
-    chart: {
-      type: "bar",
-      height: 300,
-      stacked: true,
-
-      zoom: {
-        enabled: true,
-      },
-    },
-    responsive: [
-      {
-        breakpoint: 280,
-        options: {
-          legend: {
-            position: "bottom",
-            offsetY: 0,
-          },
-        },
-      },
-    ],
-    plotOptions: {
-      bar: {
-        horizontal: false,
-        columnWidth: "20%",
-        borderRadius: 5,
-        borderRadiusTop: 5,
-      },
-    },
-    xaxis: {
-      categories: [
-        " Jan ",
-        "feb",
-        "march",
-        "april",
-        "may",
-        "june",
-        "july",
-        "auguest",
-      ],
-    },
-    legend: {
-      position: "top",
-    },
-    fill: {
-      opacity: 1,
-    },
-  },
-};
+const baseUrl = Constants.BASE_URL;
 
 const Dashboard = (props) => {
-  const [expiredData] = useState([
-    {
-      key: 1,
-      code: "IT001",
-      image: OrangeImage,
-      productName: "Orange",
-      brandName: "N/D",
-      categoryName: "Fruits",
-      expiryDate: "12-12-2022",
-    },
-    {
-      key: 2,
-      code: "IT002",
-      image: PineappleImage,
-      productName: "Pineapple",
-      brandName: "N/D",
-      categoryName: "Fruits",
-      expiryDate: "10-12-2022",
-    },
-    {
-      key: 3,
-      code: "IT003",
-      image: StawberryImage,
-      productName: "Stawberry",
-      brandName: "N/D",
-      categoryName: "Fruits",
-      expiryDate: "27-06-2022",
-    },
-    {
-      key: 4,
-      code: "IT004",
-      image: AvocatImage,
-      productName: "Avocat",
-      brandName: "N/D",
-      categoryName: "Fruits",
-      expiryDate: "20-05-2022",
-    },
-  ]);
+  const [diminishingProducts, setDiminishingProducts] = useState([]);
+  const [dashboardSummary, setDashboardSummary] = useState({});
+  const [suppliers, setSuppliers] = useState([]);
+  const [totalSales, setTotalSales] = useState(0);
+  const [totalPurchase, setTotalPurchase] = useState(0);
+  const [grossProfit, setGrossProfit] = useState(0);
+  const [totalExpenses, setTotalExpenses] = useState(0);
+  const [transactionCount, setTransactionCount] = useState(0);
+  const [monthlySales, setMonthlySales] = useState([]);
+  const [monthlyPurchases, setMonthlyPurchases] = useState([]);
+  const [isBusy, setBusy] = useState(false);
 
-  const [recentData] = useState([
-    { key: 1, image: EarpodIcon, products: "Apple Earpods", price: "$891.2" },
-    { key: 2, image: IphoneIcon, products: "iPhone 11", price: "$91.2" },
-    { key: 3, image: SamsungIcon, products: "Samsung", price: "$561.2" },
-    { key: 4, image: MacbookIcon, products: "Macbook Pro", price: "$1009.2" },
-  ]);
+  const state = {
+    series: [
+      {
+        name: "Sales",
+        data: monthlySales,
+      },
+      {
+        name: "Purchase",
+        data: monthlyPurchases,
+      },
+    ],
+    options: {
+      colors: ["#28C76F", "#EA5455"],
+      chart: {
+        type: "bar",
+        height: 300,
+        stacked: true,
 
-  const expiredProductColumns = [
+        zoom: {
+          enabled: true,
+        },
+      },
+      responsive: [
+        {
+          breakpoint: 280,
+          options: {
+            legend: {
+              position: "bottom",
+              offsetY: 0,
+            },
+          },
+        },
+      ],
+      plotOptions: {
+        bar: {
+          horizontal: false,
+          columnWidth: "20%",
+          borderRadius: 5,
+          borderRadiusTop: 5,
+        },
+      },
+      xaxis: {
+        categories: [
+          "Jan ",
+          "Feb",
+          "March",
+          "April",
+          "May",
+          "June",
+          "July",
+          "Aug",
+        ],
+      },
+      legend: {
+        position: "top",
+      },
+      fill: {
+        opacity: 1,
+      },
+    },
+  };
+
+  useEffect(() => {
+    Promise.all([
+      fetchDiminishingProducts(),
+      fetchDashboardSummary(),
+      fetchSuppliers(),
+    ]);
+  }, []);
+
+  useEffect(() => {
+    if (dashboardSummary && dashboardSummary.salesSummary) {
+      console.log("dashboardSummary:::=>");
+      console.log(dashboardSummary);
+      const { salesSummary, purchaseSummary, expenseSummary } =
+        dashboardSummary;
+
+      setTotalSales(salesSummary.totalSales);
+      setTotalPurchase(purchaseSummary.totalPurchases);
+      setGrossProfit(salesSummary.grossProfit);
+      setTotalExpenses(expenseSummary.totalExpenses);
+      setTransactionCount(salesSummary.transactionCount);
+
+      const localMonthlySalesAggregation = populateMonthlyAggregate(
+        salesSummary.monthlyAggregation,
+        "sales"
+      );
+      const localMonthlyPurchasesAggregation = populateMonthlyAggregate(
+        purchaseSummary.monthlyPurchaseTotals,
+        "purchase"
+      );
+
+      setMonthlySales(localMonthlySalesAggregation);
+      setMonthlyPurchases(localMonthlyPurchasesAggregation);
+    }
+  }, [dashboardSummary]);
+
+  const populateMonthlyAggregate = (summary, type) => {
+    let summaryToPopulate = [];
+    if (!summary) {
+      for (let i = 1; i <= 12; i++) {
+        summaryToPopulate.push(0);
+      }
+      return summaryToPopulate;
+    }
+    const monthNumbers = Object.keys(summary).sort();
+
+    for (let i = 1; i < +monthNumbers[0]; i++) {
+      summaryToPopulate.push(0);
+    }
+
+    monthNumbers.forEach((m) => {
+      const sum = type === "sales" ? summary[m] : -summary[m];
+      summaryToPopulate.push(sum);
+    });
+
+    return summaryToPopulate;
+  };
+
+  const fetchDiminishingProducts = async () => {
+    axios
+      .get(`${baseUrl}/diminishing`)
+      .then((res) => {
+        const resData = res.data;
+        console.log(resData);
+        setDiminishingProducts([...resData]);
+      })
+      .catch((error) => {
+        handleErrors(error);
+      });
+  };
+
+  const fetchDashboardSummary = async () => {
+    axios
+      .get(`${baseUrl}/dashboard`)
+      .then((res) => {
+        const resData = res.data;
+        console.log(resData);
+        setDashboardSummary({ ...resData });
+      })
+      .catch((error) => {
+        handleErrors(error);
+      });
+  };
+
+  const fetchSuppliers = async () => {
+    axios
+      .get(`${baseUrl}/suppliers`)
+      .then((res) => {
+        const resData = res.data;
+        console.log(resData);
+        setSuppliers([...resData]);
+      })
+      .catch((error) => {
+        handleErrors(error);
+      });
+  };
+
+  const handleErrors = (error) => {
+    notify("Error Loading Dashboard", "error", toast);
+  };
+
+  const suppliersColumns = [
     {
-      title: "SNo",
-      dataIndex: "key",
-      sorter: (a, b) => a.key.length - b.key.length,
+      title: "Supplier Name",
+      dataIndex: "name",
+      sorter: (a, b) => a.name.length - b.name.length,
     },
     {
-      title: "Product Code",
-      dataIndex: "code",
-      render: (text, record) => (
-        <Link to="#" style={{ fontSize: "14px" }}>
-          {text}
-        </Link>
-      ),
-      sorter: (a, b) => a.code.length - b.code.length,
+      title: "Address",
+      dataIndex: "address",
+      sorter: (a, b) => a.address.length - b.address.length,
     },
     {
-      title: "Product Name",
-      dataIndex: "productName",
-      render: (text, record) => (
-        <div className="productimgname">
-          <Link to="#" className="product-img">
-            <img alt="" src={record.image} />
-          </Link>
-          <Link to="#" style={{ fontSize: "14px" }}>
-            {record.productName}
-          </Link>
-        </div>
-      ),
-      sorter: (a, b) => a.productName.length - b.productName.length,
+      title: "Phone",
+      dataIndex: "phone",
+      sorter: (a, b) => a.phone.length - b.phone.length,
     },
     {
-      title: "Brand Name",
-      dataIndex: "brandName",
-      render: (text, record) => <div style={{ fontSize: "14px" }}>{text}</div>,
-      sorter: (a, b) => a.brandName.length - b.brandName.length,
+      title: "Email",
+      dataIndex: "email",
+      sorter: (a, b) => a.email.length - b.email.length,
     },
     {
-      title: "Category Name",
-      dataIndex: "categoryName",
-      render: (text, record) => <div style={{ fontSize: "14px" }}>{text}</div>,
-      sorter: (a, b) => a.categoryName.length - b.categoryName.length,
-    },
-    {
-      title: "Expiry Date",
-      dataIndex: "expiryDate",
-      render: (text, record) => <div style={{ fontSize: "14px" }}>{text}</div>,
-      sorter: (a, b) => a.expiryDate.length - b.expiryDate.length,
+      title: "Description",
+      dataIndex: "description",
+      sorter: (a, b) => a.description.length - b.description.length,
     },
   ];
 
-  const recentDataColumns = [
+  const diminishingProductsColumns = [
     {
-      title: "SNo",
-      dataIndex: "key",
+      title: "Name",
+      dataIndex: "name",
       sorter: (a, b) => a.key.length - b.key.length,
     },
     {
-      title: "Products",
-      dataIndex: "products",
-      render: (text, record) => (
-        <div className="productimgname">
-          <Link to="#" className="product-img">
-            <img alt="" src={record.image} />
-          </Link>
-          <Link to="#" style={{ fontSize: "14px" }}>
-            {record.products}
-          </Link>
-        </div>
-      ),
-      sorter: (a, b) => a.products.length - b.products.length,
-      width: "250px",
+      title: "Category",
+      dataIndex: "productCategory",
+      render: (text, record) => <span>{record.productCategory.name}</span>,
+      sorter: (a, b) => a.key.length - b.key.length,
     },
     {
-      title: "Price",
-      dataIndex: "price",
-      render: (text, record) => <div style={{ fontSize: "14px" }}>{text}</div>,
+      title: "Code",
+      dataIndex: "barCode",
       sorter: (a, b) => a.price.length - b.price.length,
     },
   ];
@@ -216,7 +254,7 @@ const Dashboard = (props) => {
     <>
       <div className="page-wrapper">
         <Helmet>
-          <title>Dreams Pos admin template</title>
+          <title>Admin Dashboard</title>
           <meta name="description" content="Dashboard page" />
         </Helmet>
         <div className="content">
@@ -230,12 +268,12 @@ const Dashboard = (props) => {
                 </div>
                 <div className="dash-widgetcontent">
                   <h5>
-                    $
+                    Ksh.
                     <span className="counters">
-                      <CountUp end={307144} />
+                      <CountUp end={totalSales} />
                     </span>
                   </h5>
-                  <h6>Total Purchase Due</h6>
+                  <h6>Total Sales</h6>
                 </div>
               </div>
             </div>
@@ -248,12 +286,12 @@ const Dashboard = (props) => {
                 </div>
                 <div className="dash-widgetcontent">
                   <h5>
-                    $
+                    Ksh.
                     <span className="counters">
-                      <CountUp end={4385} />
+                      <CountUp end={totalPurchase} />
                     </span>
                   </h5>
-                  <h6>Total Sales Due</h6>
+                  <h6>Total Purchases</h6>
                 </div>
               </div>
             </div>
@@ -266,12 +304,12 @@ const Dashboard = (props) => {
                 </div>
                 <div className="dash-widgetcontent">
                   <h5>
-                    $
+                    Ksh.
                     <span className="counters">
-                      <CountUp end={385656.5} />
+                      <CountUp end={totalExpenses} />
                     </span>
                   </h5>
-                  <h6>Total Sale Amount</h6>
+                  <h6>Total Expenses</h6>
                 </div>
               </div>
             </div>
@@ -284,20 +322,20 @@ const Dashboard = (props) => {
                 </div>
                 <div className="dash-widgetcontent">
                   <h5>
-                    $
+                    Ksh.
                     <span className="counters">
-                      <CountUp end={40000} />
+                      <CountUp end={grossProfit} />
                     </span>
                   </h5>
-                  <h6>Total Sale Amount</h6>
+                  <h6>Gross Profit</h6>
                 </div>
               </div>
             </div>
             <div className="col-lg-3 col-sm-6 col-12 d-flex">
               <div className="dash-count">
                 <div className="dash-counts">
-                  <h4>100</h4>
-                  <h5>Customers</h5>
+                  <h4>{transactionCount}</h4>
+                  <h5>Transactions</h5>
                 </div>
                 <div className="dash-imgs">
                   <FeatherIcon icon="user" />
@@ -307,7 +345,7 @@ const Dashboard = (props) => {
             <div className="col-lg-3 col-sm-6 col-12 d-flex">
               <div className="dash-count das1">
                 <div className="dash-counts">
-                  <h4>100</h4>
+                  <h4>{suppliers.length}</h4>
                   <h5>Suppliers</h5>
                 </div>
                 <div className="dash-imgs">
@@ -318,8 +356,8 @@ const Dashboard = (props) => {
             <div className="col-lg-3 col-sm-6 col-12 d-flex">
               <div className="dash-count das2">
                 <div className="dash-counts">
-                  <h4>100</h4>
-                  <h5>Purchase Invoice</h5>
+                  <h4>5000</h4>
+                  <h5>Cash In Shop</h5>
                 </div>
                 <div className="dash-imgs">
                   <FeatherIcon icon="file-text" />
@@ -329,8 +367,8 @@ const Dashboard = (props) => {
             <div className="col-lg-3 col-sm-6 col-12 d-flex">
               <div className="dash-count das3">
                 <div className="dash-counts">
-                  <h4>105</h4>
-                  <h5>Sales Invoice</h5>
+                  <h4>10000</h4>
+                  <h5>cash In Mpesa</h5>
                 </div>
                 <div className="dash-imgs">
                   <FeatherIcon icon="file" />
@@ -353,7 +391,7 @@ const Dashboard = (props) => {
                         data-bs-toggle="dropdown"
                         aria-expanded="false"
                       >
-                        2022
+                        2023
                         <img src={Dropdown} alt="img" className="ms-2" />
                       </button>
                       <ul
@@ -362,17 +400,17 @@ const Dashboard = (props) => {
                       >
                         <li>
                           <Link to="#" className="dropdown-item">
+                            2023
+                          </Link>
+                        </li>
+                        <li>
+                          <Link to="#" className="dropdown-item">
                             2022
                           </Link>
                         </li>
                         <li>
                           <Link to="#" className="dropdown-item">
                             2021
-                          </Link>
-                        </li>
-                        <li>
-                          <Link to="#" className="dropdown-item">
-                            2020
                           </Link>
                         </li>
                       </ul>
@@ -392,7 +430,7 @@ const Dashboard = (props) => {
             <div className="col-lg-5 col-sm-12 col-12 d-flex">
               <div className="card flex-fill">
                 <div className="card-header pb-0 d-flex justify-content-between align-items-center">
-                  <h4 className="card-title mb-0">Recently Added Products</h4>
+                  <h4 className="card-title mb-0">Diminishing Products</h4>
                   <div className="dropdown dropdown-action profile-action">
                     <Link
                       to="#"
@@ -427,13 +465,17 @@ const Dashboard = (props) => {
                 </div>
                 <div className="card-body">
                   <div className="table-responsive dataview">
-                    <Table
-                      className="table datatable"
-                      key={props}
-                      columns={recentDataColumns}
-                      dataSource={recentData}
-                      pagination={false}
-                    />
+                    {diminishingProducts.length === 0 ? (
+                      ""
+                    ) : (
+                      <Table
+                        className="table datatable"
+                        key={props}
+                        columns={diminishingProductsColumns}
+                        dataSource={diminishingProducts}
+                        pagination={false}
+                      />
+                    )}
                   </div>
                 </div>
               </div>
@@ -441,20 +483,25 @@ const Dashboard = (props) => {
           </div>
           <div className="card mb-0">
             <div className="card-body">
-              <h4 className="card-title">Expired Products</h4>
+              <h4 className="card-title">Suppliers</h4>
               <div className="table-responsive dataview">
-                <Table
-                  className="table datatable"
-                  key={props}
-                  columns={expiredProductColumns}
-                  dataSource={expiredData}
-                  rowKey={(record) => record.id}
-                  pagination={false}
-                />
+                {suppliers.length === 0 ? (
+                  ""
+                ) : (
+                  <Table
+                    className="table datatable"
+                    key={props}
+                    columns={suppliersColumns}
+                    dataSource={suppliers}
+                    rowKey={(record) => record.id}
+                    pagination={false}
+                  />
+                )}
               </div>
             </div>
           </div>
         </div>
+        <ToastContainer />
       </div>
     </>
   );

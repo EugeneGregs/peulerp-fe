@@ -27,8 +27,9 @@ import {
 import Select2 from "react-select2-wrapper";
 import "react-select2-wrapper/css/select2.css";
 import Swal from "sweetalert2";
+import * as Constants from "../../common/Constants";
 
-const baseUrl = "http://localhost:5071";
+const baseUrl = Constants.BASE_URL;
 
 const options = [
   { id: 1, text: "Choose Category", text: "Choose Category" },

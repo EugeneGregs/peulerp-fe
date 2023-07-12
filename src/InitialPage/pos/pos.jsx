@@ -26,9 +26,10 @@ import {
 } from "../../EntryFile/imagePath";
 import Loader from "react-js-loader";
 import axios from "axios";
+import * as Constants from "../../common/Constants";
 
 const Pos = () => {
-  const baseUrl = "http://localhost:5071";
+  const baseUrl = Constants.BASE_URL;
 
   const paymentTypes = ["Mobile", "Cash", "Bank"];
   const [transactionId, setTransactionId] = useState("");

@@ -10,8 +10,9 @@ import "react-toastify/dist/ReactToastify.css";
 import { Link } from "react-router-dom";
 import * as xlsx from "xlsx";
 import Table from "../../EntryFile/datatable";
+import * as Constants from "../../common/Constants";
 
-const baseUrl = "http://localhost:5071";
+const baseUrl = Constants.BASE_URL;
 
 const AddProduct = () => {
   let product = {};

@@ -23,6 +23,7 @@ import Select2 from "react-select2-wrapper";
 import "react-select2-wrapper/css/select2.css";
 import Loader from "react-js-loader";
 import axios from "axios";
+import * as Constants from "../../common/Constants";
 
 const ProductList = () => {
   const [inputfilter, setInputfilter] = useState(false);
@@ -55,9 +56,11 @@ const ProductList = () => {
   const [data, updateData] = useState({ products: [], filtered: [] });
   const [isBusy, setBusy] = useState(true);
   const [filterValue, setFilterValue] = useState('');
-  const baseUrl = "http://localhost:5071";
+  const baseUrl = Constants.BASE_URL;
 
   useEffect(() => {
+    console.log("BASE_URL::")
+    console.log(baseUrl)
     setBusy(true);
     const fetchData = async () => {
       axios.get(`${baseUrl}/products`)

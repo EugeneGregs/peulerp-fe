@@ -6,6 +6,7 @@ import axios from "axios";
 import { notify } from "../../common/ToastComponent";
 import { ToastContainer, toast } from "react-toastify";
 import { useLocation } from "react-router-dom";
+import * as Constants from "../../common/Constants";
 
 const options = [
   { id: 1, text: "India", text: "India" },
@@ -16,7 +17,7 @@ const options1 = [
   { id: 2, text: "City2", text: "City2" },
 ];
 
-const baseUrl = "http://localhost:5071/suppliers";
+const baseUrl = Constants.BASE_URL;
 
 const AddSupplier = () => {
   const { state } = useLocation();
@@ -90,7 +91,7 @@ const AddSupplier = () => {
     console.log("New::");
     console.log(supplier);
     axios
-      .post(`${baseUrl}`, supplier)
+      .post(`${baseUrl}/suppliers`, supplier)
       .then((res) => {
         console.log(res.status);
         if (res.status == 200 || res.status == 201) {

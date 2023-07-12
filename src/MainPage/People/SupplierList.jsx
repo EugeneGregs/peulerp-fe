@@ -19,8 +19,9 @@ import {
   EditIcon,
   DeleteIcon,
 } from "../../EntryFile/imagePath";
+import * as Constants from "../../common/Constants"
 
-const baseUrl = "http://localhost:5071/suppliers";
+const baseUrl = Constants.BASE_URL + "/suppliers";
 
 const SupplierList = () => {
   const [inputfilter, setInputfilter] = useState(false);

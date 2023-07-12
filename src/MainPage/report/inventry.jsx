@@ -28,8 +28,9 @@ import {
 import Select2 from "react-select2-wrapper";
 import "react-select2-wrapper/css/select2.css";
 import { set } from "react-hook-form";
+import * as Constants from "../../common/Constants";
 
-const baseUrl = "http://localhost:5071";
+const baseUrl = Constants.BASE_URL;
 
 const Invertry = () => {
   const [startDate, setStartDate] = useState(new Date());
