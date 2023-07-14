@@ -330,8 +330,7 @@ const Pos = () => {
                             className="form-control"
                             style={{marginRight: "0", marginLeft: "60%"}}
                               type="text"
-                              value={discount}
-                              onChange={(e) => setDiscount(+e.target.value)}
+                              onBlur={(e) => setDiscount(+e.target.value)}
                             />
                         </li>
                         <div

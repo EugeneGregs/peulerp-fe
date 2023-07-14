@@ -26,16 +26,6 @@ const ProductList = ({ products, updateCart }) => {
         {
             title: "Product Name",
             dataIndex: "name",
-            render: (text, record) => (
-                <div className="productimgname">
-                    <Link className="product-img">
-                        <img alt="" src={imageAddress} />
-                    </Link>
-                    <Link style={{ fontSize: "15px", marginLeft: "10px" }}>
-                        {record.name}
-                    </Link>
-                </div>
-            ),
             sorter: (a, b) => a.name.length - b.name.length,
         },
         {
