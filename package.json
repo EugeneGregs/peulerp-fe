@@ -93,6 +93,8 @@
     "react-tooltip": "^4.4.3",
     "reactstrap": "^8.5.1",
     "recharts": "^1.8.5",
+    "semantic-ui-css": "^2.5.0",
+    "semantic-ui-react": "^2.1.4",
     "simple-react-lightbox": "^3.6.9-0",
     "slick-carousel": "^1.8.1",
     "sticky-kit": "^1.1.3",
