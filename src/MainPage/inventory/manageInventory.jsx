@@ -64,8 +64,7 @@ const ManageInventory = () => {
       })
       .catch((err) => handleError(err));
   };
-
-  //Can be replaced with logic to search locally from stcokList
+  
   const fetchStockByProductId = (productId) => {
     setIsBusy(true);
     axios
