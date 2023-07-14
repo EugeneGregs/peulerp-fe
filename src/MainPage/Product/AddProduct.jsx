@@ -27,6 +27,8 @@ const AddProduct = () => {
   const [categories, setCategories] = useState([]);
   const [isBulkUpload, setIsBulkUpload] = useState(false);
   const [productList, setProductList] = useState([]);
+  const [stockQuantity, setStockQuantity] = useState("");
+  const [reorderLevel, setReorderLevel] = useState("");
 
   //Load product categories
   useEffect(() => {
@@ -63,6 +65,8 @@ const AddProduct = () => {
 
   const SaveProduct = (product) => {
     if (saveType == "post") {
+      product.quantity = stockQuantity;
+      product.reorderLevel = reorderLevel;
       axios
         .post(`${baseUrl}/products`, product)
         .then(handleResponse)
@@ -85,6 +89,8 @@ const AddProduct = () => {
         SellingPrice: product.SellingPrice,
         CategoryId: product.CategoryId,
         BuyingPrice: product.BuyingPrice,
+        Quantity: product.Quantity,
+        ReorderLevel: product.ReorderLevel,
       };
 
       productListToPost.push(newProduct);
@@ -136,6 +142,8 @@ const AddProduct = () => {
         CategoryId: productCategory.id,
         BuyingPrice: product.buyingPrice,
         Category: productCategory.name,
+        Quantity: product.quantity,
+        ReorderLevel: product.reorderLevel,
       };
       localProductList.push(newProduct);
     }
@@ -218,6 +226,8 @@ const AddProduct = () => {
     setProductName("");
     setSellingPrice("");
     setBuyingPrice("");
+    setStockQuantity("");
+    setReorderLevel("");
   };
 
   const columns = [
@@ -245,6 +255,16 @@ const AddProduct = () => {
       title: "Sell Price",
       dataIndex: "SellingPrice",
       sorter: (a, b) => a.SellingPrice.length - b.SellingPrice.length,
+    },
+    {
+      title: "Quantity",
+      dataIndex: "Quantity",
+      sorter: (a, b) => a.Quantity.length - b.Quantity.length,
+    },
+    {
+      title: "Reorder Level",
+      dataIndex: "ReorderLevel",
+      sorter: (a, b) => a.ReorderLevel.length - b.ReorderLevel.length,
     },
   ];
 
@@ -279,7 +299,7 @@ const AddProduct = () => {
             <div className="card-body">
               <div style={{ display: isBulkUpload ? "none" : "block" }}>
                 <div className="row">
-                  <div className="col-lg-3 col-sm-6 col-12">
+                  <div className="col-lg-4 col-sm-6 col-12">
                     <div className="form-group">
                       <label>Product Name</label>
                       <input
@@ -290,7 +310,7 @@ const AddProduct = () => {
                       />
                     </div>
                   </div>
-                  <div className="col-lg-3 col-sm-6 col-12">
+                  <div className="col-lg-4 col-sm-6 col-12">
                     <div className="form-group">
                       <label>Category</label>
                       <Select2
@@ -304,7 +324,7 @@ const AddProduct = () => {
                       />
                     </div>
                   </div>
-                  <div className="col-lg-2 col-sm-6 col-12">
+                  <div className="col-lg-4 col-sm-6 col-12">
                     <div className="form-group">
                       <label>Product Code</label>
                       <input
@@ -314,8 +334,10 @@ const AddProduct = () => {
                         required
                       />
                     </div>
-                  </div>
-                  <div className="col-lg-2 col-sm-6 col-12">
+                  </div>     
+                </div>
+                <div className="row">
+                 <div className="col-lg-4 col-sm-6 col-12">
                     <div className="form-group">
                       <label>Selling Price</label>
                       <input
@@ -327,7 +349,7 @@ const AddProduct = () => {
                       />
                     </div>
                   </div>
-                  <div className="col-lg-2 col-sm-6 col-12">
+                  <div className="col-lg-4 col-sm-6 col-12">
                     <div className="form-group">
                       <label>Buying Price</label>
                       <input
@@ -339,7 +361,33 @@ const AddProduct = () => {
                       />
                     </div>
                   </div>
-                  <div className="col-lg-12">
+                  <div className="col-lg-2 col-sm-6 col-12">
+                    <div className="form-group">
+                      <label>Quantity</label>
+                      <input
+                        type="text"
+                        pattern="[0-9]*"
+                        value={stockQuantity}
+                        onChange={(e) => setStockQuantity(e.target.value)}
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div className="col-lg-2 col-sm-6 col-12">
+                    <div className="form-group">
+                      <label>Reorder Level</label>
+                      <input
+                        type="text"
+                        pattern="[0-9]*"
+                        value={reorderLevel}
+                        onChange={(e) => setReorderLevel(e.target.value)}
+                        required
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div className="row">
+                <div className="col-lg-12">
                     <div className="form-group">
                       <label>Description</label>
                       <textarea className="form-control" defaultValue={""} />

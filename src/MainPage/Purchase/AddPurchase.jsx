@@ -339,7 +339,7 @@ const AddPurchase = () => {
                         <Select
                           options={supplierOptions}
                           onChange={(s) => setSupplierId(s.value)}
-                          value={supplierOptions.find((obj) => obj.value === supplierId)}
+                          value={supplierOptions.find(obj => obj.value === supplierId)}
                         />
                       </div>
                     </div>

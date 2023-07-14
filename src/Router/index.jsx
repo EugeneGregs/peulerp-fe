@@ -20,7 +20,8 @@ import Application from '../MainPage/application'
 import Report from '../MainPage/report'
 import Users from '../MainPage/users'
 import Settings from '../MainPage/settings'
-import BlankPage from "../MainPage/BlankPage";
+import BlankPage from "../MainPage/BlankPage"
+import Inventory from "../MainPage/inventory/index"
 
 export default [
     {
@@ -112,9 +113,14 @@ export default [
         component: Settings
     },
     {
-        path:'Sales',
+        path:'inventory',
+        component: Inventory
+    },
+    {
+        path:'sales',
         component: Sales
     },
+    
    
     
 ]

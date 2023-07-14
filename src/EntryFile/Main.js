@@ -10,6 +10,7 @@ import "../assets/js/bootstrap.bundle.min.js"
 import '../assets/css/font-awesome.min.css';
 import '../assets/css/line-awesome.min.css'; 
 import '../assets/css/style.css';
+import 'semantic-ui-css/semantic.min.css';
 
 const MainApp = () => (
    <Router  basename={`${config.publicPath}`}>

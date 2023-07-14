@@ -236,7 +236,7 @@ const Sidebar = (props) => {
                           New Sales
                         </Link>
                       </li> */}
-                      <li>
+                      {/* <li>
                         <Link
                           className={
                             pathname.includes("salesreturnlist") ? "active" : ""
@@ -255,6 +255,43 @@ const Sidebar = (props) => {
                         >
                           New Sales Return
                         </Link>
+                      </li> */}
+                    </ul>
+                  ) : (
+                    ""
+                  )}
+                </li>
+                <li className="submenu">
+                  <a
+                    href="#"
+                    className={
+                      pathname.includes("/dream-pos/inventory")
+                        ? "active subdrop"
+                        : "" || isSideMenu == "inventory"
+                        ? "subdrop active"
+                        : ""
+                    }
+                    onClick={() =>
+                      toggleSidebar(isSideMenu == "inventory" ? "" : "inventory")
+                    }
+                  >
+                    <img src={Sales1} alt="img" />
+                    <span> Inventory </span> <span className="menu-arrow" />
+                  </a>
+                  {isSideMenu == "inventory" ? (
+                    <ul>
+                      <li>
+                        <Link
+                          className={
+                            pathname.includes("inventorylist") ? "active" : ""
+                          }
+                          to="/dream-pos/inventory/inventorylist"
+                        >
+                          Inventory List
+                        </Link>
+                      </li>
+                      <li>
+                        <Link to="/dream-pos/inventory/addinventory">Add Inventory</Link>
                       </li>
                     </ul>
                   ) : (
