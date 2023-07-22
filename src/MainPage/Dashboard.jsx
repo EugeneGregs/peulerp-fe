@@ -25,6 +25,8 @@ import { Helmet } from "react-helmet";
 import * as Constants from "../common/Constants";
 import { notify } from "../common/ToastComponent";
 import { ToastContainer, toast } from "react-toastify";
+import { Dimmer, Loader, Segment } from "semantic-ui-react";
+import { set } from "react-hook-form";
 
 const baseUrl = Constants.BASE_URL;
 
@@ -40,6 +42,8 @@ const Dashboard = (props) => {
   const [monthlySales, setMonthlySales] = useState([]);
   const [monthlyPurchases, setMonthlyPurchases] = useState([]);
   const [isBusy, setBusy] = useState(false);
+  const [cashInShop, setCashInShop] = useState(0);
+  const [cashInMobile, setCashInMobile] = useState(0);
 
   const state = {
     series: [
@@ -104,18 +108,21 @@ const Dashboard = (props) => {
   };
 
   useEffect(() => {
+    setBusy(true);
     Promise.all([
       fetchDiminishingProducts(),
       fetchDashboardSummary(),
       fetchSuppliers(),
-    ]);
+    ]).then(() => {
+      setBusy(false);
+    })
   }, []);
 
   useEffect(() => {
     if (dashboardSummary && dashboardSummary.salesSummary) {
       console.log("dashboardSummary:::=>");
       console.log(dashboardSummary);
-      const { salesSummary, purchaseSummary, expenseSummary } =
+      const { salesSummary, purchaseSummary, expenseSummary, cashSummary } =
         dashboardSummary;
 
       setTotalSales(salesSummary.totalSales);
@@ -123,6 +130,8 @@ const Dashboard = (props) => {
       setGrossProfit(salesSummary.grossProfit);
       setTotalExpenses(expenseSummary.totalExpenses);
       setTransactionCount(salesSummary.transactionCount);
+      setCashInShop(cashSummary.cashInShop);
+      setCashInMobile(cashSummary.cashInMobile);
 
       const localMonthlySalesAggregation = populateMonthlyAggregate(
         salesSummary.monthlyAggregation,
@@ -252,257 +261,262 @@ const Dashboard = (props) => {
 
   return (
     <>
-      <div className="page-wrapper">
-        <Helmet>
-          <title>Admin Dashboard</title>
-          <meta name="description" content="Dashboard page" />
-        </Helmet>
-        <div className="content">
-          <div className="row">
-            <div className="col-lg-3 col-sm-6 col-12">
-              <div className="dash-widget">
-                <div className="dash-widgetimg">
-                  <span>
-                    <img src={Dash1} alt="img" />
-                  </span>
-                </div>
-                <div className="dash-widgetcontent">
-                  <h5>
-                    Ksh.
-                    <span className="counters">
-                      <CountUp end={totalSales} />
+      <Segment>
+        <Dimmer active={isBusy} inverted>
+          <Loader size="medium">Loading...</Loader>
+        </Dimmer>
+        <div className="page-wrapper">
+          <Helmet>
+            <title>Admin Dashboard</title>
+            <meta name="description" content="Dashboard page" />
+          </Helmet>
+          <div className="content">
+            <div className="row">
+              <div className="col-lg-3 col-sm-6 col-12">
+                <div className="dash-widget">
+                  <div className="dash-widgetimg">
+                    <span>
+                      <img src={Dash1} alt="img" />
                     </span>
-                  </h5>
-                  <h6>Total Sales</h6>
+                  </div>
+                  <div className="dash-widgetcontent">
+                    <h5>
+                      Ksh.
+                      <span className="counters">
+                        <CountUp formattingFn={(v) => v.toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,")} end={totalSales} />
+                      </span>
+                    </h5>
+                    <h6>Total Sales</h6>
+                  </div>
                 </div>
               </div>
-            </div>
-            <div className="col-lg-3 col-sm-6 col-12">
-              <div className="dash-widget dash1">
-                <div className="dash-widgetimg">
-                  <span>
-                    <img src={Dash2} alt="img" />
-                  </span>
-                </div>
-                <div className="dash-widgetcontent">
-                  <h5>
-                    Ksh.
-                    <span className="counters">
-                      <CountUp end={totalPurchase} />
+              <div className="col-lg-3 col-sm-6 col-12">
+                <div className="dash-widget dash1">
+                  <div className="dash-widgetimg">
+                    <span>
+                      <img src={Dash2} alt="img" />
                     </span>
-                  </h5>
-                  <h6>Total Purchases</h6>
+                  </div>
+                  <div className="dash-widgetcontent">
+                    <h5>
+                      Ksh.
+                      <span className="counters">
+                        <CountUp formattingFn={(v) => v.toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,")} end={totalPurchase} />
+                      </span>
+                    </h5>
+                    <h6>Total Purchases</h6>
+                  </div>
                 </div>
               </div>
-            </div>
-            <div className="col-lg-3 col-sm-6 col-12">
-              <div className="dash-widget dash2">
-                <div className="dash-widgetimg">
-                  <span>
-                    <img src={Dash3} alt="img" />
-                  </span>
-                </div>
-                <div className="dash-widgetcontent">
-                  <h5>
-                    Ksh.
-                    <span className="counters">
-                      <CountUp end={totalExpenses} />
+              <div className="col-lg-3 col-sm-6 col-12">
+                <div className="dash-widget dash2">
+                  <div className="dash-widgetimg">
+                    <span>
+                      <img src={Dash3} alt="img" />
                     </span>
-                  </h5>
-                  <h6>Total Expenses</h6>
+                  </div>
+                  <div className="dash-widgetcontent">
+                    <h5>
+                      Ksh.
+                      <span className="counters">
+                        <CountUp formattingFn={(v) => v.toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,")} end={totalExpenses} />
+                      </span>
+                    </h5>
+                    <h6>Total Expenses</h6>
+                  </div>
                 </div>
               </div>
-            </div>
-            <div className="col-lg-3 col-sm-6 col-12">
-              <div className="dash-widget dash3">
-                <div className="dash-widgetimg">
-                  <span>
-                    <img src={Dash4} alt="img" />
-                  </span>
-                </div>
-                <div className="dash-widgetcontent">
-                  <h5>
-                    Ksh.
-                    <span className="counters">
-                      <CountUp end={grossProfit} />
+              <div className="col-lg-3 col-sm-6 col-12">
+                <div className="dash-widget dash3">
+                  <div className="dash-widgetimg">
+                    <span>
+                      <img src={Dash4} alt="img" />
                     </span>
-                  </h5>
-                  <h6>Gross Profit</h6>
+                  </div>
+                  <div className="dash-widgetcontent">
+                    <h5>
+                      Ksh.
+                      <span className="counters">
+                        <CountUp formattingFn={(v) => v.toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,")} end={grossProfit} />
+                      </span>
+                    </h5>
+                    <h6>Gross Profit</h6>
+                  </div>
+                </div>
+              </div>
+              <div className="col-lg-3 col-sm-6 col-12 d-flex">
+                <div className="dash-count">
+                  <div className="dash-counts">
+                    <h4>{transactionCount}</h4>
+                    <h5>Transactions</h5>
+                  </div>
+                  <div className="dash-imgs">
+                    <FeatherIcon icon="user" />
+                  </div>
+                </div>
+              </div>
+              <div className="col-lg-3 col-sm-6 col-12 d-flex">
+                <div className="dash-count das1">
+                  <div className="dash-counts">
+                    <h4>{suppliers.length}</h4>
+                    <h5>Suppliers</h5>
+                  </div>
+                  <div className="dash-imgs">
+                    <FeatherIcon icon="user-check" />
+                  </div>
+                </div>
+              </div>
+              <div className="col-lg-3 col-sm-6 col-12 d-flex">
+                <div className="dash-count das2">
+                  <div className="dash-counts">
+                    <h4>{cashInShop.toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,")}</h4>
+                    <h5>Cash In Shop</h5>
+                  </div>
+                  <div className="dash-imgs">
+                    <FeatherIcon icon="file-text" />
+                  </div>
+                </div>
+              </div>
+              <div className="col-lg-3 col-sm-6 col-12 d-flex">
+                <div className="dash-count das3">
+                  <div className="dash-counts">
+                    <h4>{cashInMobile.toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,")}</h4>
+                    <h5>cash In Mpesa</h5>
+                  </div>
+                  <div className="dash-imgs">
+                    <FeatherIcon icon="file" />
+                  </div>
                 </div>
               </div>
             </div>
-            <div className="col-lg-3 col-sm-6 col-12 d-flex">
-              <div className="dash-count">
-                <div className="dash-counts">
-                  <h4>{transactionCount}</h4>
-                  <h5>Transactions</h5>
-                </div>
-                <div className="dash-imgs">
-                  <FeatherIcon icon="user" />
+            {/* Button trigger modal */}
+            <div className="row">
+              <div className="col-lg-7 col-sm-12 col-12 d-flex">
+                <div className="card flex-fill">
+                  <div className="card-header pb-0 d-flex justify-content-between align-items-center">
+                    <h5 className="card-title mb-0">Purchase &amp; Sales</h5>
+                    <div className="graph-sets">
+                      <div className="dropdown">
+                        <button
+                          className="btn btn-white btn-sm dropdown-toggle"
+                          type="button"
+                          id="dropdownMenuButton"
+                          data-bs-toggle="dropdown"
+                          aria-expanded="false"
+                        >
+                          2023
+                          <img src={Dropdown} alt="img" className="ms-2" />
+                        </button>
+                        <ul
+                          className="dropdown-menu"
+                          aria-labelledby="dropdownMenuButton"
+                        >
+                          <li>
+                            <Link to="#" className="dropdown-item">
+                              2023
+                            </Link>
+                          </li>
+                          <li>
+                            <Link to="#" className="dropdown-item">
+                              2022
+                            </Link>
+                          </li>
+                          <li>
+                            <Link to="#" className="dropdown-item">
+                              2021
+                            </Link>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="card-body">
+                    <Chart
+                      options={state.options}
+                      series={state.series}
+                      type="bar"
+                      height={350}
+                    />
+                  </div>
                 </div>
               </div>
-            </div>
-            <div className="col-lg-3 col-sm-6 col-12 d-flex">
-              <div className="dash-count das1">
-                <div className="dash-counts">
-                  <h4>{suppliers.length}</h4>
-                  <h5>Suppliers</h5>
-                </div>
-                <div className="dash-imgs">
-                  <FeatherIcon icon="user-check" />
-                </div>
-              </div>
-            </div>
-            <div className="col-lg-3 col-sm-6 col-12 d-flex">
-              <div className="dash-count das2">
-                <div className="dash-counts">
-                  <h4>5000</h4>
-                  <h5>Cash In Shop</h5>
-                </div>
-                <div className="dash-imgs">
-                  <FeatherIcon icon="file-text" />
-                </div>
-              </div>
-            </div>
-            <div className="col-lg-3 col-sm-6 col-12 d-flex">
-              <div className="dash-count das3">
-                <div className="dash-counts">
-                  <h4>10000</h4>
-                  <h5>cash In Mpesa</h5>
-                </div>
-                <div className="dash-imgs">
-                  <FeatherIcon icon="file" />
-                </div>
-              </div>
-            </div>
-          </div>
-          {/* Button trigger modal */}
-          <div className="row">
-            <div className="col-lg-7 col-sm-12 col-12 d-flex">
-              <div className="card flex-fill">
-                <div className="card-header pb-0 d-flex justify-content-between align-items-center">
-                  <h5 className="card-title mb-0">Purchase &amp; Sales</h5>
-                  <div className="graph-sets">
-                    <div className="dropdown">
-                      <button
-                        className="btn btn-white btn-sm dropdown-toggle"
-                        type="button"
-                        id="dropdownMenuButton"
+              <div className="col-lg-5 col-sm-12 col-12 d-flex">
+                <div className="card flex-fill">
+                  <div className="card-header pb-0 d-flex justify-content-between align-items-center">
+                    <h4 className="card-title mb-0">Diminishing Products</h4>
+                    <div className="dropdown dropdown-action profile-action">
+                      <Link
+                        to="#"
                         data-bs-toggle="dropdown"
                         aria-expanded="false"
+                        className="dropset"
                       >
-                        2023
-                        <img src={Dropdown} alt="img" className="ms-2" />
-                      </button>
+                        <i className="fa fa-ellipsis-v" />
+                      </Link>
                       <ul
                         className="dropdown-menu"
                         aria-labelledby="dropdownMenuButton"
                       >
                         <li>
-                          <Link to="#" className="dropdown-item">
-                            2023
+                          <Link
+                            to="/dream-pos/product/productlist-product"
+                            className="dropdown-item"
+                          >
+                            Product List
                           </Link>
                         </li>
                         <li>
-                          <Link to="#" className="dropdown-item">
-                            2022
-                          </Link>
-                        </li>
-                        <li>
-                          <Link to="#" className="dropdown-item">
-                            2021
+                          <Link
+                            to="/dream-pos/product/addproduct-product"
+                            className="dropdown-item"
+                          >
+                            Product Add
                           </Link>
                         </li>
                       </ul>
                     </div>
                   </div>
-                </div>
-                <div className="card-body">
-                  <Chart
-                    options={state.options}
-                    series={state.series}
-                    type="bar"
-                    height={350}
-                  />
-                </div>
-              </div>
-            </div>
-            <div className="col-lg-5 col-sm-12 col-12 d-flex">
-              <div className="card flex-fill">
-                <div className="card-header pb-0 d-flex justify-content-between align-items-center">
-                  <h4 className="card-title mb-0">Diminishing Products</h4>
-                  <div className="dropdown dropdown-action profile-action">
-                    <Link
-                      to="#"
-                      data-bs-toggle="dropdown"
-                      aria-expanded="false"
-                      className="dropset"
-                    >
-                      <i className="fa fa-ellipsis-v" />
-                    </Link>
-                    <ul
-                      className="dropdown-menu"
-                      aria-labelledby="dropdownMenuButton"
-                    >
-                      <li>
-                        <Link
-                          to="/dream-pos/product/productlist-product"
-                          className="dropdown-item"
-                        >
-                          Product List
-                        </Link>
-                      </li>
-                      <li>
-                        <Link
-                          to="/dream-pos/product/addproduct-product"
-                          className="dropdown-item"
-                        >
-                          Product Add
-                        </Link>
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-                <div className="card-body">
-                  <div className="table-responsive dataview">
-                    {diminishingProducts.length === 0 ? (
-                      ""
-                    ) : (
-                      <Table
-                        className="table datatable"
-                        key={props}
-                        columns={diminishingProductsColumns}
-                        dataSource={diminishingProducts}
-                        pagination={false}
-                      />
-                    )}
+                  <div className="card-body">
+                    <div className="table-responsive dataview">
+                      {diminishingProducts.length === 0 ? (
+                        ""
+                      ) : (
+                        <Table
+                          className="table datatable"
+                          key={props}
+                          columns={diminishingProductsColumns}
+                          dataSource={diminishingProducts}
+                          pagination={false}
+                        />
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-          <div className="card mb-0">
-            <div className="card-body">
-              <h4 className="card-title">Suppliers</h4>
-              <div className="table-responsive dataview">
-                {suppliers.length === 0 ? (
-                  ""
-                ) : (
-                  <Table
-                    className="table datatable"
-                    key={props}
-                    columns={suppliersColumns}
-                    dataSource={suppliers}
-                    rowKey={(record) => record.id}
-                    pagination={false}
-                  />
-                )}
+            <div className="card mb-0">
+              <div className="card-body">
+                <h4 className="card-title">Suppliers</h4>
+                <div className="table-responsive dataview">
+                  {suppliers.length === 0 ? (
+                    ""
+                  ) : (
+                    <Table
+                      className="table datatable"
+                      key={props}
+                      columns={suppliersColumns}
+                      dataSource={suppliers}
+                      rowKey={(record) => record.id}
+                      pagination={false}
+                    />
+                  )}
+                </div>
               </div>
             </div>
           </div>
+          <ToastContainer />
         </div>
-        <ToastContainer />
-      </div>
+      </Segment>
     </>
   );
 };

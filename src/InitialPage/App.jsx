@@ -20,19 +20,21 @@ export default class App extends Component {
         const { location } = this.props;
 
         if (location.pathname === "/") {
-            return (<Redirect to={'/signIn'} />)
+            return (<Redirect to={'/dream-pos'} />)
         }
 
         return (
             <Switch>
+                {/* Public Routes */}
                 <Route path="/signIn" component={SignIn} />
                 <Route path="/forgetPassword" component={ForgetPassword} />
-                <Route path="/signUp" component={SignUp} />
-                <Route path="/dream-pos" component={DefaultLayout} />
-                
+                <Route path="/signUp" component={SignUp} />                
                 <Route path="/error-404" component={Error404} />
                 <Route path="/error-500" component={Error500} />
                 <Route path="/pos" component={Pos} />
+
+                {/* Private Routes */}
+                <Route path="/dream-pos" component={DefaultLayout} />
 
             </Switch>
         )
