@@ -1,5 +1,5 @@
 import React from 'react'
-import { Redirect, Route, Switch } from 'react-router-dom';
+import { Navigate, Route, Routes } from 'react-router-dom';
 import Purchaseorder from './purchaseorder'
 import Inventry from './inventry'
 import Sales from './sales'
@@ -13,8 +13,8 @@ import Customer from './customer'
 
 
 const AppIndex = ({ match}) =>(
-    <Switch>
-        <Redirect exact from={`${match.url}/`} to={`${match.url}/purchaseorderreport`} />
+    <Routes>
+        <Navigate exact from={`${match.url}/`} to={`${match.url}/purchaseorderreport`} />
         <Route path={`${match.url}/purchaseorderreport`} component={Purchaseorder} />                                                                                             
         <Route path={`${match.url}/inventoryreport`} component={Inventry} />                                                                                             
         <Route path={`${match.url}/salesreport`} component={Sales} />                                                                                             
@@ -23,7 +23,7 @@ const AppIndex = ({ match}) =>(
         <Route path={`${match.url}/supplierreport`} component={Supplier} />                                                                                             
         <Route path={`${match.url}/customerreport`} component={Customer} />                                                                                             
         
-    </Switch>
+    </Routes>
 )
 
 export default AppIndex

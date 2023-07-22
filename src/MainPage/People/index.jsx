@@ -1,5 +1,5 @@
 import React from 'react'
-import { Redirect, Route, Switch } from 'react-router-dom';
+import { Navigate, Route, Routes } from 'react-router-dom';
 import CustomerList from './CustomerList'
 import AddCustomer from './AddCustomer';
 import EditCustomer from './EditCustomer';
@@ -14,8 +14,8 @@ import AddStore from './AddStore';
 import EditStore from './EditStore';
 
 const PeopleIndex = ({ match}) =>(
-    <Switch>
-        <Redirect exact from={`${match.url}/`} to={`${match.url}/customerlist-people`} />
+    <Routes>
+        <Navigate exact from={`${match.url}/`} to={`${match.url}/customerlist-people`} />
         <Route path={`${match.url}/customerlist-people`} component={CustomerList} />
         <Route path={`${match.url}/addcustomer-people`} component={AddCustomer} />
         <Route path={`${match.url}/editcustomer-people`} component={EditCustomer} />
@@ -32,7 +32,7 @@ const PeopleIndex = ({ match}) =>(
 
 
 
-    </Switch>
+    </Routes>
 )
 
 export default PeopleIndex

@@ -1,5 +1,5 @@
 import React from 'react'
-import { Redirect, Route, Switch } from 'react-router-dom';
+import { Navigate, Route, Routes } from 'react-router-dom';
 import Basictable from './basictable'
 import Datatable from './datatable'
 
@@ -8,12 +8,12 @@ import Datatable from './datatable'
 
 
 const TableIndex = ({ match}) =>(
-    <Switch>
-        <Redirect exact from={`${match.url}/`} to={`${match.url}/tables-basic`} />
+    <Routes>
+        <Navigate exact from={`${match.url}/`} to={`${match.url}/tables-basic`} />
         <Route path={`${match.url}/tables-basic`} component={Basictable} />                     
         <Route path={`${match.url}/data-tables`} component={Datatable} />                     
         
-    </Switch>
+    </Routes>
 )
 
 export default TableIndex

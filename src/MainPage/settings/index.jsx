@@ -1,5 +1,5 @@
 import React from 'react'
-import { Redirect, Route, Switch } from 'react-router-dom';
+import { Navigate, Route, Routes } from 'react-router-dom';
 import Genaral from './genaral'
 import Email from './email'
 import Payment from './payment'
@@ -15,8 +15,8 @@ import Taxrates from './taxrates'
 
 
 const UserIndex = ({ match}) =>(
-    <Switch>
-        <Redirect exact from={`${match.url}/`} to={`${match.url}/generalsettings`} />
+    <Routes>
+        <Navigate exact from={`${match.url}/`} to={`${match.url}/generalsettings`} />
         <Route path={`${match.url}/generalsettings`} component={Genaral} />                                                                                             
         <Route path={`${match.url}/emailsettings`} component={Email} />                                                                                             
         <Route path={`${match.url}/paymentsettings`} component={Payment} />                                                                                             
@@ -28,7 +28,7 @@ const UserIndex = ({ match}) =>(
                                                                                            
                                                                                                   
         
-    </Switch>
+    </Routes>
 )
 
 export default UserIndex

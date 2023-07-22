@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { withRouter, useHistory, useLocation } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+import withRouter from "../../hooks/withRouter";
 import {
   Dashboard,
   Expense,
@@ -22,7 +23,7 @@ import FeatherIcon from "feather-icons-react";
 const Sidebar = (props) => {
   const [isSideMenu, setSideMenu] = useState("");
   const [path, setPath] = useState("");
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const toggleSidebar = (value) => {
     setSideMenu(value);
@@ -34,7 +35,7 @@ const Sidebar = (props) => {
     document.body.classList.add("expand-menu");
   };
   const pageRefresh = (url, page) => {
-    history.push(`/dream-pos/${url}/${page}`);
+    navigate(`/dream-pos/${url}/${page}`);
     window.location.reload();
   };
   const location = useLocation();

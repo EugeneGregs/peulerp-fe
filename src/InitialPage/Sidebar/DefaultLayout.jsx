@@ -1,9 +1,10 @@
 import React, { useState } from "react";
-import { Route, withRouter } from "react-router-dom";
+import { Route } from "react-router-dom";
 
 import routerService from "../../Router";
 import Header from "./Header";
 import Sidebar from "./sidebar";
+import withRouter from "../../hooks/withRouter";
 
 const DefaultLayout =(props)=> {
     const { match } = props;

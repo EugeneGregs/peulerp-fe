@@ -1,5 +1,5 @@
 import React from 'react'
-import { Redirect, Route, Switch } from 'react-router-dom';
+import { Navigate, Route, Routes, Switch } from 'react-router-dom';
 import Sweetalert from './sweetalert'
 import Tooltip from './tooltip'
 import Popover from './popover'
@@ -21,8 +21,8 @@ import Formwizard from './formwizard'
 
 
 const ElementIndex = ({ match}) =>(
-    <Switch>
-        <Redirect exact from={`${match.url}/`} to={`${match.url}/sweetalerts`} />
+    <Routes>
+        <Navigate exact from={`${match.url}/`} to={`${match.url}/sweetalerts`} />
         <Route path={`${match.url}/sweetalerts`} component={Sweetalert} />
         <Route path={`${match.url}/tooltip`} component={Tooltip} />
         <Route path={`${match.url}/popover`} component={Popover} />
@@ -41,7 +41,7 @@ const ElementIndex = ({ match}) =>(
         <Route path={`${match.url}/stickynote`} component={Stickynote} />
         <Route path={`${match.url}/timeline`} component={Timeline} />
         <Route path={`${match.url}/form-wizard`} component={Formwizard} />
-    </Switch>
+    </Routes>
 )
 
 export default ElementIndex
