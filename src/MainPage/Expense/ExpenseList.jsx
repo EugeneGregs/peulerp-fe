@@ -5,22 +5,15 @@ import Tabletop from "../../EntryFile/tabletop";
 import Select2 from "react-select2-wrapper";
 import "react-select2-wrapper/css/select2.css";
 import {
-  ClosesIcon,
-  Excel,
-  Filter,
-  Pdf,
   PlusIcon,
-  Printer,
-  Search,
   search_whites,
   EditIcon,
   DeleteIcon,
 } from "../../EntryFile/imagePath";
 import Swal from "sweetalert2";
-import * as Constants from "../../common/Constants";
 import { notify } from "../../common/ToastComponent";
 import { ToastContainer, toast } from "react-toastify";
-import axios from "axios";
+import usePrivateAxios from "../../hooks/usePrivateAxios";
 
 const options = [
   { id: 1, text: "Choose Product", text: "Choose Product" },
@@ -45,13 +38,12 @@ const options5 = [
   { id: 2, text: "150.00", text: "150.00" },
 ];
 
-const baseUrl = Constants.BASE_URL + "/expense";
-const expenseTypes = Constants.EXPENSE_TYPES;
-
 const ExpenseList = () => {
   const [inputfilter, setInputfilter] = useState(false);
   const [isBusy, setBusy] = useState(false);
   const [expenseList, setExpenseList] = useState([]);
+  const API = usePrivateAxios();
+  const BASE_PATH = "/expense";
 
   useEffect(() => {
     fetchExpenseList();
@@ -59,8 +51,7 @@ const ExpenseList = () => {
 
   const fetchExpenseList = async () => {
     setBusy(true);
-    await axios
-      .get(baseUrl)
+    await API.get(BASE_PATH)
       .then((response) => {
         handleResponse(response, "load", null);
       })
@@ -71,8 +62,7 @@ const ExpenseList = () => {
 
   const deleteExpense = async (id) => {
     setBusy(true);
-    await axios
-      .delete(baseUrl + "/" + id)
+    await API.delete(`${BASE_PATH}/${id}`)
       .then((response) => {
         handleResponse(response, "delete", id);
       })
@@ -181,7 +171,13 @@ const ExpenseList = () => {
       title: "Action",
       render: (text, record) => (
         <>
-          <Link className="me-3" to={ { pathname: "/dream-pos/expense/addexpense-expense", state: { expense: record}} }>
+          <Link
+            className="me-3"
+            to={{
+              pathname: "/peul-pos/expense/addexpense-expense",
+              state: { expense: record },
+            }}
+          >
             <img src={EditIcon} alt="img" />
           </Link>
           <Link
@@ -207,7 +203,7 @@ const ExpenseList = () => {
             </div>
             <div className="page-btn">
               <Link
-                to="/dream-pos/expense/addexpense-expense"
+                to="/peul-pos/expense/addexpense-expense"
                 className="btn btn-added"
               >
                 <img src={PlusIcon} alt="img" className="me-1" />

@@ -1,20 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
-import {
-  AvocatImage,
-  Dash1,
-  Dash2,
-  Dash3,
-  Dash4,
-  Dropdown,
-  OrangeImage,
-  PineappleImage,
-  EarpodIcon,
-  StawberryImage,
-  IphoneIcon,
-  SamsungIcon,
-  MacbookIcon,
-} from "../EntryFile/imagePath";
+import { Dash1, Dash2, Dash3, Dash4, Dropdown } from "../EntryFile/imagePath";
 import { Table } from "antd";
 import "antd/dist/antd.css";
 import Chart from "react-apexcharts";
@@ -22,13 +7,10 @@ import { Link } from "react-router-dom";
 import FeatherIcon from "feather-icons-react";
 import CountUp from "react-countup";
 import { Helmet } from "react-helmet";
-import * as Constants from "../common/Constants";
 import { notify } from "../common/ToastComponent";
 import { ToastContainer, toast } from "react-toastify";
 import { Dimmer, Loader, Segment } from "semantic-ui-react";
-import { set } from "react-hook-form";
-
-const baseUrl = Constants.BASE_URL;
+import usePrivateAxios from "../hooks/usePrivateAxios";
 
 const Dashboard = (props) => {
   const [diminishingProducts, setDiminishingProducts] = useState([]);
@@ -44,6 +26,7 @@ const Dashboard = (props) => {
   const [isBusy, setBusy] = useState(false);
   const [cashInShop, setCashInShop] = useState(0);
   const [cashInMobile, setCashInMobile] = useState(0);
+  const API = usePrivateAxios();
 
   const state = {
     series: [
@@ -115,7 +98,7 @@ const Dashboard = (props) => {
       fetchSuppliers(),
     ]).then(() => {
       setBusy(false);
-    })
+    });
   }, []);
 
   useEffect(() => {
@@ -170,8 +153,7 @@ const Dashboard = (props) => {
   };
 
   const fetchDiminishingProducts = async () => {
-    axios
-      .get(`${baseUrl}/diminishing`)
+    API.get(`/diminishing`)
       .then((res) => {
         const resData = res.data;
         console.log(resData);
@@ -183,8 +165,7 @@ const Dashboard = (props) => {
   };
 
   const fetchDashboardSummary = async () => {
-    axios
-      .get(`${baseUrl}/dashboard`)
+    API.get(`/dashboard`)
       .then((res) => {
         const resData = res.data;
         console.log(resData);
@@ -196,8 +177,7 @@ const Dashboard = (props) => {
   };
 
   const fetchSuppliers = async () => {
-    axios
-      .get(`${baseUrl}/suppliers`)
+    API.get(`/suppliers`)
       .then((res) => {
         const resData = res.data;
         console.log(resData);
@@ -283,7 +263,14 @@ const Dashboard = (props) => {
                     <h5>
                       Ksh.
                       <span className="counters">
-                        <CountUp formattingFn={(v) => v.toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,")} end={totalSales} />
+                        <CountUp
+                          formattingFn={(v) =>
+                            v
+                              .toFixed(2)
+                              .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,")
+                          }
+                          end={totalSales}
+                        />
                       </span>
                     </h5>
                     <h6>Total Sales</h6>
@@ -301,7 +288,14 @@ const Dashboard = (props) => {
                     <h5>
                       Ksh.
                       <span className="counters">
-                        <CountUp formattingFn={(v) => v.toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,")} end={totalPurchase} />
+                        <CountUp
+                          formattingFn={(v) =>
+                            v
+                              .toFixed(2)
+                              .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,")
+                          }
+                          end={totalPurchase}
+                        />
                       </span>
                     </h5>
                     <h6>Total Purchases</h6>
@@ -319,7 +313,14 @@ const Dashboard = (props) => {
                     <h5>
                       Ksh.
                       <span className="counters">
-                        <CountUp formattingFn={(v) => v.toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,")} end={totalExpenses} />
+                        <CountUp
+                          formattingFn={(v) =>
+                            v
+                              .toFixed(2)
+                              .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,")
+                          }
+                          end={totalExpenses}
+                        />
                       </span>
                     </h5>
                     <h6>Total Expenses</h6>
@@ -337,7 +338,14 @@ const Dashboard = (props) => {
                     <h5>
                       Ksh.
                       <span className="counters">
-                        <CountUp formattingFn={(v) => v.toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,")} end={grossProfit} />
+                        <CountUp
+                          formattingFn={(v) =>
+                            v
+                              .toFixed(2)
+                              .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,")
+                          }
+                          end={grossProfit}
+                        />
                       </span>
                     </h5>
                     <h6>Gross Profit</h6>
@@ -369,7 +377,11 @@ const Dashboard = (props) => {
               <div className="col-lg-3 col-sm-6 col-12 d-flex">
                 <div className="dash-count das2">
                   <div className="dash-counts">
-                    <h4>{cashInShop.toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,")}</h4>
+                    <h4>
+                      {cashInShop
+                        .toFixed(2)
+                        .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,")}
+                    </h4>
                     <h5>Cash In Shop</h5>
                   </div>
                   <div className="dash-imgs">
@@ -380,7 +392,11 @@ const Dashboard = (props) => {
               <div className="col-lg-3 col-sm-6 col-12 d-flex">
                 <div className="dash-count das3">
                   <div className="dash-counts">
-                    <h4>{cashInMobile.toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,")}</h4>
+                    <h4>
+                      {cashInMobile
+                        .toFixed(2)
+                        .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,")}
+                    </h4>
                     <h5>cash In Mpesa</h5>
                   </div>
                   <div className="dash-imgs">
@@ -459,7 +475,7 @@ const Dashboard = (props) => {
                       >
                         <li>
                           <Link
-                            to="/dream-pos/product/productlist-product"
+                            to="/peul-pos/product/productlist-product"
                             className="dropdown-item"
                           >
                             Product List
@@ -467,7 +483,7 @@ const Dashboard = (props) => {
                         </li>
                         <li>
                           <Link
-                            to="/dream-pos/product/addproduct-product"
+                            to="/peul-pos/product/addproduct-product"
                             className="dropdown-item"
                           >
                             Product Add

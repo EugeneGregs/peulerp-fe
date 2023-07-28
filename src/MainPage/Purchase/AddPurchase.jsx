@@ -14,13 +14,12 @@ import "react-datepicker/dist/react-datepicker.css";
 import "react-select2-wrapper/css/select2.css";
 import Table from "../../EntryFile/datatable";
 import Select from "react-select";
-import axios from "axios";
 import Modal from "react-bootstrap/Modal";
 import { notify } from "../../common/ToastComponent";
 import { ToastContainer, toast } from "react-toastify";
 import { useLocation } from "react-router-dom";
 import * as Constants from "../../common/Constants";
-import { set } from "react-hook-form";
+import usePrivateAxios from "../../hooks/usePrivateAxios";
 
 const paymentStatusOptions = [
   { value: 1, label: "Paid" },
@@ -28,7 +27,6 @@ const paymentStatusOptions = [
   { value: 3, label: "Partial" },
 ];
 
-const baseUrl = Constants.BASE_URL;
 const paymentTypes = Constants.PAYMENT_TYPES;
 
 const paymentTypeOptions = paymentTypes.map((paymentType, index) => {
@@ -54,7 +52,8 @@ const AddPurchase = () => {
   const [paymentType, setPaymentType] = useState(0);
   const [purchaseDate, setPurchaseDate] = useState(new Date());
   const [purchaseDescription, setPurchaseDescription] = useState("");
-
+  const API = usePrivateAxios();
+  
   const handSaveEdit = () => {
     let purchasedProductsClone = [...purchaseProducts];
     const index = purchasedProductsClone.findIndex(
@@ -164,14 +163,14 @@ const AddPurchase = () => {
   }, [supplier]);
 
   const fetchProducts = async () => {
-    const productsRes = await axios(`${baseUrl}/products`);
+    const productsRes = await API.get(`/products`);
     const products = productsRes.data;
     setProducts([...products]);
     console.log(products);
   };
 
   const fetchSuppliers = async () => {
-    const suppliersRes = await axios(`${baseUrl}/suppliers`);
+    const suppliersRes = await API.get(`/suppliers`);
     const suppliers = suppliersRes.data;
     setSupplier([...suppliers]);
     console.log(suppliers);
@@ -289,7 +288,7 @@ const AddPurchase = () => {
       console.log(purchase);
       currentPurchase.id = purchase.id;
     }
-    const res = await axios.post(`${baseUrl}/purchases`, currentPurchase);
+    const res = await API.post(`/purchases`, currentPurchase);
     console.log(res);
     if (res.status === 200 || res.status === 201) {
       notify("Purchase saved successfully", "success", toast);

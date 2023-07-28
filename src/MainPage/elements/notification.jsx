@@ -58,7 +58,7 @@ const Notification = () => {
               <h3 className="page-title">Notification</h3>
               <ul className="breadcrumb">
                 <li className="breadcrumb-item">
-                  <Link to="/dream-pos/dashboard">Dashboard</Link>
+                  <Link to="/peul-pos/dashboard">Dashboard</Link>
                 </li>
                 <li className="breadcrumb-item active">Notification</li>
               </ul>

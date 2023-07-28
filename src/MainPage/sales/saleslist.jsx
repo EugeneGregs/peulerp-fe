@@ -282,13 +282,13 @@ const SalesList = () => {
             </Link>
             <ul className="dropdown-menu">
               <li>
-                <Link to="/dream-pos/sales/sales-details" className="dropdown-item">
+                <Link to="/peul-pos/sales/sales-details" className="dropdown-item">
                   <img src={Eye1} className="me-2" alt="img" />
                   Sale Detail
                 </Link>
               </li>
               <li>
-                <Link to="/dream-pos/sales/edit-sales" className="dropdown-item">
+                <Link to="/peul-pos/sales/edit-sales" className="dropdown-item">
                   <img src={EditIcon} className="me-2" alt="img" />
                   Edit Sale
                 </Link>
@@ -347,7 +347,7 @@ const SalesList = () => {
               <h6>Manage your Sales</h6>
             </div>
             <div className="page-btn">
-              <Link to="/dream-pos/sales/add-sales" className="btn btn-added">
+              <Link to="/peul-pos/sales/add-sales" className="btn btn-added">
                 <img src={PlusIcon} alt="img" className="me-1" />
                 Add Sales
               </Link>

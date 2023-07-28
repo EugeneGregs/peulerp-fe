@@ -16,7 +16,7 @@ const Formwizard = () => {
                 <h3 className="page-title">Form Wizard</h3>
                 <ul className="breadcrumb">
                   <li className="breadcrumb-item">
-                    <a href="/dream-pos/dashboard">Dashboard</a>
+                    <a href="/peul-pos/dashboard">Dashboard</a>
                   </li>
                   <li className="breadcrumb-item active">Form Wizard</li>
                 </ul>

@@ -15,7 +15,7 @@ const Stickynote = () => {
                 <h3 className="page-title">Sticky Note</h3>
                 <ul className="breadcrumb">
                   <li className="breadcrumb-item">
-                    <Link to="/dream-pos/dashboard">Dashboard</Link>
+                    <Link to="/peul-pos/dashboard">Dashboard</Link>
                   </li>
                   <li className="breadcrumb-item active">Sticky Note</li>
                 </ul>

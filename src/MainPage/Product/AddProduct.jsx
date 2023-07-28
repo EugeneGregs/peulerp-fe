@@ -3,16 +3,13 @@ import { useLocation } from "react-router-dom";
 import { Excel, Upload, PlusIcon } from "../../EntryFile/imagePath";
 import Select2 from "react-select2-wrapper";
 import "react-select2-wrapper/css/select2.css";
-import axios from "axios";
 import { notify } from "../../common/ToastComponent";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Link } from "react-router-dom";
 import * as xlsx from "xlsx";
 import Table from "../../EntryFile/datatable";
-import * as Constants from "../../common/Constants";
-
-const baseUrl = Constants.BASE_URL;
+import usePrivateAxios from "../../hooks/usePrivateAxios";
 
 const AddProduct = () => {
   let product = {};
@@ -29,11 +26,13 @@ const AddProduct = () => {
   const [productList, setProductList] = useState([]);
   const [stockQuantity, setStockQuantity] = useState("");
   const [reorderLevel, setReorderLevel] = useState("");
+  const API = usePrivateAxios();
+  const BASE_PATH = "/products";
 
   //Load product categories
   useEffect(() => {
     const fetchData = async () => {
-      axios.get(`${baseUrl}/productcategory`).then((res) => {
+      API.get(`/productcategory`).then((res) => {
         const resData = res.data.map((category) => {
           return { id: category.id, name: category.name, text: category.name };
         });
@@ -45,7 +44,6 @@ const AddProduct = () => {
   }, []);
 
   useEffect(() => {
-    console.log("Here");
     categories.length && initializeForm();
   }, [categories]);
 
@@ -67,16 +65,9 @@ const AddProduct = () => {
     if (saveType == "post") {
       product.quantity = stockQuantity;
       product.reorderLevel = reorderLevel;
-      axios
-        .post(`${baseUrl}/products`, product)
-        .then(handleResponse)
-        .catch(handleError);
+      API.post(`${BASE_PATH}`, product).then(handleResponse).catch(handleError);
     } else {
-      console.log(product.id);
-      axios
-        .put(`${baseUrl}/products/${product.id}`, product)
-        .then(handleResponse)
-        .catch(handleError);
+      API.put(`${BASE_PATH}`, product).then(handleResponse).catch(handleError);
     }
   };
 
@@ -96,8 +87,7 @@ const AddProduct = () => {
       productListToPost.push(newProduct);
     }
 
-    axios
-      .post(`${baseUrl}/products/colection`, productListToPost)
+    API.post(`${BASE_PATH}/colection`, productListToPost)
       .then((res) => {
         notify("Products Added Successfully!", "success", toast);
       })
@@ -117,7 +107,6 @@ const AddProduct = () => {
         const sheetName = workbook.SheetNames[0];
         const worksheet = workbook.Sheets[sheetName];
         const json = xlsx.utils.sheet_to_json(worksheet);
-        console.log(json);
         populateProductList(json);
       };
       reader.readAsArrayBuffer(e.target.files[0]);
@@ -152,8 +141,6 @@ const AddProduct = () => {
   };
 
   const handleResponse = (res) => {
-    console.log("POST RES::");
-    console.log(res.data);
     notify(
       `${productName} ${
         saveType == "post" ? "Added" : "Updated"
@@ -165,8 +152,6 @@ const AddProduct = () => {
   };
 
   const handleError = (res) => {
-    console.log("POST RES::");
-    console.log(res.data);
     notify(
       `Error ${saveType == "post" ? "Adding" : "Updating"} ${productName}`,
       "error",
@@ -192,7 +177,6 @@ const AddProduct = () => {
       }
 
       //Post Products
-      console.log(product);
       SaveProduct(product);
     }
   };
@@ -334,10 +318,10 @@ const AddProduct = () => {
                         required
                       />
                     </div>
-                  </div>     
+                  </div>
                 </div>
                 <div className="row">
-                 <div className="col-lg-4 col-sm-6 col-12">
+                  <div className="col-lg-4 col-sm-6 col-12">
                     <div className="form-group">
                       <label>Selling Price</label>
                       <input
@@ -387,7 +371,7 @@ const AddProduct = () => {
                   </div>
                 </div>
                 <div className="row">
-                <div className="col-lg-12">
+                  <div className="col-lg-12">
                     <div className="form-group">
                       <label>Description</label>
                       <textarea className="form-control" defaultValue={""} />

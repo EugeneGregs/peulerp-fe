@@ -3,35 +3,28 @@ import Table from "../../EntryFile/datatable";
 import Tabletop from "../../EntryFile/tabletop"
 import { Link } from "react-router-dom";
 import Swal from "sweetalert2";
-import axios from "axios";
 import { notify } from "../../common/ToastComponent";
 import { ToastContainer, toast } from "react-toastify";
 import {
-  ClosesIcon,
   Noimage,
-  Excel,
-  Filter,
-  Pdf,
   PlusIcon,
-  Printer,
-  Search,
   search_whites,
   EditIcon,
   DeleteIcon,
 } from "../../EntryFile/imagePath";
-import * as Constants from "../../common/Constants"
-
-const baseUrl = Constants.BASE_URL + "/suppliers";
+import usePrivateAxios from "../../hooks/usePrivateAxios";
 
 const SupplierList = () => {
   const [inputfilter, setInputfilter] = useState(false);
   const [supplierList, setSupplierList] = useState([]);
   const [isBusy, setBusy] = useState(false);
+  const API = usePrivateAxios();
+  const BASE_PATH = "/suppliers";
 
   useEffect(() => {
     setBusy(true);
     const fetchData = async () => {
-      axios.get(`${baseUrl}`).then((res) => {
+      API.get(BASE_PATH).then((res) => {
         const resData = res.data;
         console.log(resData);
         setSupplierList([...resData]);
@@ -63,7 +56,7 @@ const SupplierList = () => {
   };
 
   const deleteSupplier = (id) => {
-    axios.delete(`${baseUrl}/${id}`)
+    API.delete(`${BASE_PATH}/${id}`)
     .then((res) => {
       console.log(res.status);
       setSupplierList([...supplierList.filter((supplier) => supplier.id !== id)]);
@@ -114,7 +107,7 @@ const SupplierList = () => {
       title: "Action",
       render: (text, record) => (
         <>
-          <Link className="me-3" to={ { pathname: "/dream-pos/people/addsupplier-people", state: { supplier: record } } }>
+          <Link className="me-3" to={ { pathname: "/peul-pos/people/addsupplier-people", state: { supplier: record } } }>
             <img src={EditIcon} alt="img" />
           </Link>
           <Link className="confirm-text" to="#" onClick={() => confirmText(record)}>
@@ -135,7 +128,7 @@ const SupplierList = () => {
             </div>
             <div className="page-btn">
               <Link
-                to="/dream-pos/people/addsupplier-people"
+                to="/peul-pos/people/addsupplier-people"
                 className="btn btn-added"
               >
                 <img src={PlusIcon} alt="img" className="me-1" />

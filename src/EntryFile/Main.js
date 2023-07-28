@@ -7,8 +7,6 @@ import {
   HashRouter,
 } from "react-router-dom";
 import App from "../InitialPage/App";
-import config from "config";
-import withRouter from "../hooks/withRouter";
 
 import "../assets/plugins/fontawesome/css/fontawesome.min.css";
 import "../assets/plugins/fontawesome/css/all.min.css";
@@ -21,8 +19,8 @@ import "semantic-ui-css/semantic.min.css";
 
 const MainApp = () => (
     <Routes>
-      <Route path="/" element={<App />} />
+      <Route path="/*" element={<App />} />
     </Routes>
 );
 
-export default withRouter(MainApp);
+export default MainApp;

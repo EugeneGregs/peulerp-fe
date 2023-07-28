@@ -15,7 +15,7 @@ const FeatherIcons = () => {
                 <h3 className="page-title">Feather Icon</h3>
                 <ul className="breadcrumb">
                   <li className="breadcrumb-item">
-                    <Link to="/dream-pos/dashboard">Dashboard</Link>
+                    <Link to="/peul-pos/dashboard">Dashboard</Link>
                   </li>
                   <li className="breadcrumb-item active">Feather Icon</li>
                 </ul>

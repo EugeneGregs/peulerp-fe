@@ -1,26 +1,28 @@
-import React, { Component, useEffect } from "react";
-import { Navigate, Route, Routes, Switch } from "react-router-dom";
+import React, { useEffect } from "react";
+import { Route, Routes, useNavigate } from "react-router-dom";
 
 import SignIn from "./SignIn";
 import ForgetPassword from "./ForgetPassword";
 import SignUp from "./SignUp";
 import Pos from "./pos/pos";
-import DefaultLayout from "./Sidebar/DefaultLayout";
-
 import Error404 from "../MainPage/ErrorPage/Error404";
 import Error500 from "../MainPage/ErrorPage/Error500";
 import { useLocation } from "react-router-dom";
+import DefaultLayout from "./Sidebar/DefaultLayout";
+import RequireAuth from "../MainPage/auth/RequireAuth";
 
 const App = () => {
   const { pathname } = useLocation();
-
-//   if (pathname === "/") {
-//     return <Navigate to={"/signIn"} replace={true} />;
-//   }
+  const navigate = useNavigate();
 
   useEffect(() => {
     console.log("location");
-    console.log(pathname);
+    // console.log(pathname);
+
+    if (pathname === "/") {
+      navigate("/peul-pos/dashboard");
+    }
+
     if (
       pathname.includes("signIn") ||
       pathname.includes("signUp") ||
@@ -32,19 +34,22 @@ const App = () => {
 
   return (
     <>
-    <SignIn />
-      {/* <Routes> */}
+      <Routes>
         {/* Public Routes */}
-        {/* <Route path="/signIn" element={<SignIn />} />
-        <Route path="/forgetPassword" component={ForgetPassword} />
-        <Route path="/signUp" component={SignUp} />
-        <Route path="/error-404" component={Error404} />
-        <Route path="/error-500" component={Error500} />
-        <Route path="/pos" component={Pos} /> */}
+        <Route path="/signIn" element={<SignIn />} />
+        <Route path="/forgetPassword" element={<ForgetPassword />} />
+        <Route path="/signUp" element={<SignUp />} />
 
         {/* Private Routes */}
-        {/* <Route path="/dream-pos" component={DefaultLayout} />
-      </Routes> */}
+        <Route element={<RequireAuth />}>
+          <Route path="/pos" element={<Pos />} />
+          <Route path="/peul-pos/*" element={<DefaultLayout />} />
+        </Route>
+
+        {/* Error Routes */}
+        <Route path="/error-500" element={<Error500 />} />
+        <Route path="*" element={<Error404 />} />
+      </Routes>
     </>
   );
 };

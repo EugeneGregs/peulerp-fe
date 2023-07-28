@@ -1,22 +1,21 @@
 import React, { useEffect } from "react";
 import { Upload, Excel, PlusIcon } from "../../EntryFile/imagePath";
-import axios from "axios";
 import { notify } from "../../common/ToastComponent";
 import { ToastContainer, toast } from "react-toastify";
 import { useLocation } from "react-router-dom";
 import { Link } from "react-router-dom";
 import * as xlsx from "xlsx";
 import Table from "../../EntryFile/datatable";
-import { set } from "react-hook-form";
-import * as Constants from "../../common/Constants";
+import usePrivateAxios from "../../hooks/usePrivateAxios";
 
 const AddCategory = () => {
   const [category, setCategory] = React.useState("");
-  const baseUrl = Constants.BASE_URL;
   const { state } = useLocation();
   const [saveType, setSaveType] = React.useState("post");
   const [isBulkUpload, setIsBulkUpload] = React.useState(false);
   const [categoryList, setCategoryList] = React.useState([]);
+  const API = usePrivateAxios();
+  const BASE_PATH = "/productcategory";
 
   const addCategory = () => {
     console.log(category);
@@ -30,8 +29,8 @@ const AddCategory = () => {
       notify("Please enter category name", "error", toast);
       return;
     }
-    axios
-      .post(`${baseUrl}/productcategory`, {
+    API
+      .post(`${BASE_PATH}`, {
         Name: category,
       })
       .then((res) => handleResponse(res))
@@ -49,8 +48,8 @@ const AddCategory = () => {
       return;
     }
 
-    axios
-      .post(`${baseUrl}/productcategory/collection`, categoriesToPost)
+    API
+      .post(`${BASE_PATH}/collection`, categoriesToPost)
       .then((res) => handleResponse(res))
       .catch((err) => handleError(err));
   }
@@ -61,8 +60,8 @@ const AddCategory = () => {
       notify("Please enter category name", "error", toast);
       return;
     }
-    axios
-      .put(`${baseUrl}/productcategory/${state.category.id}`, {
+    API
+      .put(`${BASE_PATH}/${state.category.id}`, {
         Name: category,
       })
       .then((res) => handleResponse(res))

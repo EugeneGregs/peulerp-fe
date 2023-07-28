@@ -190,7 +190,7 @@ const QuotationList = () => {
       title: "Action",
       render: () => (
         <>
-          <Link className="me-3" to="/dream-pos/quotation/editquotation-quotation">
+          <Link className="me-3" to="/peul-pos/quotation/editquotation-quotation">
             <img src={EditIcon} alt="img" />
           </Link>
           <Link className="confirm-text" to="#" onClick={confirmText}>
@@ -211,7 +211,7 @@ const QuotationList = () => {
             </div>
             <div className="page-btn">
               <Link
-                to="/dream-pos/quotation/addquotation-quotation"
+                to="/peul-pos/quotation/addquotation-quotation"
                 className="btn btn-added"
               >
                 <img src={PlusIcon} alt="img" className="me-1" />

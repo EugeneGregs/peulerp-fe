@@ -6,14 +6,20 @@ import {
   GoogleIcon,
   FacebookIcon,
 } from "../EntryFile/imagePath";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
+import useAuth from "../hooks/useAuth";
+import API from "../service/api";
 
 const SignInPage = (props) => {
+  const location = useLocation();
+  const { setAuth } = useAuth();
+  const from = location.state?.from?.pathname || "/peul-pos/dashboard";
   const [eye, seteye] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     console.log("Signing In..");
@@ -41,7 +47,39 @@ const SignInPage = (props) => {
 
   const onSubmit = (data) => {
     console.log(JSON.stringify(data, null, 2));
-    props.history.push("/dream-pos/dashboard");
+
+    API.post("/users/login", data)
+      .then((response) => {
+        console.log(response.data);
+        setAuth({
+          user: {
+            email: data.email,
+            password: data.password,
+            token: response.data.token,
+            role: response.data.role,
+          },
+        });
+        navigate(from, { replace: true });
+      })
+      .catch((error) => {
+        handleError(error);
+      });
+  };
+
+  const handleError = (error) => {
+    console.error("error");
+    console.error(error);
+
+    if (!error?.response) {
+      // Handle Network Error
+      console.log("Network Error");
+    } else if (error.response?.status === 400) {
+      // Handle 401 Error
+      console.log("400 Error");
+    } else if (error.response?.status === 401) {
+      // Handle 401 Error
+      console.log("401 Error");
+    }
   };
 
   return (
@@ -71,7 +109,7 @@ const SignInPage = (props) => {
                         {...register("email")}
                         className={` ${errors.email ? "is-invalid" : ""}`}
                         placeholder="Enter your email address"
-                        defaultValue="admin@dreamguystech.com"
+                        defaultValue="eugenegregs@gmail.com"
                       />
                       <img src={MailIcon} alt="img" />
                       <div className="invalid-feedback">
@@ -87,7 +125,7 @@ const SignInPage = (props) => {
                         className={` ${errors.password ? "is-invalid" : ""}`}
                         placeholder="Enter your password"
                         {...register("password")}
-                        defaultValue={123456}
+                        defaultValue="yjslphYf"
                       />
                       <span
                         onClick={onEyeClick}

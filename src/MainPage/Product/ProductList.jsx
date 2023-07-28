@@ -3,17 +3,8 @@ import { Link } from "react-router-dom";
 import Swal from "sweetalert2";
 import Table from "../../EntryFile/datatable"
 import Tabletop from "../../EntryFile/tabletop"
-import { getUsers, getProducts } from "../../services/productservice.js"
 import {
   PlusIcon,
-  MacbookIcon,
-  IphoneIcon,
-  SamsungIcon,
-  EarpodIcon,
-  OrangeImage,
-  PineappleImage,
-  StawberryImage,
-  AvocatImage,
   EyeIcon,
   EditIcon,
   DeleteIcon,
@@ -22,8 +13,7 @@ import {
 import Select2 from "react-select2-wrapper";
 import "react-select2-wrapper/css/select2.css";
 import Loader from "react-js-loader";
-import axios from "axios";
-import * as Constants from "../../common/Constants";
+import usePrivateAxios from "../../hooks/usePrivateAxios";
 
 const ProductList = () => {
   const [inputfilter, setInputfilter] = useState(false);
@@ -56,14 +46,13 @@ const ProductList = () => {
   const [data, updateData] = useState({ products: [], filtered: [] });
   const [isBusy, setBusy] = useState(true);
   const [filterValue, setFilterValue] = useState('');
-  const baseUrl = Constants.BASE_URL;
+  const API = usePrivateAxios();
+  const BASE_PATH = "/products";
 
   useEffect(() => {
-    console.log("BASE_URL::")
-    console.log(baseUrl)
     setBusy(true);
     const fetchData = async () => {
-      axios.get(`${baseUrl}/products`)
+      API.get(`${BASE_PATH}`)
         .then(res => {
           const resData = res.data;
           let products = resData ? [...resData.map(p => { return {name: p.name, sellingPrice: p.sellingPrice, buyingPrice: p.buyingPrice, barCode: p.barCode, productCategory: { name: p.productCategory.name, id: p.productCategory.id}, id: p.id} })] : [];
@@ -100,7 +89,7 @@ const ProductList = () => {
   const deleteProduct = (product) => {
     console.log(product);
 
-    axios.delete(`${baseUrl}/products/${product.id}`)
+    API.delete(`${BASE_PATH}/${product.id}`)
       .then(res => {
         const products = data.products;
         const filtered = data.filtered;
@@ -176,10 +165,10 @@ const ProductList = () => {
       render: (text, record) => (
         <>
           <>
-            <Link className="me-3" to="/dream-pos/product/product-details">
+            <Link className="me-3" to="/peul-pos/product/product-details">
               <img src={EyeIcon} alt="img" />
             </Link>
-            <Link className="me-3" to={{ pathname: "/dream-pos/product/addproduct-product", state: { product: record } }}>
+            <Link className="me-3" to={{ pathname: "/peul-pos/product/addproduct-product", state: { product: record } }}>
               <img src={EditIcon} alt="img" />
             </Link>
             <Link className="confirm-text" to="#" onClick={() => confirmText(record)}>
@@ -202,7 +191,7 @@ const ProductList = () => {
             </div>
             <div className="page-btn">
               <Link
-                to="/dream-pos/product/addproduct-product"
+                to="/peul-pos/product/addproduct-product"
                 className="btn btn-added"
               >
                 <img src={PlusIcon} alt="img" className="me-1" />

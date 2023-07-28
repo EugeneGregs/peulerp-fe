@@ -5,7 +5,6 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { notify } from "../../common/ToastComponent";
 import { ToastContainer, toast } from "react-toastify";
-import axios from "axios";
 import {
   ClosesIcon,
   Excel,
@@ -20,14 +19,13 @@ import {
 } from "../../EntryFile/imagePath";
 import Select2 from "react-select2-wrapper";
 import "react-select2-wrapper/css/select2.css";
-import * as Constants from "../../common/Constants";
 import { Dimmer, Loader, Segment } from "semantic-ui-react";
-
-const baseUrl = Constants.BASE_URL;
+import usePrivateAxios from "../../hooks/usePrivateAxios";
 
 const InvertryList = () => {
   const [startDate, setStartDate] = useState(new Date());
   const [startDate1, setStartDate1] = useState(new Date());
+  const API = usePrivateAxios();
   const options = [
     { id: 1, text: "Choose Supplier", text: "Choose Product" },
     { id: 2, text: "Supplier", text: "Supplier" },
@@ -40,7 +38,7 @@ const InvertryList = () => {
     const fetchData = async () => {
       setBusy(true);
       console.log("fetching data");
-      axios.get(`${baseUrl}/stock`).then((res) => handleResponse(res));
+      API.get(`/stock`).then((res) => handleResponse(res));
     };
 
     fetchData().catch((reason) => {
@@ -123,7 +121,7 @@ const InvertryList = () => {
         render: (text, record) => (
           <>
             <>
-              <Link className="me-3" to={{ pathname: "/dream-pos/inventory/addinventory", state: { stock: record } }}>
+              <Link className="me-3" to={{ pathname: "/peul-pos/inventory/addinventory", state: { stock: record } }}>
                 <img src={EditIcon} alt="img" />
               </Link>
               <Link className="confirm-text" to="#" onClick={() => { notify("Action Not Allowed", "warning", toast)} }>

@@ -2,24 +2,11 @@ import React, { useState, useEffect } from "react";
 import Table from "../../EntryFile/datatable";
 import { Link } from "react-router-dom";
 import Tabletop from "../../EntryFile/tabletop";
-import axios from "axios";
 import Loader from "react-js-loader";
 import { notify } from "../../common/ToastComponent";
 import { ToastContainer, toast } from "react-toastify";
 import {
-  ClosesIcon,
-  Excel,
-  Filter,
-  Pdf,
   PlusIcon,
-  Printer,
-  Search,
-  MacbookIcon,
-  OrangeImage,
-  PineappleImage,
-  StawberryImage,
-  AvocatImage,
-  EyeIcon,
   EditIcon,
   DeleteIcon,
   search_whites,
@@ -27,9 +14,7 @@ import {
 import Select2 from "react-select2-wrapper";
 import "react-select2-wrapper/css/select2.css";
 import Swal from "sweetalert2";
-import * as Constants from "../../common/Constants";
-
-const baseUrl = Constants.BASE_URL;
+import usePrivateAxios from "../../hooks/usePrivateAxios";
 
 const options = [
   { id: 1, text: "Choose Category", text: "Choose Category" },
@@ -63,11 +48,13 @@ const CategoryList = () => {
   const [inputfilter, setInputfilter] = useState(false);
   const [categories, setCategories] = useState([]);
   const [isBusy, setBusy] = useState(true);
+  const API = usePrivateAxios();
+  const BASE_PATH = "/productcategory";
 
   useEffect(() => {
     setBusy(true);
     const fetchData = async () => {
-      axios.get(`${baseUrl}/productcategory`).then((res) => {
+      API.get(`${BASE_PATH}`).then((res) => {
         const resData = res.data;
         let catList = resData.map(c => {return { id: c.id, code: c.id.split("-")[0], name: c.name, createdBy: "Admin", createdAt: c.createdDate.split("T")[0]}})
         console.log(catList)
@@ -81,7 +68,7 @@ const CategoryList = () => {
 
   const deleteCategory = (id) => {
     console.log(id)
-    axios.delete(`${baseUrl}/productcategory/${id}`).then((res) => {
+    API.delete(`${BASE_PATH}/${id}`).then((res) => {
       const resData = res.data;
       console.log(resData)
       setCategories([...categories.filter(c => c.code !== id.split("-")[0])]);
@@ -119,7 +106,7 @@ const CategoryList = () => {
       render: (text, record) => (
         <>
           <>
-            <Link className="me-3" to={{ pathname: "/dream-pos/product/addcategory-product", state: { category: record } }}>
+            <Link className="me-3" to={{ pathname: "/peul-pos/product/addcategory-product", state: { category: record } }}>
               <img src={EditIcon} alt="img" />
             </Link>
             <Link className="confirm-text" to="#" onClick={() => { confirmText(record, deleteCategory)} }>
@@ -142,7 +129,7 @@ const CategoryList = () => {
             </div>
             <div className="page-btn">
               <Link
-                to="/dream-pos/product/addcategory-product"
+                to="/peul-pos/product/addcategory-product"
                 className="btn btn-added"
               >
                 <img src={PlusIcon} alt="img" className="me-1" />

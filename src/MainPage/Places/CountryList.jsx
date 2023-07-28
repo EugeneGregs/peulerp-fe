@@ -104,7 +104,7 @@ const CountryList = () => {
       title: "Action",
       render: () => (
         <>
-          <Link className="me-3" to="/dream-pos/places/editcountry-places">
+          <Link className="me-3" to="/peul-pos/places/editcountry-places">
             <img src={EditIcon} alt="img" />
           </Link>
           <Link className="confirm-text" to="#" onClick={confirmText}>
@@ -125,7 +125,7 @@ const CountryList = () => {
             </div>
             <div className="page-btn">
               <Link
-                to="/dream-pos/places/newcountry-places"
+                to="/peul-pos/places/newcountry-places"
                 className="btn btn-added"
               >
                 <img src={PlusIcon} alt="img" className="me-1" />

@@ -5,7 +5,6 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { notify } from "../../common/ToastComponent";
 import { ToastContainer, toast } from "react-toastify";
-import axios from "axios";
 import {
   ClosesIcon,
   Excel,
@@ -14,23 +13,11 @@ import {
   Calendar,
   Printer,
   search_whites,
-  Search,
-  MacbookIcon,
-  OrangeImage,
-  PineappleImage,
-  StawberryImage,
-  AvocatImage,
-  Product1,
-  Product7,
-  Product8,
-  Product9,
+  Search
 } from "../../EntryFile/imagePath";
 import Select2 from "react-select2-wrapper";
 import "react-select2-wrapper/css/select2.css";
-import { set } from "react-hook-form";
-import * as Constants from "../../common/Constants";
-
-const baseUrl = Constants.BASE_URL;
+import usePrivateAxios from "../../hooks/usePrivateAxios";
 
 const Invertry = () => {
   const [startDate, setStartDate] = useState(new Date());
@@ -42,12 +29,12 @@ const Invertry = () => {
   const [inputfilter, setInputfilter] = useState(false);
   const [inventoryList, setInventoryList] = useState([]);
   const [isBusy, setBusy] = useState(false);
+  const API = usePrivateAxios();
 
   useEffect(() => {
     const fetchData = async () => {
       setBusy(true);
-      console.log("fetching data");
-      axios.get(`${baseUrl}/stock`).then((res) => handleResponse(res));
+      API.get(`/stock`).then((res) => handleResponse(res));
     };
 
     fetchData().catch((reason) => console.log(reason));
@@ -58,7 +45,6 @@ const Invertry = () => {
     setBusy(false);
     if (response.status === 200) {
         const resData = response.data;
-        console.log(resData);
         setInventoryList([...resData]);
     } else {
       notify("Error Fetching Data", "Error", toast);

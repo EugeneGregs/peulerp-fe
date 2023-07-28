@@ -170,7 +170,7 @@ const UserList = () => {
       title: "Action",
       render: () => (
         <>
-          <Link className="me-3" to="/dream-pos/people/edituser-people">
+          <Link className="me-3" to="/peul-pos/people/edituser-people">
             <img src={EditIcon} alt="img" />
           </Link>
           <Link className="confirm-text" to="#" onClick={confirmText}>
@@ -190,7 +190,7 @@ const UserList = () => {
               <h6>Manage your User</h6>
             </div>
             <div className="page-btn">
-              <Link to="/dream-pos/people/adduser-people" className="btn btn-added">
+              <Link to="/peul-pos/people/adduser-people" className="btn btn-added">
                 <img src={PlusIcon} alt="img" className="me-1" />
                 Add User
               </Link>
