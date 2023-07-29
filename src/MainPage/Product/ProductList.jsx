@@ -168,7 +168,7 @@ const ProductList = () => {
             <Link className="me-3" to="/peul-pos/product/product-details">
               <img src={EyeIcon} alt="img" />
             </Link>
-            <Link className="me-3" to={{ pathname: "/peul-pos/product/addproduct-product", state: { product: record } }}>
+            <Link className="me-3" to="/peul-pos/product/addproduct-product" state={{ product: record }}>
               <img src={EditIcon} alt="img" />
             </Link>
             <Link className="confirm-text" to="#" onClick={() => confirmText(record)}>

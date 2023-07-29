@@ -109,7 +109,6 @@ const SignInPage = (props) => {
                         {...register("email")}
                         className={` ${errors.email ? "is-invalid" : ""}`}
                         placeholder="Enter your email address"
-                        defaultValue="eugenegregs@gmail.com"
                       />
                       <img src={MailIcon} alt="img" />
                       <div className="invalid-feedback">
@@ -125,7 +124,6 @@ const SignInPage = (props) => {
                         className={` ${errors.password ? "is-invalid" : ""}`}
                         placeholder="Enter your password"
                         {...register("password")}
-                        defaultValue="yjslphYf"
                       />
                       <span
                         onClick={onEyeClick}

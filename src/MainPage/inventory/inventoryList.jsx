@@ -121,7 +121,7 @@ const InvertryList = () => {
         render: (text, record) => (
           <>
             <>
-              <Link className="me-3" to={{ pathname: "/peul-pos/inventory/addinventory", state: { stock: record } }}>
+              <Link className="me-3" to="/peul-pos/inventory/addinventory" state={{ stock: record }}>
                 <img src={EditIcon} alt="img" />
               </Link>
               <Link className="confirm-text" to="#" onClick={() => { notify("Action Not Allowed", "warning", toast)} }>

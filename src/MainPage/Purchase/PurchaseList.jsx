@@ -33,7 +33,7 @@ const PurchaseList = () => {
       setBusy(true);
       fetchProducts().then(() => {
         fetchSuppliers();
-      })
+      });
     };
     fetchData();
   }, []);
@@ -231,10 +231,8 @@ const PurchaseList = () => {
           </Link>
           <Link
             className="me-3"
-            to={{
-              pathname: "/peul-pos/purchase/addpurchase-purchase",
-              state: { purchase: record },
-            }}
+            to="/peul-pos/purchase/addpurchase-purchase"
+            state={{ purchase: record }}
           >
             <img src={EditIcon} alt="img" />
           </Link>

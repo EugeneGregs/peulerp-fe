@@ -173,10 +173,8 @@ const ExpenseList = () => {
         <>
           <Link
             className="me-3"
-            to={{
-              pathname: "/peul-pos/expense/addexpense-expense",
-              state: { expense: record },
-            }}
+            to="/peul-pos/expense/addexpense-expense"
+            state={{ expense: record }}
           >
             <img src={EditIcon} alt="img" />
           </Link>

@@ -107,7 +107,7 @@ const SupplierList = () => {
       title: "Action",
       render: (text, record) => (
         <>
-          <Link className="me-3" to={ { pathname: "/peul-pos/people/addsupplier-people", state: { supplier: record } } }>
+          <Link className="me-3" to="/peul-pos/people/addsupplier-people" state= {{ supplier: record } }>
             <img src={EditIcon} alt="img" />
           </Link>
           <Link className="confirm-text" to="#" onClick={() => confirmText(record)}>

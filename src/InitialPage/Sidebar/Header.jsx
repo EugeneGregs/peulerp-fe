@@ -27,7 +27,7 @@ const Header = (props) => {
   const [searchBar, SetSearchBar] = useState(false);
   const [toggle, SetToggle] = useState(false);
   const navigate = useNavigate();
-  const { setAuth } = useAuth();
+  const { auth, setAuth } = useAuth();
   const handlesidebar = () => {
     document.body.classList.toggle("mini-sidebar");
     SetToggle((current) => !current);
@@ -178,7 +178,7 @@ const Header = (props) => {
                         </span>
                         <div className="media-body flex-grow-1">
                           <p className="noti-details">
-                            <span className="noti-title">John Doe</span> added
+                            <span className="noti-title">{auth.user.email}</span> added
                             new task{" "}
                             <span className="noti-title">
                               Patient appointment booking
@@ -315,8 +315,8 @@ const Header = (props) => {
                     <span className="status online" />
                   </span>
                   <div className="profilesets">
-                    <h6>John Doe</h6>
-                    <h5>Admin</h5>
+                    <h6>{auth?.user?.email?.split("@")[0]}</h6>
+                    <h5>{auth?.user?.role}</h5>
                   </div>
                 </div>
                 <hr className="m-0" />
