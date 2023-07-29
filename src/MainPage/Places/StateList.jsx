@@ -101,7 +101,7 @@ const StateList = () => {
       title: "Action",
       render: () => (
         <>
-          <Link className="me-3" to="/dream-pos/places/editstate-places">
+          <Link className="me-3" to="/peul-pos/places/editstate-places">
             <img src={EditIcon} alt="img" />
           </Link>
           <Link className="confirm-text" to="#" onClick={confirmText}>
@@ -121,7 +121,7 @@ const StateList = () => {
               <h6>Manage your State</h6>
             </div>
             <div className="page-btn">
-              <Link to="/dream-pos/places/newstate-places" className="btn btn-added">
+              <Link to="/peul-pos/places/newstate-places" className="btn btn-added">
                 <img src={PlusIcon} alt="img" className="me-1" />
                 Add State
               </Link>

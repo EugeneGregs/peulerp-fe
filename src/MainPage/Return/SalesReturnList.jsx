@@ -247,7 +247,7 @@ const SalesReturnList = () => {
       title: "Action",
       render: () => (
         <>
-          <Link className="me-3" to="/dream-pos/return/editsalesreturn-return">
+          <Link className="me-3" to="/peul-pos/return/editsalesreturn-return">
             <img src={EditIcon} alt="img" />
           </Link>
           <Link className="confirm-text" to="#" onClick={confirmText}>
@@ -268,7 +268,7 @@ const SalesReturnList = () => {
             </div>
             <div className="page-btn">
               <Link
-                to="/dream-pos/return/addsalesreturn-return"
+                to="/peul-pos/return/addsalesreturn-return"
                 className="btn btn-added"
               >
                 <img src={PlusIcon} alt="img" className="me-1" />

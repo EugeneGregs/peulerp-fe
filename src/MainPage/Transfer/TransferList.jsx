@@ -175,7 +175,7 @@ const TransferList = () => {
       title: "Action",
       render: () => (
         <>
-          <Link className="me-3" to="/dream-pos/transfer/edittransfer-transfer">
+          <Link className="me-3" to="/peul-pos/transfer/edittransfer-transfer">
             <img src={EditIcon} alt="img" />
           </Link>
           <Link className="confirm-text" to="#" onClick={confirmText}>
@@ -196,7 +196,7 @@ const TransferList = () => {
             </div>
             <div className="page-btn">
               <Link
-                to="/dream-pos/transfer/addtransfer-transfer"
+                to="/peul-pos/transfer/addtransfer-transfer"
                 className="btn btn-added"
               >
                 <img src={PlusIcon} alt="img" className="me-1" />

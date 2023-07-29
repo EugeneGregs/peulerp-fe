@@ -19,10 +19,15 @@ import {
   Logout,
 } from "../../EntryFile/imagePath";
 import { Link } from "react-router-dom";
+import { Button } from "react-bootstrap";
+import useAuth from "../../hooks/useAuth";
+import { useNavigate } from "react-router-dom";
 
 const Header = (props) => {
   const [searchBar, SetSearchBar] = useState(false);
   const [toggle, SetToggle] = useState(false);
+  const navigate = useNavigate();
+  const { auth, setAuth } = useAuth();
   const handlesidebar = () => {
     document.body.classList.toggle("mini-sidebar");
     SetToggle((current) => !current);
@@ -41,6 +46,11 @@ const Header = (props) => {
 
   let pathname = location.pathname;
 
+  const handleLogOut = () => {
+    setAuth(null);
+    navigate("/signIn");
+  };
+
   return (
     <>
       <div className="header">
@@ -50,10 +60,10 @@ const Header = (props) => {
           onMouseLeave={expandMenu}
           onMouseOver={expandMenuOpen}
         >
-          <Link to="/dream-pos/dashboard" className="logo">
+          <Link to="/peul-pos/dashboard" className="logo">
             <img src={Logo} alt="" />
           </Link>
-          <Link to="/dream-pos/dashboard" className="logo-small">
+          <Link to="/peul-pos/dashboard" className="logo-small">
             <img src={SmallLogo} alt="" />
           </Link>
           <Link
@@ -161,14 +171,14 @@ const Header = (props) => {
               <div className="noti-content">
                 <ul className="notification-list">
                   <li className="notification-message">
-                    <Link to="/dream-pos/activities">
+                    <Link to="/peul-pos/activities">
                       <div className="media d-flex">
                         <span className="avatar flex-shrink-0">
                           <img alt="" src={Avatar2} />
                         </span>
                         <div className="media-body flex-grow-1">
                           <p className="noti-details">
-                            <span className="noti-title">John Doe</span> added
+                            <span className="noti-title">{auth.user.email}</span> added
                             new task{" "}
                             <span className="noti-title">
                               Patient appointment booking
@@ -184,7 +194,7 @@ const Header = (props) => {
                     </Link>
                   </li>
                   <li className="notification-message">
-                    <Link to="/dream-pos/activities">
+                    <Link to="/peul-pos/activities">
                       <div className="media d-flex">
                         <span className="avatar flex-shrink-0">
                           <img alt="" src={Avatar3} />
@@ -207,7 +217,7 @@ const Header = (props) => {
                     </Link>
                   </li>
                   <li className="notification-message">
-                    <Link to="/dream-pos/activities">
+                    <Link to="/peul-pos/activities">
                       <div className="media d-flex">
                         <span className="avatar flex-shrink-0">
                           <img alt="" src={Avatar6} />
@@ -233,7 +243,7 @@ const Header = (props) => {
                     </Link>
                   </li>
                   <li className="notification-message">
-                    <Link to="/dream-pos/activities">
+                    <Link to="/peul-pos/activities">
                       <div className="media d-flex">
                         <span className="avatar flex-shrink-0">
                           <img alt="" src={Avatar17} />
@@ -256,7 +266,7 @@ const Header = (props) => {
                     </Link>
                   </li>
                   <li className="notification-message">
-                    <Link to="/dream-pos/activities">
+                    <Link to="/peul-pos/activities">
                       <div className="media d-flex">
                         <span className="avatar flex-shrink-0">
                           <img alt="" src={Avatar13} />
@@ -281,7 +291,7 @@ const Header = (props) => {
                 </ul>
               </div>
               <div className="topnav-dropdown-footer">
-                <Link to="/dream-pos/activities">View all Notifications</Link>
+                <Link to="/peul-pos/activities">View all Notifications</Link>
               </div>
             </div>
           </li>
@@ -305,26 +315,26 @@ const Header = (props) => {
                     <span className="status online" />
                   </span>
                   <div className="profilesets">
-                    <h6>John Doe</h6>
-                    <h5>Admin</h5>
+                    <h6>{auth?.user?.email?.split("@")[0]}</h6>
+                    <h5>{auth?.user?.role}</h5>
                   </div>
                 </div>
                 <hr className="m-0" />
-                <Link className="dropdown-item" to="/dream-pos/profile/user-profile">
+                <Link className="dropdown-item" to="/peul-pos/profile/user-profile">
                   <i className="me-2" data-feather="user" /> My Profile
                 </Link>
                 <Link
                   className="dropdown-item"
-                  to="/dream-pos/settings/generalsettings"
+                  to="/peul-pos/settings/generalsettings"
                 >
                   <i className="me-2" data-feather="settings" />
                   Settings
                 </Link>
                 <hr className="m-0" />
-                <Link className="dropdown-item logout pb-0" to="/signIn">
+                <Button className="dropdown-item logout pb-0" onClick={() => handleLogOut()}>
                   <img src={Logout} className="me-2" alt="img" />
                   Logout
-                </Link>
+                </Button>
               </div>
             </div>
           </li>
@@ -341,10 +351,10 @@ const Header = (props) => {
             <i className="fa fa-ellipsis-v" />
           </Link>
           <div className="dropdown-menu dropdown-menu-right">
-            <Link className="dropdown-item" to="/dream-pos/profile/user-profile">
+            <Link className="dropdown-item" to="/peul-pos/profile/user-profile">
               My Profile
             </Link>
-            <Link className="dropdown-item" to="/dream-pos/settings/generalsettings">
+            <Link className="dropdown-item" to="/peul-pos/settings/generalsettings">
               Settings
             </Link>
             <Link className="dropdown-item" to="/signIn">

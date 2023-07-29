@@ -149,7 +149,7 @@ const CustomerList = () => {
       title: "Action",
       render: () => (
         <>
-          <Link className="me-3" to="/dream-pos/people/editcustomer-people">
+          <Link className="me-3" to="/peul-pos/people/editcustomer-people">
             <img src={EditIcon} alt="img" />
           </Link>
           <Link className="confirm-text" to="#" onClick={confirmText}>
@@ -170,7 +170,7 @@ const CustomerList = () => {
             </div>
             <div className="page-btn">
               <Link
-                to="/dream-pos/people/addcustomer-people"
+                to="/peul-pos/people/addcustomer-people"
                 className="btn btn-added"
               >
                 <img src={PlusIcon} alt="img" className="me-1" />

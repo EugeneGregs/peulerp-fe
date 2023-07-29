@@ -1,40 +1,56 @@
-import React, { Component } from 'react';
-import { Redirect, Route, Switch } from 'react-router-dom';
+import React, { useEffect } from "react";
+import { Route, Routes, useNavigate, useLocation } from "react-router-dom";
 
-import SignIn from './SignIn'
-import ForgetPassword from './ForgetPassword';
-import SignUp from './SignUp'
-import Pos from './pos/pos'
-import DefaultLayout from './Sidebar/DefaultLayout';
+import SignIn from "./SignIn";
+import ForgetPassword from "./ForgetPassword";
+import SignUp from "./SignUp";
+import Pos from "./pos/pos";
+import Error404 from "../MainPage/ErrorPage/Error404";
+import Error500 from "../MainPage/ErrorPage/Error500";
+import DefaultLayout from "./Sidebar/DefaultLayout";
+import RequireAuth from "../MainPage/auth/RequireAuth";
 
-import Error404 from '../MainPage/ErrorPage/Error404';
-import Error500 from '../MainPage/ErrorPage/Error500';
+const App = () => {
+  const { pathname } = useLocation();
+  const navigate = useNavigate();
 
-export default class App extends Component {
-    componentDidMount() {
-        if (location.pathname.includes("signIn") || location.pathname.includes("signUp") || location.pathname.includes("forgetPassword")) {
-            $('body').addClass('account-page');
-        }    
+  useEffect(() => {
+    console.log("location");
+    // console.log(pathname);
+
+    if (pathname === "/") {
+      navigate("/peul-pos/dashboard");
     }
-    render() {
-        const { location } = this.props;
 
-        if (location.pathname === "/") {
-            return (<Redirect to={'/signIn'} />)
-        }
-
-        return (
-            <Switch>
-                <Route path="/signIn" component={SignIn} />
-                <Route path="/forgetPassword" component={ForgetPassword} />
-                <Route path="/signUp" component={SignUp} />
-                <Route path="/dream-pos" component={DefaultLayout} />
-                
-                <Route path="/error-404" component={Error404} />
-                <Route path="/error-500" component={Error500} />
-                <Route path="/pos" component={Pos} />
-
-            </Switch>
-        )
+    if (
+      pathname.includes("signIn") ||
+      pathname.includes("signUp") ||
+      pathname.includes("forgetPassword")
+    ) {
+      $("body").addClass("account-page");
     }
-}
+  }, []);
+
+  return (
+    <>
+      <Routes>
+        {/* Public Routes */}
+        <Route path="/signIn" element={<SignIn />} />
+        <Route path="/forgetPassword" element={<ForgetPassword />} />
+        <Route path="/signUp" element={<SignUp />} />
+
+        {/* Private Routes */}
+        <Route element={<RequireAuth />}>
+          <Route path="/pos" element={<Pos />} />
+          <Route path="/peul-pos/*" element={<DefaultLayout />} />
+        </Route>
+
+        {/* Error Routes */}
+        <Route path="/error-500" element={<Error500 />} />
+        <Route path="*" element={<Error404 />} />
+      </Routes>
+    </>
+  );
+};
+
+export default App;

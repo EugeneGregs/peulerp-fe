@@ -1,14 +1,12 @@
 import React, { useEffect, useState } from "react";
 import Header from "./posheader";
 import { Link } from "react-router-dom";
-import Swal from "sweetalert2";
 import POS from "./posleft";
 import "react-select2-wrapper/css/select2.css";
 import CartComponent from "./cartcomponent";
 import { ToastContainer, toast } from "react-toastify";
 import { notify } from "../../common/ToastComponent";
 import {
-  Product34,
   wallet1,
   transcation,
   trash12,
@@ -17,20 +15,12 @@ import {
   pause1,
   debitcard,
   cash,
-  Product30,
-  Product31,
-  Product35,
-  delete2,
-  ellipise1,
   scanner1,
 } from "../../EntryFile/imagePath";
 import Loader from "react-js-loader";
-import axios from "axios";
-import * as Constants from "../../common/Constants";
+import usePrivateAxios from "../../hooks/usePrivateAxios";
 
 const Pos = () => {
-  const baseUrl = Constants.BASE_URL;
-
   const paymentTypes = ["Mobile", "Cash", "Bank"];
   const [transactionId, setTransactionId] = useState("");
   const [products, setProducts] = useState([]);
@@ -38,11 +28,14 @@ const Pos = () => {
   const [isBusy, setBusy] = useState(true);
   const [cartProducts, setCartProducts] = useState([]);
   const [totalCost, setTotalCost] = useState(0);
+  const [runningCost, setRunningCost] = useState(0);
   const [cartItemsCount, setcartItemsCount] = useState(0);
   const [totalMargin, setTotalMargin] = useState(0);
+  const [runningMargin, setRunningMargin] = useState(0);
   const [paymentTye, setPaymentType] = useState("");
   const [amount, setAmount] = useState(0);
   const [discount, setDiscount] = useState(0);
+  const API = usePrivateAxios();
 
   const updateCart = (prod, action) => {
     let currentCartContent = [...cartProducts];
@@ -107,10 +100,8 @@ const Pos = () => {
   const initializeProducts = () => {
     setBusy(true);
     const fetchProducts = async () => {
-      axios.get(`${baseUrl}/products`).then((res) => {
+      API.get(`/products`).then((res) => {
         const resData = res.data;
-        console.log("resData:::=>");
-        console.log(resData);
         let prods = resData
           ? [
               ...resData.map((p) => {
@@ -176,9 +167,14 @@ const Pos = () => {
   }, []);
 
   useEffect(() => {
-    setTotalMargin(totalMargin - discount);
-    setTotalCost(totalCost - discount);
+      setRunningCost(totalCost - discount);
+      setRunningMargin(totalMargin - discount);  
   }, [discount]);
+
+  useEffect(() => {
+    setRunningCost(totalCost - discount);
+    setRunningMargin(totalMargin - discount);
+  },[totalCost]);
 
   const generateTransactionId = () =>
     ([1e7] + -1e3 + -4e3 + -8e3 + -1e11)
@@ -203,8 +199,8 @@ const Pos = () => {
       tellerId: "00000000-0000-0000-0000-000000000000",
       discount: discount,
       customerId: "00000000-0000-0000-0000-000000000000",
-      totalCost: totalCost,
-      totalMargin: totalMargin - discount,
+      totalCost: runningCost,
+      totalMargin: runningMargin,
     };
   };
 
@@ -212,25 +208,30 @@ const Pos = () => {
     const trans = createTransaction();
     if (ValidateTransaction(trans)) {
       console.log(trans);
-      axios
-        .post(`${baseUrl}/transaction`, trans)
+      API
+        .post(`/transaction`, trans)
         .then(handleResponse)
         .catch(handleError);
     }
   };
 
-  const handleResponse = (res) => {
-    console.log("POST RES::");
-    console.log(res.data);
-    clearCart();
-    setTransactionId(generateTransactionId());
-    setPaymentType("");
-    setAmount(0);
+  const handleResponse = (res) => {   
+    clearFields();
     notify(
       `Transaction Of Id: ${res.data.orderNumber} Sent!`,
       "success",
       toast
     );
+  };
+
+  const clearFields = () => {
+    clearCart();
+    setTransactionId(generateTransactionId());
+    setPaymentType("");
+    setAmount(0);
+    setDiscount(0);
+    setRunningCost(0);
+    setRunningMargin(0);
   };
 
   const handleError = (res) => {
@@ -301,7 +302,7 @@ const Pos = () => {
                   <div className="card-body pt-0">
                     <div className="totalitem">
                       <h4>Total items : {cartItemsCount}</h4>
-                      <h4>Current Margin : {totalMargin}</h4>
+                      <h4>Current Margin : {runningMargin}</h4>
                       <Link to="#" onClick={() => clearCart()}>
                         Clear all
                       </Link>
@@ -322,7 +323,7 @@ const Pos = () => {
                       <ul>
                         <li className="total-value">
                           <h5>Total</h5>
-                          <h6>Ksh. {totalCost}.00</h6>
+                          <h6>Ksh. {runningCost}.00</h6>
                         </li>
                         <li className="total-value">
                           <h5>Discount</h5>
@@ -330,7 +331,8 @@ const Pos = () => {
                             className="form-control"
                             style={{marginRight: "0", marginLeft: "60%"}}
                               type="text"
-                              onBlur={(e) => setDiscount(+e.target.value)}
+                              onChange={(e) => setDiscount(+e.target.value)}
+                              value={discount}
                             />
                         </li>
                         <div
@@ -421,7 +423,7 @@ const Pos = () => {
                       onClick={HandleCheckout}
                     >
                       <h5>Checkout</h5>
-                      <h6>Ksh. {totalCost}.00</h6>
+                      <h6>Ksh. {runningCost}.00</h6>
                     </Link>
                     <div className="btn-pos">
                       <ul>

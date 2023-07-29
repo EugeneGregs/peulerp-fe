@@ -1,5 +1,5 @@
 import React from 'react'
-import { Redirect, Route, Switch } from 'react-router-dom';
+import { Route, Routes, Navigate } from 'react-router-dom';
 import Basicinput from './basic-input'
 import Forminputgroup from './form-input-group'
 import HorizontalForm from './horizontal-form'
@@ -13,8 +13,8 @@ import Fileupload from './fileupload'
 
 
 const IconIndex = ({ match}) =>(
-    <Switch>
-        <Redirect exact from={`${match.url}/`} to={`${match.url}/form-basic-inputs`} />
+    <Routes>
+        <Navigate exact from={`${match.url}/`} to={`${match.url}/form-basic-inputs`} />
         <Route path={`${match.url}/form-basic-inputs`} component={Basicinput} />        
         <Route path={`${match.url}/form-input-groups`} component={Forminputgroup} />        
         <Route path={`${match.url}/form-horizontal`} component={HorizontalForm} />        
@@ -24,7 +24,7 @@ const IconIndex = ({ match}) =>(
         <Route path={`${match.url}/form-select2`} component={FormSelect2} />              
         <Route path={`${match.url}/form-fileupload`} component={Fileupload} />        
         
-    </Switch>
+    </Routes>
 )
 
 export default IconIndex

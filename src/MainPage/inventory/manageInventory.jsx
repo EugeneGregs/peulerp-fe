@@ -1,14 +1,12 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { notify } from "../../common/ToastComponent";
 import { ToastContainer, toast } from "react-toastify";
 import { useLocation } from "react-router-dom";
 import * as Constants from "../../common/Constants";
 import { Dimmer, Loader, Segment } from "semantic-ui-react";
 import Select from "react-select";
-import { set } from "react-hook-form";
+import usePrivateAxios from "../../hooks/usePrivateAxios";
 
-const baseUrl = Constants.BASE_URL;
 const successCodes = Constants.SUCCESS_CODES;
 
 const ManageInventory = () => {
@@ -20,6 +18,7 @@ const ManageInventory = () => {
   const [productList, setProductList] = useState([]);
   const [saveType, setSaveType] = useState("post");
   const [isBusy, setIsBusy] = useState(false);
+  const API = usePrivateAxios();
 
   useEffect(() => {
     setIsBusy(true);
@@ -41,8 +40,8 @@ const ManageInventory = () => {
   }, [existingStock]);
 
   const fetchProductList = () => {
-    axios
-      .get(`${baseUrl}/products`)
+    API
+      .get(`/products`)
       .then((res) => {
         setIsBusy(false);
         if (!successCodes.includes(res.status)) {
@@ -67,8 +66,8 @@ const ManageInventory = () => {
   
   const fetchStockByProductId = (productId) => {
     setIsBusy(true);
-    axios
-      .get(`${baseUrl}/stocks/product/${productId}`)
+    API
+      .get(`/stocks/product/${productId}`)
       .then((res) => {
         setIsBusy(false);
         if (successCodes.includes(res.status)) {
@@ -95,8 +94,8 @@ const ManageInventory = () => {
       stock.id = existingStock.id;
     }
 
-    axios
-      .post(`${baseUrl}/stocks`, stock)
+    API
+      .post(`/stocks`, stock)
       .then((res) => handleResponse(res))
       .catch((err) => handleError(err));
   };

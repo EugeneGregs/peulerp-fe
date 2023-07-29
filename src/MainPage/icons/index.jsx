@@ -1,5 +1,5 @@
 import React from 'react'
-import { Redirect, Route, Switch } from 'react-router-dom';
+import { Navigate, Route, Routes } from 'react-router-dom';
 import Fontawesome from './font-awesome'
 import Feather from './feather'
 import Ionic from './ionic'
@@ -14,8 +14,8 @@ import Flag from './flag'
 
 
 const IconIndex = ({ match}) =>(
-    <Switch>
-        <Redirect exact from={`${match.url}/`} to={`${match.url}/icon-fontawesome`} />
+    <Routes>
+        <Navigate exact from={`${match.url}/`} to={`${match.url}/icon-fontawesome`} />
         <Route path={`${match.url}/icon-fontawesome`} component={Fontawesome} />
         <Route path={`${match.url}/icon-feather`} component={Feather} />
         <Route path={`${match.url}/icon-ionic`} component={Ionic} />
@@ -27,7 +27,7 @@ const IconIndex = ({ match}) =>(
         <Route path={`${match.url}/icon-typicon`} component={Typicon} />
         <Route path={`${match.url}/icon-flag`} component={Flag} />
         
-    </Switch>
+    </Routes>
 )
 
 export default IconIndex

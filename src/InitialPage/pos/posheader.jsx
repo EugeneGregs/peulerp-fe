@@ -34,10 +34,10 @@ const PosHeader = (props) => {
       <div className="header">
         {/* Logo */}
         <div className="header-left border-0">
-          <Link to="/dream-pos/dashboard" className="logo">
+          <Link to="/peul-pos/dashboard" className="logo">
             <img src={Logo} alt="" />
           </Link>
-          <Link to="/dream-pos/dashboard" className="logo-small">
+          <Link to="/peul-pos/dashboard" className="logo-small">
             <img src={SmallLogo} alt="" />
           </Link>
         </div>
@@ -127,7 +127,7 @@ const PosHeader = (props) => {
               <div className="noti-content">
                 <ul className="notification-list">
                   <li className="notification-message">
-                    <Link to="/dream-pos/activities">
+                    <Link to="/peul-pos/activities">
                       <div className="media d-flex">
                         <span className="avatar flex-shrink-0">
                           <img alt="" src={Avatar2} />
@@ -150,7 +150,7 @@ const PosHeader = (props) => {
                     </Link>
                   </li>
                   <li className="notification-message">
-                    <Link to="/dream-pos/activities">
+                    <Link to="/peul-pos/activities">
                       <div className="media d-flex">
                         <span className="avatar flex-shrink-0">
                           <img alt="" src={Avatar3} />
@@ -173,7 +173,7 @@ const PosHeader = (props) => {
                     </Link>
                   </li>
                   <li className="notification-message">
-                    <Link to="/dream-pos/activities">
+                    <Link to="/peul-pos/activities">
                       <div className="media d-flex">
                         <span className="avatar flex-shrink-0">
                           <img alt="" src={Avatar6} />
@@ -199,7 +199,7 @@ const PosHeader = (props) => {
                     </Link>
                   </li>
                   <li className="notification-message">
-                    <Link to="/dream-pos/activities">
+                    <Link to="/peul-pos/activities">
                       <div className="media d-flex">
                         <span className="avatar flex-shrink-0">
                           <img alt="" src={Avatar17} />
@@ -222,7 +222,7 @@ const PosHeader = (props) => {
                     </Link>
                   </li>
                   <li className="notification-message">
-                    <Link to="/dream-pos/activities">
+                    <Link to="/peul-pos/activities">
                       <div className="media d-flex">
                         <span className="avatar flex-shrink-0">
                           <img alt="" src={Avatar13} />
@@ -247,7 +247,7 @@ const PosHeader = (props) => {
                 </ul>
               </div>
               <div className="topnav-dropdown-footer">
-                <Link to="/dream-pos/activities">View all Notifications</Link>
+                <Link to="/peul-pos/activities">View all Notifications</Link>
               </div>
             </div>
           </li>
@@ -276,10 +276,10 @@ const PosHeader = (props) => {
                   </div>
                 </div>
                 <hr className="m-0" />
-                <Link className="dropdown-item" to="/dream-pos/profile/user-profile">
+                <Link className="dropdown-item" to="/peul-pos/profile/user-profile">
                   <i className="me-2" data-feather="user" /> My Profile
                 </Link>
-                <Link className="dropdown-item" to="/dream-pos/settings/generalsettings">
+                <Link className="dropdown-item" to="/peul-pos/settings/generalsettings">
                   <i className="me-2" data-feather="settings" />
                   Settings
                 </Link>
@@ -304,10 +304,10 @@ const PosHeader = (props) => {
             <i className="fa fa-ellipsis-v" />
           </Link>
           <div className="dropdown-menu dropdown-menu-right">
-            <Link className="dropdown-item" to="/dream-pos/profile/user-profile">
+            <Link className="dropdown-item" to="/peul-pos/profile/user-profile">
               My Profile
             </Link>
-            <Link className="dropdown-item" to="/dream-pos/settings/generalsettings">
+            <Link className="dropdown-item" to="/peul-pos/settings/generalsettings">
               Settings
             </Link>
             <Link className="dropdown-item" to="/signIn">

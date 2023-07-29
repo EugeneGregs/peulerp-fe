@@ -233,7 +233,7 @@ export default class Sweetalert extends Component {
                 <h3 className="page-title">Sweetalerts</h3>
                 <ul className="breadcrumb">
                   <li className="breadcrumb-item">
-                    <Link to="/dream-pos/dashboard">Dashboard</Link>
+                    <Link to="/peul-pos/dashboard">Dashboard</Link>
                   </li>
                   <li className="breadcrumb-item active">Sweetalerts</li>
                 </ul>

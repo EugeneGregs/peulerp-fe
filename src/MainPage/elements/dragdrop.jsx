@@ -61,7 +61,7 @@ class DragDrop extends Component {
                 <h3 className="page-title">Drag &amp; Drop</h3>
                 <ul className="breadcrumb">
                   <li className="breadcrumb-item">
-                    <a href="/dream-pos/dashboard">Dashboard</a>
+                    <a href="/peul-pos/dashboard">Dashboard</a>
                   </li>
                   <li className="breadcrumb-item active">Drag &amp; Drop</li>
                 </ul>

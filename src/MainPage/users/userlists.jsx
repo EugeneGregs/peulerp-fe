@@ -209,7 +209,7 @@ const UserLists = () => {
             <h6>Manage your User</h6>
           </div>
           <div className="page-btn">
-            <Link to="/dream-pos/people/adduser-people" className="btn btn-added">
+            <Link to="/peul-pos/people/adduser-people" className="btn btn-added">
               <img src={PlusIcon} alt="img" className="me-2" />
               Add User
             </Link>

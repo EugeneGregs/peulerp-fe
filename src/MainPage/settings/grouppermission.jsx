@@ -83,7 +83,7 @@ const GroupPermission = () => {
       className: "text-end",
       render: (text, record) => (
         <div className="text-end">
-          <Link className="me-3" to="/dream-pos/settings/editpermission">
+          <Link className="me-3" to="/peul-pos/settings/editpermission">
             <img src={EditIcon} alt="img" />
           </Link>
           <Link className="me-3 confirm-text" to="#" onClick={confirmText}>
@@ -105,7 +105,7 @@ const GroupPermission = () => {
             </div>
             <div className="page-btn">
               <Link
-                to="/dream-pos/settings/createpermission"
+                to="/peul-pos/settings/createpermission"
                 className="btn btn-added"
               >
                 <img src={PlusIcon} alt="img" className="me-2" />

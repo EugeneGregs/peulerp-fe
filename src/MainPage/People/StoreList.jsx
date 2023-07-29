@@ -136,7 +136,7 @@ const StoreList = () => {
       title: "Action",
       render: () => (
         <>
-          <Link className="me-3" to="/dream-pos/people/editstore-people">
+          <Link className="me-3" to="/peul-pos/people/editstore-people">
             <img src={EditIcon} alt="img" />
           </Link>
           <Link className="confirm-text" to="#" onClick={confirmText}>
@@ -156,7 +156,7 @@ const StoreList = () => {
               <h6>Manage your Store</h6>
             </div>
             <div className="page-btn">
-              <Link to="/dream-pos/people/addstore-people" className="btn btn-added">
+              <Link to="/peul-pos/people/addstore-people" className="btn btn-added">
                 <img src={PlusIcon} alt="img" className="me-1" />
                 Add Store
               </Link>

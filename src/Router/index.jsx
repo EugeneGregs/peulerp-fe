@@ -22,104 +22,111 @@ import Users from '../MainPage/users'
 import Settings from '../MainPage/settings'
 import BlankPage from "../MainPage/BlankPage"
 import Inventory from "../MainPage/inventory/index"
+import React from "react";
+import ProductLayout from "../MainPage/Product/layout";
+import ExpenseLayout from "../MainPage/Expense/ExpenseLayout";
+import PurchaseLayout from "../MainPage/Purchase/PurchaseLayout";
+import InventoryLayout from "../MainPage/inventory/defaultLayout";
+import PeopleLayout from "../MainPage/People/PeopleLayout";
+import ReportLayout from "../MainPage/report/reportLayout";
 
 export default [
     {
         path: 'dashboard',
-        component: Dashboard
+        component: <Dashboard/>
+    },
+    // {
+    //     path: 'activities',
+    //     component: Activities
+    // },
+    {
+        path: 'product/*',
+        component: <ProductLayout/>
+    },
+    // {
+    //     path:'profile',
+    //     component: Profile
+    // },
+    {
+        path:'purchase/*',
+        component: <PurchaseLayout/>
     },
     {
-        path: 'activities',
-        component: Activities
+        path:'expense/*',
+        component: <ExpenseLayout/>
     },
+    // {
+    //     path:'quotation',
+    //     component: Quotation
+    // },
+    // {
+    //     path:'transfer',
+    //     component: Transfer
+    // },
+    // {
+    //     path:'return',
+    //     component: Return
+    // },
     {
-        path: 'product',
-        component: Product
+        path:'people/*',
+        component: <PeopleLayout/>
     },
+    // {
+    //     path:'places',
+    //     component: Places
+    // },
+    // {
+    //     path:'components',
+    //     component: Components
+    // },
+    // {
+    //     path:'blankpage',
+    //     component: BlankPage
+    // },
+    // {
+    //     path:'elements',
+    //     component: Elements
+    // },
+    // {
+    //     path:'charts',
+    //     component: Charts
+    // },
+    // {
+    //     path:'icons',
+    //     component: Icons
+    // },
+    // {
+    //     path:'forms',
+    //     component: Forms
+    // },
+    // {
+    //     path:'table',
+    //     component: Tables
+    // },
+    // {
+    //     path:'application',
+    //     component: Application
+    // },
     {
-        path:'profile',
-        component: Profile
+        path:'report/*',
+        component: <ReportLayout/>
     },
+    // {
+    //     path:'users',
+    //     component: Users
+    // },
+    // {
+    //     path:'settings',
+    //     component: Settings
+    // },
     {
-        path:'purchase',
-        component: Purchase
+        path:'inventory/*',
+        component: <InventoryLayout/>
     },
-    {
-        path:'expense',
-        component: Expense
-    },
-    {
-        path:'quotation',
-        component: Quotation
-    },
-    {
-        path:'transfer',
-        component: Transfer
-    },
-    {
-        path:'return',
-        component: Return
-    },
-    {
-        path:'people',
-        component: People
-    },
-    {
-        path:'places',
-        component: Places
-    },
-    {
-        path:'components',
-        component: Components
-    },
-    {
-        path:'blankpage',
-        component: BlankPage
-    },
-    {
-        path:'elements',
-        component: Elements
-    },
-    {
-        path:'charts',
-        component: Charts
-    },
-    {
-        path:'icons',
-        component: Icons
-    },
-    {
-        path:'forms',
-        component: Forms
-    },
-    {
-        path:'table',
-        component: Tables
-    },
-    {
-        path:'application',
-        component: Application
-    },
-    {
-        path:'report',
-        component: Report
-    },
-    {
-        path:'users',
-        component: Users
-    },
-    {
-        path:'settings',
-        component: Settings
-    },
-    {
-        path:'inventory',
-        component: Inventory
-    },
-    {
-        path:'sales',
-        component: Sales
-    },
+    // {
+    //     path:'sales',
+    //     component: Sales
+    // },
     
    
     

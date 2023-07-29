@@ -256,7 +256,7 @@ const PurchaseReturnList = () => {
       title: "Action",
       render: () => (
         <>
-          <Link className="me-3" to="/dream-pos/return/editpurchasereturn-return">
+          <Link className="me-3" to="/peul-pos/return/editpurchasereturn-return">
             <img src={EditIcon} alt="img" />
           </Link>
           <Link className="confirm-text" to="#" onClick={confirmText}>
@@ -277,7 +277,7 @@ const PurchaseReturnList = () => {
             </div>
             <div className="page-btn">
               <Link
-                to="/dream-pos/return/addpurchasereturn-return"
+                to="/peul-pos/return/addpurchasereturn-return"
                 className="btn btn-added"
               >
                 <img src={PlusIcon} alt="img" className="me-1" />

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { withRouter, useHistory, useLocation } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+import withRouter from "../../hooks/withRouter";
 import {
   Dashboard,
   Expense,
@@ -22,7 +23,7 @@ import FeatherIcon from "feather-icons-react";
 const Sidebar = (props) => {
   const [isSideMenu, setSideMenu] = useState("");
   const [path, setPath] = useState("");
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const toggleSidebar = (value) => {
     setSideMenu(value);
@@ -34,7 +35,7 @@ const Sidebar = (props) => {
     document.body.classList.add("expand-menu");
   };
   const pageRefresh = (url, page) => {
-    history.push(`/dream-pos/${url}/${page}`);
+    navigate(`/peul-pos/${url}/${page}`);
     window.location.reload();
   };
   const location = useLocation();
@@ -61,7 +62,7 @@ const Sidebar = (props) => {
               <ul>
                 <li className={pathname.includes("dashboard") ? "active" : ""}>
                   <Link
-                    to="/dream-pos/dashboard"
+                    to="/peul-pos/dashboard"
                     onClick={() => toggleSidebar(isSideMenu == "" ? "" : "")}
                   >
                     <img src={Dashboard} alt="img" />
@@ -72,7 +73,7 @@ const Sidebar = (props) => {
                   <a
                     href="#"
                     className={
-                      pathname.includes("/dream-pos/product")
+                      pathname.includes("/peul-pos/product")
                         ? "active subdrop"
                         : "" || isSideMenu == "product"
                         ? "subdrop active"
@@ -92,7 +93,7 @@ const Sidebar = (props) => {
                           className={
                             pathname.includes("productlist-") ? "active" : ""
                           }
-                          to="/dream-pos/product/productlist-product"
+                          to="/peul-pos/product/productlist-product"
                         >
                           Product List
                         </Link>
@@ -102,7 +103,7 @@ const Sidebar = (props) => {
                           className={
                             pathname.includes("addproduct-") ? "active" : ""
                           }
-                          to="/dream-pos/product/addproduct-product"
+                          to="/peul-pos/product/addproduct-product"
                         >
                           Add Product
                         </Link>
@@ -112,7 +113,7 @@ const Sidebar = (props) => {
                           className={
                             pathname.includes("categorylist-") ? "active" : ""
                           }
-                          to="/dream-pos/product/categorylist-product"
+                          to="/peul-pos/product/categorylist-product"
                         >
                           Category List
                         </Link>
@@ -122,7 +123,7 @@ const Sidebar = (props) => {
                           className={
                             pathname.includes("addcategory-") ? "active" : ""
                           }
-                          to="/dream-pos/product/addcategory-product"
+                          to="/peul-pos/product/addcategory-product"
                         >
                           Add Category{" "}
                         </Link>
@@ -134,7 +135,7 @@ const Sidebar = (props) => {
                               ? "active"
                               : ""
                           }
-                          to="/dream-pos/product/subcategorytable-product"
+                          to="/peul-pos/product/subcategorytable-product"
                         >
                           Sub Category List
                         </Link>
@@ -144,7 +145,7 @@ const Sidebar = (props) => {
                           className={
                             pathname.includes("addsubcategory-") ? "active" : ""
                           }
-                          to="/dream-pos/product/addsubcategory-product"
+                          to="/peul-pos/product/addsubcategory-product"
                         >
                           Add Sub Category{" "}
                         </Link>
@@ -154,7 +155,7 @@ const Sidebar = (props) => {
                           className={
                             pathname.includes("brandlist-") ? "active" : ""
                           }
-                          to="/dream-pos/product/brandlist-product"
+                          to="/peul-pos/product/brandlist-product"
                         >
                           Brand list{" "}
                         </Link>
@@ -164,7 +165,7 @@ const Sidebar = (props) => {
                           className={
                             pathname.includes("addbrand-") ? "active" : ""
                           }
-                          to="/dream-pos/product/addbrand-product"
+                          to="/peul-pos/product/addbrand-product"
                         >
                           Add Brand
                         </Link>
@@ -174,7 +175,7 @@ const Sidebar = (props) => {
                           className={
                             pathname.includes("importproduct-") ? "active" : ""
                           }
-                          to="/dream-pos/product/importproduct-product"
+                          to="/peul-pos/product/importproduct-product"
                         >
                           Import Product
                         </Link>
@@ -184,7 +185,7 @@ const Sidebar = (props) => {
                           className={
                             pathname.includes("printbarcode-") ? "active" : ""
                           }
-                          to="/dream-pos/product/printbarcode-product"
+                          to="/peul-pos/product/printbarcode-product"
                         >
                           Print Barcode
                         </Link>
@@ -198,7 +199,7 @@ const Sidebar = (props) => {
                   <a
                     href="#"
                     className={
-                      pathname.includes("/dream-pos/sales")
+                      pathname.includes("/peul-pos/sales")
                         ? "active subdrop"
                         : "" || isSideMenu == "sales"
                         ? "subdrop active"
@@ -213,22 +214,22 @@ const Sidebar = (props) => {
                   </a>
                   {isSideMenu == "sales" ? (
                     <ul>
-                      <li>
+                      {/* <li>
                         <Link
                           className={
                             pathname.includes("saleslist") ? "active" : ""
                           }
-                          to="/dream-pos/sales/saleslist"
+                          to="/peul-pos/sales/saleslist"
                         >
                           Sales List
                         </Link>
-                      </li>
+                      </li> */}
                       <li>
                         <Link to="/pos">POS</Link>
                       </li>
                       {/* <li>
                         <Link
-                          to="/dream-pos/sales/add-sales"
+                          to="/peul-pos/sales/add-sales"
                           className={
                             pathname.includes("add-sales") ? "active" : ""
                           }
@@ -241,7 +242,7 @@ const Sidebar = (props) => {
                           className={
                             pathname.includes("salesreturnlist") ? "active" : ""
                           }
-                          to="/dream-pos/sales/salesreturnlist-return"
+                          to="/peul-pos/sales/salesreturnlist-return"
                         >
                           Sales Return List
                         </Link>
@@ -251,7 +252,7 @@ const Sidebar = (props) => {
                           className={
                             pathname.includes("addsalesreturn") ? "active" : ""
                           }
-                          to="/dream-pos/sales/addsalesreturn-return"
+                          to="/peul-pos/sales/addsalesreturn-return"
                         >
                           New Sales Return
                         </Link>
@@ -265,7 +266,7 @@ const Sidebar = (props) => {
                   <a
                     href="#"
                     className={
-                      pathname.includes("/dream-pos/inventory")
+                      pathname.includes("/peul-pos/inventory")
                         ? "active subdrop"
                         : "" || isSideMenu == "inventory"
                         ? "subdrop active"
@@ -285,13 +286,13 @@ const Sidebar = (props) => {
                           className={
                             pathname.includes("inventorylist") ? "active" : ""
                           }
-                          to="/dream-pos/inventory/inventorylist"
+                          to="/peul-pos/inventory/inventorylist"
                         >
                           Inventory List
                         </Link>
                       </li>
                       <li>
-                        <Link to="/dream-pos/inventory/addinventory">Add Inventory</Link>
+                        <Link to="/peul-pos/inventory/addinventory">Add Inventory</Link>
                       </li>
                     </ul>
                   ) : (
@@ -302,7 +303,7 @@ const Sidebar = (props) => {
                   <a
                     href="#"
                     className={
-                      pathname.includes("/dream-pos/purchase")
+                      pathname.includes("/peul-pos/purchase")
                         ? "subdrop active"
                         : "" || isSideMenu == "purchase"
                         ? "subdrop active"
@@ -323,7 +324,7 @@ const Sidebar = (props) => {
                           className={
                             pathname.includes("purchaselist-") ? "active" : ""
                           }
-                          to="/dream-pos/purchase/purchaselist-purchase"
+                          to="/peul-pos/purchase/purchaselist-purchase"
                         >
                           Purchase List
                         </Link>
@@ -333,7 +334,7 @@ const Sidebar = (props) => {
                           className={
                             pathname.includes("addpurchase-") ? "active" : ""
                           }
-                          to="/dream-pos/purchase/addpurchase-purchase"
+                          to="/peul-pos/purchase/addpurchase-purchase"
                         >
                           Add Purchase
                         </Link>
@@ -343,7 +344,7 @@ const Sidebar = (props) => {
                           className={
                             pathname.includes("importpurchase-") ? "active" : ""
                           }
-                          to="/dream-pos/purchase/importpurchase-purchase"
+                          to="/peul-pos/purchase/importpurchase-purchase"
                         >
                           Import Purchase
                         </Link>
@@ -357,7 +358,7 @@ const Sidebar = (props) => {
                   <a
                     href="#"
                     className={
-                      pathname.includes("/dream-pos/expense")
+                      pathname.includes("/peul-pos/expense")
                         ? "subdrop active"
                         : "" || isSideMenu == "expense"
                         ? "subdrop active"
@@ -378,7 +379,7 @@ const Sidebar = (props) => {
                           className={
                             pathname.includes("expenselist-") ? "active" : ""
                           }
-                          to="/dream-pos/expense/expenselist-expense"
+                          to="/peul-pos/expense/expenselist-expense"
                         >
                           Expense List
                         </Link>
@@ -388,23 +389,23 @@ const Sidebar = (props) => {
                           className={
                             pathname.includes("addexpense-") ? "active" : ""
                           }
-                          to="/dream-pos/expense/addexpense-expense"
+                          to="/peul-pos/expense/addexpense-expense"
                         >
                           Add Expense
                         </Link>
                       </li>
-                      <li>
+                      {/* <li>
                         <Link
                           className={
                             pathname.includes("expensecategory-")
                               ? "active"
                               : ""
                           }
-                          to="/dream-pos/expense/expensecategory-expense"
+                          to="/peul-pos/expense/expensecategory-expense"
                         >
                           Expense Category
                         </Link>
-                      </li>
+                      </li> */}
                     </ul>
                   ) : (
                     ""
@@ -414,7 +415,7 @@ const Sidebar = (props) => {
                   <a
                     href="#"
                     className={
-                      pathname.includes("/dream-pos/quotation")
+                      pathname.includes("/peul-pos/quotation")
                         ? "subdrop active"
                         : "" || isSideMenu == "quotation"
                         ? "subdrop active"
@@ -437,7 +438,7 @@ const Sidebar = (props) => {
                           className={
                             pathname.includes("quotationlist-") ? "active" : ""
                           }
-                          to="/dream-pos/quotation/quotationlist-quotation"
+                          to="/peul-pos/quotation/quotationlist-quotation"
                         >
                           Quotation List
                         </Link>
@@ -447,7 +448,7 @@ const Sidebar = (props) => {
                           className={
                             pathname.includes("addquotation-") ? "active" : ""
                           }
-                          to="/dream-pos/quotation/addquotation-quotation"
+                          to="/peul-pos/quotation/addquotation-quotation"
                         >
                           Add Quotation
                         </Link>
@@ -457,11 +458,11 @@ const Sidebar = (props) => {
                     ""
                   )}
                 </li> */}
-                <li className="submenu">
+                {/* <li className="submenu">
                   <a
                     href="#"
                     className={
-                      pathname.includes("/dream-pos/transfer")
+                      pathname.includes("/peul-pos/transfer")
                         ? "subdrop active"
                         : "" || isSideMenu == "transfer"
                         ? "subdrop active"
@@ -482,7 +483,7 @@ const Sidebar = (props) => {
                           className={
                             pathname.includes("transferlist-") ? "active" : ""
                           }
-                          to="/dream-pos/transfer/transferlist-transfer"
+                          to="/peul-pos/transfer/transferlist-transfer"
                         >
                           Transfer List
                         </Link>
@@ -492,31 +493,31 @@ const Sidebar = (props) => {
                           className={
                             pathname.includes("addtransfer-") ? "active" : ""
                           }
-                          to="/dream-pos/transfer/addtransfer-transfer"
+                          to="/peul-pos/transfer/addtransfer-transfer"
                         >
                           Add Transfer
                         </Link>
                       </li>
-                      {/* <li>
+                      <li>
                         <Link
                           className={
                             pathname.includes("importtransfer-") ? "active" : ""
                           }
-                          to="/dream-pos/transfer/importtransfer-transfer"
+                          to="/peul-pos/transfer/importtransfer-transfer"
                         >
                           Import Transfer
                         </Link>
-                      </li> */}
+                      </li>
                     </ul>
                   ) : (
                     ""
                   )}
-                </li>
-                <li className="submenu">
+                </li> */}
+                {/* <li className="submenu">
                   <a
                     href="#"
                     className={
-                      pathname.includes("/dream-pos/return")
+                      pathname.includes("/peul-pos/return")
                         ? "subdrop active"
                         : "" || isSideMenu == "return"
                         ? "subdrop active"
@@ -539,7 +540,7 @@ const Sidebar = (props) => {
                               ? "active"
                               : ""
                           }
-                          to="/dream-pos/return/salesreturnlist-return"
+                          to="/peul-pos/return/salesreturnlist-return"
                         >
                           Sales Return List
                         </Link>
@@ -549,7 +550,7 @@ const Sidebar = (props) => {
                           className={
                             pathname.includes("addsalesreturn-") ? "active" : ""
                           }
-                          to="/dream-pos/return/addsalesreturn-return"
+                          to="/peul-pos/return/addsalesreturn-return"
                         >
                           Add Sales Return
                         </Link>
@@ -561,7 +562,7 @@ const Sidebar = (props) => {
                               ? "active"
                               : ""
                           }
-                          to="/dream-pos/return/purchasereturnlist-return"
+                          to="/peul-pos/return/purchasereturnlist-return"
                         >
                           Purchase Return List
                         </Link>
@@ -573,7 +574,7 @@ const Sidebar = (props) => {
                               ? "active"
                               : ""
                           }
-                          to="/dream-pos/return/addpurchasereturn-return"
+                          to="/peul-pos/return/addpurchasereturn-return"
                         >
                           Add Purchase Return
                         </Link>
@@ -582,12 +583,12 @@ const Sidebar = (props) => {
                   ) : (
                     ""
                   )}
-                </li>
+                </li> */}
                 <li className="submenu">
                   <a
                     href="#"
                     className={
-                      pathname.includes("/dream-pos/people")
+                      pathname.includes("/peul-pos/people")
                         ? "subdrop active"
                         : "" || isSideMenu == "people"
                         ? "subdrop active"
@@ -608,7 +609,7 @@ const Sidebar = (props) => {
                           className={
                             pathname.includes("customerlist-") ? "active" : ""
                           }
-                          to="/dream-pos/people/customerlist-people"
+                          to="/peul-pos/people/customerlist-people"
                         >
                           Customer List
                         </Link>
@@ -618,7 +619,7 @@ const Sidebar = (props) => {
                           className={
                             pathname.includes("addcustomer-") ? "active" : ""
                           }
-                          to="/dream-pos/people/addcustomer-people"
+                          to="/peul-pos/people/addcustomer-people"
                         >
                           Add Customer
                         </Link>
@@ -628,7 +629,7 @@ const Sidebar = (props) => {
                           className={
                             pathname.includes("supplierlist-") ? "active" : ""
                           }
-                          to="/dream-pos/people/supplierlist-people"
+                          to="/peul-pos/people/supplierlist-people"
                         >
                           Supplier List
                         </Link>
@@ -638,7 +639,7 @@ const Sidebar = (props) => {
                           className={
                             pathname.includes("addsupplier-") ? "active" : ""
                           }
-                          to="/dream-pos/people/addsupplier-people"
+                          to="/peul-pos/people/addsupplier-people"
                         >
                           Add Supplier
                         </Link>
@@ -648,7 +649,7 @@ const Sidebar = (props) => {
                           className={
                             pathname.includes("userlist-") ? "active" : ""
                           }
-                          to="/dream-pos/people/userlist-people"
+                          to="/peul-pos/people/userlist-people"
                         >
                           User List
                         </Link>
@@ -658,7 +659,7 @@ const Sidebar = (props) => {
                           className={
                             pathname.includes("adduser-") ? "active" : ""
                           }
-                          to="/dream-pos/people/adduser-people"
+                          to="/peul-pos/people/adduser-people"
                         >
                           Add User
                         </Link>
@@ -668,7 +669,7 @@ const Sidebar = (props) => {
                           className={
                             pathname.includes("storelist-") ? "active" : ""
                           }
-                          to="/dream-pos/people/storelist-people"
+                          to="/peul-pos/people/storelist-people"
                         >
                           Store List
                         </Link>
@@ -678,7 +679,7 @@ const Sidebar = (props) => {
                           className={
                             pathname.includes("addstore-") ? "active" : ""
                           }
-                          to="/dream-pos/people/addstore-people"
+                          to="/peul-pos/people/addstore-people"
                         >
                           Add Store
                         </Link>
@@ -692,7 +693,7 @@ const Sidebar = (props) => {
                   <a
                     href="#"
                     className={
-                      pathname.includes("/dream-pos/places")
+                      pathname.includes("/peul-pos/places")
                         ? "subdrop active"
                         : "" || isSideMenu == "places"
                         ? "subdrop active"
@@ -713,7 +714,7 @@ const Sidebar = (props) => {
                           className={
                             pathname.includes("newcountry-") ? "active" : ""
                           }
-                          to="/dream-pos/places/newcountry-places"
+                          to="/peul-pos/places/newcountry-places"
                         >
                           New Country
                         </Link>
@@ -723,7 +724,7 @@ const Sidebar = (props) => {
                           className={
                             pathname.includes("countrylist-") ? "active" : ""
                           }
-                          to="/dream-pos/places/countrylist-places"
+                          to="/peul-pos/places/countrylist-places"
                         >
                           Country List
                         </Link>
@@ -733,7 +734,7 @@ const Sidebar = (props) => {
                           className={
                             pathname.includes("newstate-") ? "active" : ""
                           }
-                          to="/dream-pos/places/newstate-places"
+                          to="/peul-pos/places/newstate-places"
                         >
                           New State
                         </Link>
@@ -743,7 +744,7 @@ const Sidebar = (props) => {
                           className={
                             pathname.includes("statelist-") ? "active" : ""
                           }
-                          to="/dream-pos/places/statelist-places"
+                          to="/peul-pos/places/statelist-places"
                         >
                           State List
                         </Link>
@@ -755,7 +756,7 @@ const Sidebar = (props) => {
                 </li> */}
                 {/* <li className={pathname.includes("components") ? "active" : ""}>
                   <Link
-                    to="/dream-pos/components"
+                    to="/peul-pos/components"
                     onClick={() => toggleSidebar(isSideMenu == "" ? "" : "")}
                   >
                     {" "}
@@ -765,7 +766,7 @@ const Sidebar = (props) => {
                 </li>
                 <li className={pathname.includes("blankpage") ? "active" : ""}>
                   <Link
-                    to="/dream-pos/blankpage"
+                    to="/peul-pos/blankpage"
                     onClick={() => toggleSidebar(isSideMenu == "" ? "" : "")}
                   >
                     {" "}
@@ -806,7 +807,7 @@ const Sidebar = (props) => {
                   <Link
                     to="#"
                     className={
-                      pathname.includes("/dream-pos/elements")
+                      pathname.includes("/peul-pos/elements")
                         ? "subdrop active"
                         : "" || isSideMenu == "elements"
                         ? "subdrop active"
@@ -823,7 +824,7 @@ const Sidebar = (props) => {
                     <ul>
                       <li>
                         <Link
-                          to="/dream-pos/elements/sweetalerts"
+                          to="/peul-pos/elements/sweetalerts"
                           className={
                             pathname.includes("sweetalerts") ? "active" : ""
                           }
@@ -833,7 +834,7 @@ const Sidebar = (props) => {
                       </li>
                       <li>
                         <Link
-                          to="/dream-pos/elements/tooltip"
+                          to="/peul-pos/elements/tooltip"
                           className={
                             pathname.includes("tooltip") ? "active" : ""
                           }
@@ -846,14 +847,14 @@ const Sidebar = (props) => {
                           className={
                             pathname.includes("popover") ? "active" : ""
                           }
-                          to="/dream-pos/elements/popover"
+                          to="/peul-pos/elements/popover"
                         >
                           Popover
                         </Link>
                       </li>
                       <li>
                         <Link
-                          to="/dream-pos/elements/ribbon"
+                          to="/peul-pos/elements/ribbon"
                           className={
                             pathname.includes("ribbon") ? "active" : ""
                           }
@@ -863,7 +864,7 @@ const Sidebar = (props) => {
                       </li>
                       <li>
                         <Link
-                          to="/dream-pos/elements/clipboard"
+                          to="/peul-pos/elements/clipboard"
                           className={
                             pathname.includes("clipboard") ? "active" : ""
                           }
@@ -873,7 +874,7 @@ const Sidebar = (props) => {
                       </li>
                       <li>
                         <Link
-                          to="/dream-pos/elements/drag-drop"
+                          to="/peul-pos/elements/drag-drop"
                           className={
                             pathname.includes("drag-drop") ? "active" : ""
                           }
@@ -883,7 +884,7 @@ const Sidebar = (props) => {
                       </li>
                       <li>
                         <Link
-                          to="/dream-pos/elements/rangeslider"
+                          to="/peul-pos/elements/rangeslider"
                           className={
                             pathname.includes("rangeslider") ? "active" : ""
                           }
@@ -896,7 +897,7 @@ const Sidebar = (props) => {
                       </li>
                       <li>
                         <Link
-                          to="/dream-pos/elements/rating"
+                          to="/peul-pos/elements/rating"
                           className={
                             pathname.includes("rating") ? "active" : ""
                           }
@@ -906,7 +907,7 @@ const Sidebar = (props) => {
                       </li>
                       <li>
                         <Link
-                          to="/dream-pos/elements/toastr"
+                          to="/peul-pos/elements/toastr"
                           className={
                             pathname.includes("toastr") ? "active" : ""
                           }
@@ -916,7 +917,7 @@ const Sidebar = (props) => {
                       </li>
                       <li>
                         <Link
-                          to="/dream-pos/elements/text-editor"
+                          to="/peul-pos/elements/text-editor"
                           className={
                             pathname.includes("text-editor") ? "active" : ""
                           }
@@ -926,7 +927,7 @@ const Sidebar = (props) => {
                       </li>
                       <li>
                         <Link
-                          to="/dream-pos/elements/counter"
+                          to="/peul-pos/elements/counter"
                           className={
                             pathname.includes("counter") ? "active" : ""
                           }
@@ -936,7 +937,7 @@ const Sidebar = (props) => {
                       </li>
                       <li>
                         <Link
-                          to="/dream-pos/elements/scrollbar"
+                          to="/peul-pos/elements/scrollbar"
                           className={
                             pathname.includes("scrollbar") ? "active" : ""
                           }
@@ -946,7 +947,7 @@ const Sidebar = (props) => {
                       </li>
                       <li>
                         <Link
-                          to="/dream-pos/elements/spinner"
+                          to="/peul-pos/elements/spinner"
                           className={
                             pathname.includes("spinner") ? "active" : ""
                           }
@@ -956,7 +957,7 @@ const Sidebar = (props) => {
                       </li>
                       <li>
                         <Link
-                          to="/dream-pos/elements/notification"
+                          to="/peul-pos/elements/notification"
                           className={
                             pathname.includes("notification") ? "active" : ""
                           }
@@ -966,7 +967,7 @@ const Sidebar = (props) => {
                       </li>
                       <li>
                         <Link
-                          to="/dream-pos/elements/lightbox"
+                          to="/peul-pos/elements/lightbox"
                           className={
                             pathname.includes("lightbox") ? "active" : ""
                           }
@@ -976,7 +977,7 @@ const Sidebar = (props) => {
                       </li>
                       <li>
                         <Link
-                          to="/dream-pos/elements/stickynote"
+                          to="/peul-pos/elements/stickynote"
                           className={
                             pathname.includes("stickynote") ? "active" : ""
                           }
@@ -986,7 +987,7 @@ const Sidebar = (props) => {
                       </li>
                       <li>
                         <Link
-                          to="/dream-pos/elements/timeline"
+                          to="/peul-pos/elements/timeline"
                           className={
                             pathname.includes("timeline") ? "active" : ""
                           }
@@ -996,7 +997,7 @@ const Sidebar = (props) => {
                       </li>
                       <li>
                         <Link
-                          to="/dream-pos/elements/form-wizard"
+                          to="/peul-pos/elements/form-wizard"
                           className={
                             pathname.includes("form-wizard") ? "active" : ""
                           }
@@ -1016,7 +1017,7 @@ const Sidebar = (props) => {
                   <Link
                     to="#"
                     className={
-                      pathname.includes("/dream-pos/charts")
+                      pathname.includes("/peul-pos/charts")
                         ? "subdrop active"
                         : "" || isSideMenu == "Charts"
                         ? "subdrop active"
@@ -1033,7 +1034,7 @@ const Sidebar = (props) => {
                     <ul>
                       <li>
                         <Link
-                          to="/dream-pos/charts/chart-apex"
+                          to="/peul-pos/charts/chart-apex"
                           className={
                             pathname.includes("chart-apex") ? "active" : ""
                           }
@@ -1043,7 +1044,7 @@ const Sidebar = (props) => {
                       </li>
                       <li>
                         <Link
-                          to="/dream-pos/charts/chart-js"
+                          to="/peul-pos/charts/chart-js"
                           className={
                             pathname.includes("chart-js") ? "active" : ""
                           }
@@ -1054,7 +1055,7 @@ const Sidebar = (props) => {
                       </li>
                       <li>
                         <Link
-                          to="/dream-pos/charts/chart-morris"
+                          to="/peul-pos/charts/chart-morris"
                           className={
                             pathname.includes("chart-morris") ? "active" : ""
                           }
@@ -1064,7 +1065,7 @@ const Sidebar = (props) => {
                       </li>
                       <li>
                         <Link
-                          to="/dream-pos/charts/chart-flot"
+                          to="/peul-pos/charts/chart-flot"
                           className={
                             pathname.includes("chart-flot") ? "active" : ""
                           }
@@ -1075,7 +1076,7 @@ const Sidebar = (props) => {
                       </li>
                       <li>
                         <Link
-                          to="/dream-pos/charts/chart-peity"
+                          to="/peul-pos/charts/chart-peity"
                           className={
                             pathname.includes("chart-peity") ? "active" : ""
                           }
@@ -1093,7 +1094,7 @@ const Sidebar = (props) => {
                   <Link
                     to="#"
                     className={
-                      pathname.includes("/dream-pos/icons")
+                      pathname.includes("/peul-pos/icons")
                         ? "subdrop active"
                         : "" || isSideMenu == "Icons"
                         ? "subdrop active"
@@ -1110,7 +1111,7 @@ const Sidebar = (props) => {
                     <ul>
                       <li>
                         <Link
-                          to="/dream-pos/icons/icon-fontawesome"
+                          to="/peul-pos/icons/icon-fontawesome"
                           className={
                             pathname.includes("fontawesome") ? "active" : ""
                           }
@@ -1120,7 +1121,7 @@ const Sidebar = (props) => {
                       </li>
                       <li>
                         <Link
-                          to="/dream-pos/icons/icon-feather"
+                          to="/peul-pos/icons/icon-feather"
                           className={
                             pathname.includes("feather") ? "active" : ""
                           }
@@ -1130,7 +1131,7 @@ const Sidebar = (props) => {
                       </li>
                       <li>
                         <Link
-                          to="/dream-pos/icons/icon-ionic"
+                          to="/peul-pos/icons/icon-ionic"
                           className={pathname.includes("ionic") ? "active" : ""}
                         >
                           Ionic Icons
@@ -1138,7 +1139,7 @@ const Sidebar = (props) => {
                       </li>
                       <li>
                         <Link
-                          to="/dream-pos/icons/icon-material"
+                          to="/peul-pos/icons/icon-material"
                           className={
                             pathname.includes("material") ? "active" : ""
                           }
@@ -1148,7 +1149,7 @@ const Sidebar = (props) => {
                       </li>
                       <li>
                         <Link
-                          to="/dream-pos/icons/icon-pe7"
+                          to="/peul-pos/icons/icon-pe7"
                           className={
                             pathname.includes("icon-pe7") ? "active" : ""
                           }
@@ -1158,7 +1159,7 @@ const Sidebar = (props) => {
                       </li>
                       <li>
                         <Link
-                          to="/dream-pos/icons/icon-simpleline"
+                          to="/peul-pos/icons/icon-simpleline"
                           className={
                             pathname.includes("simpleline") ? "active" : ""
                           }
@@ -1168,7 +1169,7 @@ const Sidebar = (props) => {
                       </li>
                       <li>
                         <Link
-                          to="/dream-pos/icons/icon-themify"
+                          to="/peul-pos/icons/icon-themify"
                           className={
                             pathname.includes("themify") ? "active" : ""
                           }
@@ -1178,7 +1179,7 @@ const Sidebar = (props) => {
                       </li>
                       <li>
                         <Link
-                          to="/dream-pos/icons/icon-weather"
+                          to="/peul-pos/icons/icon-weather"
                           className={
                             pathname.includes("weather") ? "active" : ""
                           }
@@ -1188,7 +1189,7 @@ const Sidebar = (props) => {
                       </li>
                       <li>
                         <Link
-                          to="/dream-pos/icons/icon-typicon"
+                          to="/peul-pos/icons/icon-typicon"
                           className={
                             pathname.includes("typicon") ? "active" : ""
                           }
@@ -1198,7 +1199,7 @@ const Sidebar = (props) => {
                       </li>
                       <li>
                         <Link
-                          to="/dream-pos/icons/icon-flag"
+                          to="/peul-pos/icons/icon-flag"
                           className={
                             pathname.includes("icon-flag") ? "active" : ""
                           }
@@ -1215,7 +1216,7 @@ const Sidebar = (props) => {
                   <Link
                     to="#"
                     className={
-                      pathname.includes("/dream-pos/forms")
+                      pathname.includes("/peul-pos/forms")
                         ? "subdrop active"
                         : "" || isSideMenu == "Forms"
                         ? "subdrop active"
@@ -1232,7 +1233,7 @@ const Sidebar = (props) => {
                     <ul>
                       <li>
                         <Link
-                          to="/dream-pos/forms/form-basic-inputs"
+                          to="/peul-pos/forms/form-basic-inputs"
                           className={
                             pathname.includes("form-basic-inputs")
                               ? "active"
@@ -1244,7 +1245,7 @@ const Sidebar = (props) => {
                       </li>
                       <li>
                         <Link
-                          to="/dream-pos/forms/form-input-groups"
+                          to="/peul-pos/forms/form-input-groups"
                           className={
                             pathname.includes("form-input-groups")
                               ? "active"
@@ -1256,7 +1257,7 @@ const Sidebar = (props) => {
                       </li>
                       <li>
                         <Link
-                          to="/dream-pos/forms/form-horizontal"
+                          to="/peul-pos/forms/form-horizontal"
                           className={
                             pathname.includes("horizontal") ? "active" : ""
                           }
@@ -1266,7 +1267,7 @@ const Sidebar = (props) => {
                       </li>
                       <li>
                         <Link
-                          to="/dream-pos/forms/form-vertical"
+                          to="/peul-pos/forms/form-vertical"
                           className={
                             pathname.includes("form-vertical") ? "active" : ""
                           }
@@ -1277,7 +1278,7 @@ const Sidebar = (props) => {
                       </li>
                       <li>
                         <Link
-                          to="/dream-pos/forms/form-mask"
+                          to="/peul-pos/forms/form-mask"
                           className={
                             pathname.includes("form-mask") ? "active" : ""
                           }
@@ -1287,7 +1288,7 @@ const Sidebar = (props) => {
                       </li>
                       <li>
                         <Link
-                          to="/dream-pos/forms/form-validation"
+                          to="/peul-pos/forms/form-validation"
                           className={
                             pathname.includes("validation") ? "active" : ""
                           }
@@ -1297,7 +1298,7 @@ const Sidebar = (props) => {
                       </li>
                       <li>
                         <Link
-                          to="/dream-pos/forms/form-select2"
+                          to="/peul-pos/forms/form-select2"
                           className={
                             pathname.includes("form-select2") ? "active" : ""
                           }
@@ -1307,7 +1308,7 @@ const Sidebar = (props) => {
                       </li>
                       <li>
                         <Link
-                          to="/dream-pos/forms/form-fileupload"
+                          to="/peul-pos/forms/form-fileupload"
                           className={
                             pathname.includes("fileupload") ? "active" : ""
                           }
@@ -1324,7 +1325,7 @@ const Sidebar = (props) => {
                   <Link
                     to="#"
                     className={
-                      pathname.includes("/dream-pos/table")
+                      pathname.includes("/peul-pos/table")
                         ? "subdrop active"
                         : "" || isSideMenu == "Table"
                         ? "subdrop active"
@@ -1341,7 +1342,7 @@ const Sidebar = (props) => {
                     <ul>
                       <li>
                         <Link
-                          to="/dream-pos/table/tables-basic"
+                          to="/peul-pos/table/tables-basic"
                           className={
                             pathname.includes("tables-basic") ? "active" : ""
                           }
@@ -1351,7 +1352,7 @@ const Sidebar = (props) => {
                       </li>
                       <li>
                         <Link
-                          to="/dream-pos/table/data-tables"
+                          to="/peul-pos/table/data-tables"
                           className={
                             pathname.includes("data-tables") ? "active" : ""
                           }
@@ -1368,7 +1369,7 @@ const Sidebar = (props) => {
                   <Link
                     to="#"
                     className={
-                      pathname.includes("/dream-pos/application")
+                      pathname.includes("/peul-pos/application")
                         ? "subdrop active"
                         : "" || isSideMenu == "Application"
                         ? "subdrop active"
@@ -1387,7 +1388,7 @@ const Sidebar = (props) => {
                     <ul>
                       <li>
                         <Link
-                          to="/dream-pos/application/chat"
+                          to="/peul-pos/application/chat"
                           className={pathname.includes("chat") ? "active" : ""}
                         >
                           Chat
@@ -1395,7 +1396,7 @@ const Sidebar = (props) => {
                       </li>
                       <li>
                         <Link
-                          to="/dream-pos/application/calendar"
+                          to="/peul-pos/application/calendar"
                           className={
                             pathname.includes("calendar") ? "active" : ""
                           }
@@ -1405,7 +1406,7 @@ const Sidebar = (props) => {
                       </li>
                       <li>
                         <Link
-                          to="/dream-pos/application/email"
+                          to="/peul-pos/application/email"
                           className={pathname.includes("email") ? "active" : ""}
                         >
                           Email
@@ -1420,7 +1421,7 @@ const Sidebar = (props) => {
                   <Link
                     to="#"
                     className={
-                      pathname.includes("/dream-pos/report")
+                      pathname.includes("/peul-pos/report")
                         ? "subdrop active"
                         : "" || isSideMenu == "Report"
                         ? "subdrop active"
@@ -1435,9 +1436,9 @@ const Sidebar = (props) => {
                   </Link>
                   {isSideMenu == "Report" ? (
                     <ul>
-                      <li>
+                      {/* <li>
                         <Link
-                          to="/dream-pos/report/purchaseorderreport"
+                          to="/peul-pos/report/purchaseorderreport"
                           className={
                             pathname.includes("purchaseorderreport")
                               ? "active"
@@ -1446,10 +1447,10 @@ const Sidebar = (props) => {
                         >
                           Purchase order report
                         </Link>
-                      </li>
+                      </li> */}
                       <li>
                         <Link
-                          to="/dream-pos/report/inventoryreport"
+                          to="/peul-pos/report/inventoryreport"
                           className={
                             pathname.includes("inventoryreport") ? "active" : ""
                           }
@@ -1457,9 +1458,9 @@ const Sidebar = (props) => {
                           Inventory Report
                         </Link>
                       </li>
-                      <li>
+                      {/* <li>
                         <Link
-                          to="/dream-pos/report/salesreport"
+                          to="/peul-pos/report/salesreport"
                           className={
                             pathname.includes("salesreport") ? "active" : ""
                           }
@@ -1469,7 +1470,7 @@ const Sidebar = (props) => {
                       </li>
                       <li>
                         <Link
-                          to="/dream-pos/report/invoicereport"
+                          to="/peul-pos/report/invoicereport"
                           className={
                             pathname.includes("invoicereport") ? "active" : ""
                           }
@@ -1479,7 +1480,7 @@ const Sidebar = (props) => {
                       </li>
                       <li>
                         <Link
-                          to="/dream-pos/report/purchasereport"
+                          to="/peul-pos/report/purchasereport"
                           className={
                             pathname.includes("purchasereport") ? "active" : ""
                           }
@@ -1489,17 +1490,17 @@ const Sidebar = (props) => {
                       </li>
                       <li>
                         <Link
-                          to="/dream-pos/report/supplierreport"
+                          to="/peul-pos/report/supplierreport"
                           className={
                             pathname.includes("supplierreport") ? "active" : ""
                           }
                         >
                           Supplier Report
                         </Link>
-                      </li>
+                      </li> */}
                       {/* <li>
                         <Link
-                          to="/dream-pos/report/customerreport"
+                          to="/peul-pos/report/customerreport"
                           className={
                             pathname.includes("customerreport") ? "active" : ""
                           }
@@ -1512,11 +1513,11 @@ const Sidebar = (props) => {
                     ""
                   )}
                 </li>
-                <li className="submenu">
+                {/* <li className="submenu">
                   <Link
                     to="#"
                     className={
-                      pathname.includes("/dream-pos/users")
+                      pathname.includes("/peul-pos/users")
                         ? "subdrop active"
                         : "" || isSideMenu == "Users"
                         ? "subdrop active"
@@ -1533,7 +1534,7 @@ const Sidebar = (props) => {
                     <ul>
                       <li>
                         <Link
-                          to="/dream-pos/users/newuser"
+                          to="/peul-pos/users/newuser"
                           className={
                             pathname.includes("newuser") ? "active" : ""
                           }
@@ -1543,7 +1544,7 @@ const Sidebar = (props) => {
                       </li>
                       <li>
                         <Link
-                          to="/dream-pos/users/userlists"
+                          to="/peul-pos/users/userlists"
                           className={
                             pathname.includes("userlists") ? "active" : ""
                           }
@@ -1555,12 +1556,12 @@ const Sidebar = (props) => {
                   ) : (
                     ""
                   )}
-                </li>
+                </li> */}
                 {/* <li className="submenu">
                   <Link
                     to="#"
                     className={
-                      pathname.includes("/dream-pos/settings")
+                      pathname.includes("/peul-pos/settings")
                         ? "subdrop active"
                         : "" || isSideMenu == "Settings"
                         ? "subdrop active"
@@ -1577,7 +1578,7 @@ const Sidebar = (props) => {
                     <ul>
                       <li>
                         <Link
-                          to="/dream-pos/settings/generalsettings"
+                          to="/peul-pos/settings/generalsettings"
                           className={
                             pathname.includes("generalsettings") ? "active" : ""
                           }
@@ -1587,7 +1588,7 @@ const Sidebar = (props) => {
                       </li>
                       <li>
                         <Link
-                          to="/dream-pos/settings/emailsettings"
+                          to="/peul-pos/settings/emailsettings"
                           className={
                             pathname.includes("emailsettings") ? "active" : ""
                           }
@@ -1597,7 +1598,7 @@ const Sidebar = (props) => {
                       </li>
                       <li>
                         <Link
-                          to="/dream-pos/settings/paymentsettings"
+                          to="/peul-pos/settings/paymentsettings"
                           className={
                             pathname.includes("paymentsettings") ? "active" : ""
                           }
@@ -1607,7 +1608,7 @@ const Sidebar = (props) => {
                       </li>
                       <li>
                         <Link
-                          to="/dream-pos/settings/currencysettings"
+                          to="/peul-pos/settings/currencysettings"
                           className={
                             pathname.includes("currencysettings")
                               ? "active"
@@ -1619,7 +1620,7 @@ const Sidebar = (props) => {
                       </li>
                       <li>
                         <Link
-                          to="/dream-pos/settings/grouppermissions"
+                          to="/peul-pos/settings/grouppermissions"
                           className={
                             pathname.includes("permission") ? "active" : ""
                           }
@@ -1629,7 +1630,7 @@ const Sidebar = (props) => {
                       </li>
                       <li>
                         <Link
-                          to="/dream-pos/settings/taxrates"
+                          to="/peul-pos/settings/taxrates"
                           className={
                             pathname.includes("taxrates") ? "active" : ""
                           }

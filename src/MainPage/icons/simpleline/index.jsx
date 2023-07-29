@@ -14,7 +14,7 @@ const SimplelineIcons = () => {
                 <h3 className="page-title">Simpleline Icon</h3>
                 <ul className="breadcrumb">
                   <li className="breadcrumb-item">
-                    <Link to="/dream-pos/dashboard">Dashboard</Link>
+                    <Link to="/peul-pos/dashboard">Dashboard</Link>
                   </li>
                   <li className="breadcrumb-item active">Simpleline Icon</li>
                 </ul>

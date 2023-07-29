@@ -14,12 +14,12 @@ import "react-datepicker/dist/react-datepicker.css";
 import "react-select2-wrapper/css/select2.css";
 import Table from "../../EntryFile/datatable";
 import Select from "react-select";
-import axios from "axios";
 import Modal from "react-bootstrap/Modal";
 import { notify } from "../../common/ToastComponent";
 import { ToastContainer, toast } from "react-toastify";
 import { useLocation } from "react-router-dom";
 import * as Constants from "../../common/Constants";
+import usePrivateAxios from "../../hooks/usePrivateAxios";
 
 const paymentStatusOptions = [
   { value: 1, label: "Paid" },
@@ -27,7 +27,11 @@ const paymentStatusOptions = [
   { value: 3, label: "Partial" },
 ];
 
-const baseUrl = Constants.BASE_URL;
+const paymentTypes = Constants.PAYMENT_TYPES;
+
+const paymentTypeOptions = paymentTypes.map((paymentType, index) => {
+  return { value: index + 1, label: paymentType };
+});
 
 const AddPurchase = () => {
   const { state } = useLocation();
@@ -45,9 +49,11 @@ const AddPurchase = () => {
   const [editingPrduct, setEditingProduct] = useState({});
   const [supplierId, setSupplierId] = useState("");
   const [paymentStatus, setPaymentStatus] = useState(1);
+  const [paymentType, setPaymentType] = useState(0);
   const [purchaseDate, setPurchaseDate] = useState(new Date());
   const [purchaseDescription, setPurchaseDescription] = useState("");
-
+  const API = usePrivateAxios();
+  
   const handSaveEdit = () => {
     let purchasedProductsClone = [...purchaseProducts];
     const index = purchasedProductsClone.findIndex(
@@ -90,7 +96,7 @@ const AddPurchase = () => {
         ...editingPrduct,
         purchasePrice: +value,
         totalCost: quantity * value,
-      });   
+      });
     }
   };
 
@@ -99,23 +105,30 @@ const AddPurchase = () => {
   }, [editingPrduct]);
 
   useEffect(() => {
-    if(state && state.purchase){
+    if (state && state.purchase) {
       const { purchase } = state;
       purchase.purchaseProducts.forEach((purchaseProduct) => {
         purchaseProduct.totalCost =
           purchaseProduct.quantity * purchaseProduct.purchasePrice;
         purchaseProduct.id = purchaseProduct.productId;
-      })
-      setPurchase(purchase)
-      setSaveType("put")
-      setReffereceNo(purchase.refferenceNo)
-      setSupplierId(purchase.supplierId)
-      setPaymentStatus(purchase.paymentStatus === "Paid" ? 1 : purchase.paymentStatus === "Pending" ? 2 : 3)
-      setPurchaseDate(new Date(purchase.purchaseDate))
-      setPurchaseDescription(purchase.description)
-      setPurchaseProducts(purchase.purchaseProducts)
-      setGrandTotal(purchase.amount)
-    } else{
+      });
+      setPurchase(purchase);
+      setSaveType("put");
+      setReffereceNo(purchase.refferenceNo);
+      setSupplierId(purchase.supplierId);
+      setPaymentStatus(
+        purchase.paymentStatus === "Paid"
+          ? 1
+          : purchase.paymentStatus === "Pending"
+          ? 2
+          : 3
+      );
+      setPurchaseDate(new Date(purchase.purchaseDate));
+      setPurchaseDescription(purchase.description);
+      setPurchaseProducts(purchase.purchaseProducts);
+      setGrandTotal(purchase.amount);
+      setPaymentType(purchase.paymentType);
+    } else {
       setReffereceNo(generateRefferenceNumber());
     }
 
@@ -150,14 +163,14 @@ const AddPurchase = () => {
   }, [supplier]);
 
   const fetchProducts = async () => {
-    const productsRes = await axios(`${baseUrl}/products`);
+    const productsRes = await API.get(`/products`);
     const products = productsRes.data;
     setProducts([...products]);
     console.log(products);
   };
 
   const fetchSuppliers = async () => {
-    const suppliersRes = await axios(`${baseUrl}/suppliers`);
+    const suppliersRes = await API.get(`/suppliers`);
     const suppliers = suppliersRes.data;
     setSupplier([...suppliers]);
     console.log(suppliers);
@@ -189,7 +202,7 @@ const AddPurchase = () => {
 
   const handleSubmitPurchase = () => {
     //vlaidate purchase details
-    if (!validatePurchaseDetails()) return
+    if (!validatePurchaseDetails()) return;
 
     //Build Purchase object
     const stockList = purchaseProducts.map((purchaseProduct) => {
@@ -209,6 +222,7 @@ const AddPurchase = () => {
       amount: grandTotal,
       purchaseProducts: stockList,
       description: purchaseDescription,
+      paymentType: paymentType,
     };
 
     console.log(purchase);
@@ -242,15 +256,20 @@ const AddPurchase = () => {
       return false;
     }
 
+    if (!paymentType) {
+      notify("Please select payment type", "error", toast);
+      return false;
+    }
+
     return true;
-  }
+  };
 
   const handleDelete = (product) => {
     let purchaseProductsClone = [...purchaseProducts];
     const index = purchaseProductsClone.findIndex((p) => p.id === product.id);
     purchaseProductsClone.splice(index, 1);
     setPurchaseProducts(purchaseProductsClone);
-  }
+  };
 
   const clearPurchase = () => {
     setPurchaseProducts([]);
@@ -260,15 +279,16 @@ const AddPurchase = () => {
     setPaymentStatus(1);
     setPurchaseDate(new Date());
     setPurchaseDescription("");
-  }
+    setPaymentType(0);
+  };
 
   const postPurchase = async (currentPurchase) => {
-    if(saveType === "put"){
-      console.log("putting purchase")
-      console.log(purchase)
+    if (saveType === "put") {
+      console.log("putting purchase");
+      console.log(purchase);
       currentPurchase.id = purchase.id;
     }
-    const res = await axios.post(`${baseUrl}/purchases`, currentPurchase);
+    const res = await API.post(`/purchases`, currentPurchase);
     console.log(res);
     if (res.status === 200 || res.status === 201) {
       notify("Purchase saved successfully", "success", toast);
@@ -296,12 +316,16 @@ const AddPurchase = () => {
     {
       title: "Unit cost",
       dataIndex: "purchasePrice",
-      render: (text) => `Ksh. ${text.toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,")}`,
+      render: (text) =>
+        `Ksh. ${text.toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,")}`,
     },
     {
       title: "Total Cost",
       dataIndex: "totalCost",
-      render: (text, record) => `Ksh. ${(record.purchasePrice * record.quantity).toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,")}`,
+      render: (text, record) =>
+        `Ksh. ${(record.purchasePrice * record.quantity)
+          .toFixed(2)
+          .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,")}`,
     },
     {
       title: "Action",
@@ -325,13 +349,13 @@ const AddPurchase = () => {
           <div className="page-header">
             <div className="page-title">
               <h4>Purchase Add</h4>
-              <h6>{saveType == "post" ? "Add" : "Update" } Purchase</h6>
+              <h6>{saveType == "post" ? "Add" : "Update"} Purchase</h6>
             </div>
           </div>
           <div className="card">
             <div className="card-body">
               <div className="row">
-                <div className="col-lg-3 col-sm-6 col-12">
+                <div className="col-lg-4 col-sm-6 col-12">
                   <div className="form-group">
                     <label>Supplier Name</label>
                     <div className="row">
@@ -339,13 +363,15 @@ const AddPurchase = () => {
                         <Select
                           options={supplierOptions}
                           onChange={(s) => setSupplierId(s.value)}
-                          value={supplierOptions.find(obj => obj.value === supplierId)}
+                          value={supplierOptions.find(
+                            (obj) => obj.value === supplierId
+                          )}
                         />
                       </div>
                     </div>
                   </div>
                 </div>
-                <div className="col-lg-3 col-sm-6 col-12">
+                <div className="col-lg-4 col-sm-6 col-12">
                   <div className="form-group">
                     <label>Purchase Date </label>
                     <div className="input-groupicon">
@@ -361,22 +387,40 @@ const AddPurchase = () => {
                     </div>
                   </div>
                 </div>
-                <div className="col-lg-3 col-sm-6 col-12">
+                <div className="col-lg-4 col-sm-6 col-12">
                   <div className="form-group">
                     <label>Reference No.</label>
                     <input type="text" value={reffereceNo} readOnly />
                   </div>
                 </div>
-                <div className="col-lg-3 col-sm-6 col-12">
+              </div>
+              <div className="row">
+                <div className="col-lg-4 col-sm-6 col-12">
                   <div className="form-group">
                     <label>Payment Status</label>
                     <Select
                       options={paymentStatusOptions}
                       onChange={(ps) => setPaymentStatus(ps.value)}
-                      value={paymentStatusOptions.find((obj) => obj.value === paymentStatus)}
+                      value={paymentStatusOptions.find(
+                        (obj) => obj.value === paymentStatus
+                      )}
                     />
                   </div>
                 </div>
+                <div className="col-lg-4 col-sm-6 col-12">
+                  <div className="form-group">
+                    <label>Payment Type</label>
+                    <Select
+                      options={paymentTypeOptions}
+                      onChange={(pt) => setPaymentType(pt.value)}
+                      value={paymentTypeOptions.find(
+                        (obj) => obj.value === paymentType
+                      )}
+                    />
+                  </div>
+                </div>
+              </div>
+              <div className="row">
                 <div className="col-lg-12 col-sm-6 col-12">
                   <div className="form-group">
                     <label>Product Name</label>
@@ -456,7 +500,12 @@ const AddPurchase = () => {
                     <ul>
                       <li className="total">
                         <h4>Grand Total</h4>
-                        <h5>ksh. {grandTotal.toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,")}</h5>
+                        <h5>
+                          ksh.{" "}
+                          {grandTotal
+                            .toFixed(2)
+                            .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,")}
+                        </h5>
                       </li>
                     </ul>
                   </div>
@@ -466,15 +515,23 @@ const AddPurchase = () => {
                 <div className="col-lg-12">
                   <div className="form-group">
                     <label>Description</label>
-                    <textarea className="form-control"
-                    value={purchaseDescription}
-                    onChange={(e) => setPurchaseDescription(e.target.value)}
+                    <textarea
+                      className="form-control"
+                      value={purchaseDescription}
+                      onChange={(e) => setPurchaseDescription(e.target.value)}
                     />
                   </div>
                 </div>
                 <div className="col-lg-12">
-                  <button className="btn btn-submit me-2" onClick={handleSubmitPurchase}>Submit</button>
-                  <button className="btn btn-cancel" onClick={clearPurchase}>Cancel</button>
+                  <button
+                    className="btn btn-submit me-2"
+                    onClick={handleSubmitPurchase}
+                  >
+                    Submit
+                  </button>
+                  <button className="btn btn-cancel" onClick={clearPurchase}>
+                    Cancel
+                  </button>
                 </div>
               </div>
             </div>

@@ -19,7 +19,7 @@ const Activities = () => {
               <li>
                 <div className="activity-user">
                   <Link
-                    to="/dream-pos/profile/user-profile"
+                    to="/peul-pos/profile/user-profile"
                     title=""
                     data-toggle="tooltip"
                     data-original-title="Lesley Grauer"
@@ -33,7 +33,7 @@ const Activities = () => {
                 </div>
                 <div className="activity-content">
                   <div className="timeline-content">
-                    <Link to="/dream-pos/profile/user-profile" className="name">
+                    <Link to="/peul-pos/profile/user-profile" className="name">
                       Elwis Mathew{" "}
                     </Link>{" "}
                     added a new product{" "}
@@ -45,7 +45,7 @@ const Activities = () => {
               <li>
                 <div className="activity-user">
                   <Link
-                    to="/dream-pos/profile/user-profile"
+                    to="/peul-pos/profile/user-profile"
                     title=""
                     data-toggle="tooltip"
                     data-original-title="Lesley Grauer"
@@ -59,7 +59,7 @@ const Activities = () => {
                 </div>
                 <div className="activity-content">
                   <div className="timeline-content">
-                    <Link to="/dream-pos/profile/user-profile" className="name">
+                    <Link to="/peul-pos/profile/user-profile" className="name">
                       Elizabeth Olsen
                     </Link>{" "}
                     added a new product category{" "}
@@ -71,7 +71,7 @@ const Activities = () => {
               <li>
                 <div className="activity-user">
                   <Link
-                    to="/dream-pos/profile/user-profile"
+                    to="/peul-pos/profile/user-profile"
                     title=""
                     data-toggle="tooltip"
                     data-original-title="Lesley Grauer"
@@ -86,7 +86,7 @@ const Activities = () => {
                 <div className="activity-content">
                   <div className="timeline-content">
                     <div className="timeline-content">
-                      <Link to="/dream-pos/profile/user-profile" className="name">
+                      <Link to="/peul-pos/profile/user-profile" className="name">
                         William Smith
                       </Link>{" "}
                       added a new sales list for
@@ -99,7 +99,7 @@ const Activities = () => {
               <li>
                 <div className="activity-user">
                   <Link
-                    to="/dream-pos/profile/user-profile"
+                    to="/peul-pos/profile/user-profile"
                     title=""
                     data-toggle="tooltip"
                     data-original-title="Lesley Grauer"
@@ -113,7 +113,7 @@ const Activities = () => {
                 </div>
                 <div className="activity-content">
                   <div className="timeline-content">
-                    <Link to="/dream-pos/profile/user-profile" className="name">
+                    <Link to="/peul-pos/profile/user-profile" className="name">
                       Lesley Grauer
                     </Link>{" "}
                     has updated invoice{" "}

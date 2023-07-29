@@ -14,7 +14,7 @@ const ChartJs = () => {
               <h3 className="page-title">Chartjs</h3>
               <ul className="breadcrumb">
                 <li className="breadcrumb-item">
-                  <a href="/dream-pos/dashboard">Dashboard</a>
+                  <a href="/peul-pos/dashboard">Dashboard</a>
                 </li>
                 <li className="breadcrumb-item active">Chartjs</li>
               </ul>

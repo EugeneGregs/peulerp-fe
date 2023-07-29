@@ -1,23 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { Upload } from "../../EntryFile/imagePath";
-import Select2 from "react-select2-wrapper";
 import "react-select2-wrapper/css/select2.css";
-import axios from "axios";
 import { notify } from "../../common/ToastComponent";
 import { ToastContainer, toast } from "react-toastify";
 import { useLocation } from "react-router-dom";
-import * as Constants from "../../common/Constants";
-
-const options = [
-  { id: 1, text: "India", text: "India" },
-  { id: 2, text: "Australia", text: "Australia" },
-];
-const options1 = [
-  { id: 1, text: "City1", text: "City1" },
-  { id: 2, text: "City2", text: "City2" },
-];
-
-const baseUrl = Constants.BASE_URL;
+import usePrivateAxios from "../../hooks/usePrivateAxios";
 
 const AddSupplier = () => {
   const { state } = useLocation();
@@ -28,6 +15,7 @@ const AddSupplier = () => {
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
   const [description, setDescription] = useState("");
+  const API = usePrivateAxios();
 
   useEffect(() => {
     if (state && state.supplier) {
@@ -90,8 +78,8 @@ const AddSupplier = () => {
     };
     console.log("New::");
     console.log(supplier);
-    axios
-      .post(`${baseUrl}/suppliers`, supplier)
+    API
+      .post(`/suppliers`, supplier)
       .then((res) => {
         console.log(res.status);
         if (res.status == 200 || res.status == 201) {
@@ -114,9 +102,8 @@ const AddSupplier = () => {
        address: address,
        description: description
     }
-    console.log(supplier);
-    axios
-      .put(`${baseUrl}/${updatedSupplier.id}`, updatedSupplier)
+    API
+      .put(`/suppliers/${updatedSupplier.id}`, updatedSupplier)
       .then((res) => {
         console.log(res.status);
         if (res.status == 200 || res.status == 204) {

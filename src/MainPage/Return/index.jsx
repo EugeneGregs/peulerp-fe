@@ -1,5 +1,5 @@
 import React from 'react'
-import { Switch, Redirect, Route } from 'react-router-dom'
+import { Routes, Navigate, Route } from 'react-router-dom'
 import SalesReturnList from './SalesReturnList'
 import AddSalesReturn from './AddSalesReturn'
 import EditSalesReturn from './EditSalesReturn'
@@ -8,8 +8,8 @@ import AddPurchaseReturn from './AddPurchaseReturn'
 import EditPurchaseReturn from './EditPurchaseReturn.jsx'
 
 const ReturnIndex =({ match }) =>(
-    <Switch>
-         <Redirect exact from={`${match.url}/`} to={`${match.url}/salesreturnlist-return`} />
+    <Routes>
+         <Navigate exact from={`${match.url}/`} to={`${match.url}/salesreturnlist-return`} />
         <Route path={`${match.url}/salesreturnlist-return`} component={SalesReturnList} />
         <Route path={`${match.url}/addsalesreturn-return`} component={AddSalesReturn} />
         <Route path={`${match.url}/editsalesreturn-return`} component={EditSalesReturn} />
@@ -18,7 +18,7 @@ const ReturnIndex =({ match }) =>(
         <Route path={`${match.url}/editpurchasereturn-return`} component={EditPurchaseReturn} />
 
 
-    </Switch>
+    </Routes>
 )
 
 export default ReturnIndex
