@@ -5,7 +5,7 @@ import useRefreshToken from "./useRefreshToke";
 import { useEffect } from "react";
 
 const usePrivateAxios = () => {
-  const { auth } = useAuth();
+  const { auth, setAuth } = useAuth();
   const refresh = useRefreshToken();
 
   useEffect(() => {
@@ -21,7 +21,11 @@ const usePrivateAxios = () => {
       (response) => response,
       async (error) => {
         const originalResponse = error?.config;
-        if (error?.response?.status === 401 && !originalResponse.sent) {
+        if (error?.response?.status === 401) {
+          if (originalResponse.sent) {
+            setAuth(null);
+            return Promise.reject(error);
+          }
           originalResponse.sent = true;
           try {
             refresh()

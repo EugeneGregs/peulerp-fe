@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Route, Routes, useNavigate } from "react-router-dom";
+import { Route, Routes, useNavigate, useLocation } from "react-router-dom";
 
 import SignIn from "./SignIn";
 import ForgetPassword from "./ForgetPassword";
@@ -7,7 +7,6 @@ import SignUp from "./SignUp";
 import Pos from "./pos/pos";
 import Error404 from "../MainPage/ErrorPage/Error404";
 import Error500 from "../MainPage/ErrorPage/Error500";
-import { useLocation } from "react-router-dom";
 import DefaultLayout from "./Sidebar/DefaultLayout";
 import RequireAuth from "../MainPage/auth/RequireAuth";
 

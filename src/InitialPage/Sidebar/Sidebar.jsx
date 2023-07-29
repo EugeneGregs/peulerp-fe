@@ -214,7 +214,7 @@ const Sidebar = (props) => {
                   </a>
                   {isSideMenu == "sales" ? (
                     <ul>
-                      <li>
+                      {/* <li>
                         <Link
                           className={
                             pathname.includes("saleslist") ? "active" : ""
@@ -223,7 +223,7 @@ const Sidebar = (props) => {
                         >
                           Sales List
                         </Link>
-                      </li>
+                      </li> */}
                       <li>
                         <Link to="/pos">POS</Link>
                       </li>
