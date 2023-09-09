@@ -9,6 +9,7 @@ import Error404 from "../MainPage/ErrorPage/Error404";
 import Error500 from "../MainPage/ErrorPage/Error500";
 import DefaultLayout from "./Sidebar/DefaultLayout";
 import RequireAuth from "../MainPage/auth/RequireAuth";
+import ResetPassword from "./ResetPassword";
 
 const App = () => {
   const { pathname } = useLocation();
@@ -41,6 +42,7 @@ const App = () => {
 
         {/* Private Routes */}
         <Route element={<RequireAuth />}>
+          <Route path="/changePassword" element={<ResetPassword />} />
           <Route path="/pos" element={<Pos />} />
           <Route path="/peul-pos/*" element={<DefaultLayout />} />
         </Route>

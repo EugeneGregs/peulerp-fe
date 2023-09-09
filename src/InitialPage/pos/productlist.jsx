@@ -27,7 +27,7 @@ const ProductList = ({ products, updateCart }) => {
       title: "Product Name",
       sorter: (a, b) => a.name.length - b.name.length,
       render: (text, record) => (
-        <span>{`${record.name}(${record.barCode})`}</span>
+        <span>{`${record.name}`}</span>
       ),
     },
     {

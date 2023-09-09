@@ -13,6 +13,8 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
 import useAuth from "../hooks/useAuth";
 import API from "../service/api";
+import { notify } from "../common/ToastComponent";
+import { ToastContainer, toast } from "react-toastify";
 
 const SignInPage = (props) => {
   const location = useLocation();
@@ -51,14 +53,19 @@ const SignInPage = (props) => {
     API.post("/users/login", data)
       .then((response) => {
         console.log(response.data);
-        setAuth({
-          user: {
-            email: data.email,
-            password: data.password,
-            token: response.data.token,
-            role: response.data.role,
-          },
-        });
+        const user = {
+          email: data.email,
+          password: data.password,
+          token: response.data.token,
+          role: response.data.role,
+        };
+        setAuth({ user: user });
+
+        if(response.data.resetPassword){
+          navigate("/changePassword", { state: { user: user}, replace: true });
+          return;
+        }
+
         navigate(from, { replace: true });
       })
       .catch((error) => {
@@ -72,13 +79,13 @@ const SignInPage = (props) => {
 
     if (!error?.response) {
       // Handle Network Error
-      console.log("Network Error");
+      notify("Network Error", "error", toast);
     } else if (error.response?.status === 400) {
       // Handle 401 Error
-      console.log("400 Error");
+      notify("All Fields Must Be Filled", "warning", toast);
     } else if (error.response?.status === 401) {
       // Handle 401 Error
-      console.log("401 Error");
+      notify("Username or Password is Incorrect", "Warning", toast);
     }
   };
 
@@ -182,6 +189,7 @@ const SignInPage = (props) => {
               <img src={LoginImage} alt="img" />
             </div>
           </div>
+          <ToastContainer />
         </div>
       </div>
     </>

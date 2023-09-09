@@ -62,13 +62,9 @@ const AddProduct = () => {
   };
 
   const SaveProduct = (product) => {
-    if (saveType == "post") {
-      product.quantity = stockQuantity;
-      product.reorderLevel = reorderLevel;
-      API.post(`${BASE_PATH}`, product).then(handleResponse).catch(handleError);
-    } else {
-      API.put(`${BASE_PATH}`, product).then(handleResponse).catch(handleError);
-    }
+    product.quantity = +stockQuantity;
+    product.reorderLevel = +reorderLevel;
+    API.post(`${BASE_PATH}`, product).then(handleResponse).catch(handleError);
   };
 
   const saveProducts = () => {
@@ -173,13 +169,19 @@ const AddProduct = () => {
       };
 
       if (saveType == "update") {
-        product.id = state.product.id;
+        return updateProdut(product);
       }
 
       //Post Products
       SaveProduct(product);
     }
   };
+
+  const updateProdut = (product) => {
+    API.put(`${BASE_PATH}/${state.product.id}`, product)
+      .then(handleResponse)
+      .catch(handleError);
+  }
 
   const isInputsVaid = () => {
     if (isBulkUpload) {
@@ -353,7 +355,8 @@ const AddProduct = () => {
                         pattern="[0-9]*"
                         value={stockQuantity}
                         onChange={(e) => setStockQuantity(e.target.value)}
-                        required
+                        required = {saveType == "post"}
+                        disabled = {saveType == "update"}
                       />
                     </div>
                   </div>
@@ -365,7 +368,8 @@ const AddProduct = () => {
                         pattern="[0-9]*"
                         value={reorderLevel}
                         onChange={(e) => setReorderLevel(e.target.value)}
-                        required
+                        required = {saveType == "post"}
+                        disabled = {saveType == "update"}
                       />
                     </div>
                   </div>

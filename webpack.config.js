@@ -66,7 +66,7 @@ module.exports = {
       apiUrl: '',
       imageapiUrl: '',
       
-      publicPath : '/reactjs/template/'            
+      publicPath : '/'            
   })
 },
  resolve: {

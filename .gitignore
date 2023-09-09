@@ -1,4 +1,4 @@
-.gitignore
+*.gitignore*
 .DS_STORE
 node_modules
 scripts/flow/*/.flowconfig
@@ -25,6 +25,7 @@ chrome-user-data
 .vscode
 *.swp
 *.swo
+*.zip
 
 packages/react-devtools-core/dist
 packages/react-devtools-extensions/chrome/build
