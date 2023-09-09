@@ -14,6 +14,7 @@ import Select2 from "react-select2-wrapper";
 import "react-select2-wrapper/css/select2.css";
 import Loader from "react-js-loader";
 import usePrivateAxios from "../../hooks/usePrivateAxios";
+import useAuth from "../../hooks/useAuth";
 
 const ProductList = () => {
   const [inputfilter, setInputfilter] = useState(false);
@@ -48,8 +49,11 @@ const ProductList = () => {
   const [filterValue, setFilterValue] = useState('');
   const API = usePrivateAxios();
   const BASE_PATH = "/products";
+  const {auth} = useAuth();
 
   useEffect(() => {
+    console.log("auth::");
+    console.log(auth);
     setBusy(true);
     const fetchData = async () => {
       API.get(`${BASE_PATH}`)
@@ -171,9 +175,9 @@ const ProductList = () => {
             <Link className="me-3" to="/peul-pos/product/addproduct-product" state={{ product: record }}>
               <img src={EditIcon} alt="img" />
             </Link>
-            <Link className="confirm-text" to="#" onClick={() => confirmText(record)}>
-              <img src={DeleteIcon} alt="img" />
-            </Link>
+            {
+              auth?.user?.role == "Admin" && <Link className="confirm-text" to="#" onClick={() => confirmText(record)}><img src={DeleteIcon} alt="img" /></Link>
+            }            
           </>
         </>
       ),
