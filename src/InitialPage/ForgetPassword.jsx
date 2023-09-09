@@ -1,11 +1,28 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { LoginImage, Logo, MailIcon, } from '../EntryFile/imagePath'
-import { Link } from 'react-router-dom'
 import { Helmet } from 'react-helmet'
-
-
+import usePrivateAxios from '../hooks/usePrivateAxios';
+import { notify} from '../common/ToastComponent';
+import { ToastContainer, toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
+import API from "../service/api";
 
 const ForgotPassword = () => {
+    const [email, setEmail] = useState("");
+    const navigate = useNavigate();
+
+    const submitEmail = () => {
+        API.post("/users/forgot-password", { email: email })
+            .then((res) => {
+                console.log(res);
+                notify("success", "Success! Check new password sent to your email", toast);
+                navigate("/signIn");  
+            })
+            .catch((err) => {
+                console.log(err);
+                notify("error", err.response.data.message, toast);
+        })
+    }
 
     return (
         <>
@@ -34,12 +51,15 @@ const ForgotPassword = () => {
                                         <input
                                             type="text"
                                             placeholder="Enter your email address"
+                                            value={email}
+                                            onChange={(e) => setEmail(e.target.value)}
+                                            required
                                         />
                                         <img src={MailIcon} alt="img" />
                                     </div>
                                 </div>
                                 <div className="form-login">
-                                    <button type='submit' className="btn btn-login">
+                                    <button type='submit' className="btn btn-login" onClick={submitEmail}>
                                         Submit
                                     </button>
                                 </div>
@@ -49,6 +69,7 @@ const ForgotPassword = () => {
                             <img src={LoginImage} alt="img" />
                         </div>
                     </div>
+                    <ToastContainer />
                 </div>
             </div>
         </>
